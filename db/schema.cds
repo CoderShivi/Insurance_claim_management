@@ -1,26 +1,27 @@
 namespace claimsure;
  
-using {  cuid } from '@sap/cds/common';
- 
+using { cuid } from '@sap/cds/common';
  
 entity Policies : cuid {
  
     policyNumber : String(50) @mandatory;
-  
+ 
     coverageLimit : Decimal(15,2) @mandatory;
  
-    premiumAmount : Decimal(15,2);
+    startDate : Date;
  
-    startDate : Date @mandatory;
+    endDate : Date;
  
-    endDate : Date @mandatory;
- 
-    status : String(20) enum {Active;
-    Expired;
-    Cancelled;
-    Suspended;
-    } default 'Active';
+    status : String(20) enum {
 
+        Active;
+
+        Expired;
+
+        Cancelled;
+
+    } default 'Active';
+ 
 }
  
  
@@ -28,71 +29,48 @@ entity Claims : cuid {
  
     claimNumber : String(50) @mandatory;
  
-    incidentDate : Date @mandatory;
+    incidentDate : Date;
  
-    reportedDate : Timestamp default $now;
- 
-    incidentLocation : String(300);
- 
-    description : LargeString;
+    description : String(500);
  
     claimedAmount : Decimal(15,2) @mandatory;
  
-    approvedAmount : Decimal(15,2);
- 
- 
     status : String(30) enum {
-    Draft;
-    Submitted;
-    UnderReview;
-    InvestigationRequired;
-    PendingApproval;
-    Approved;
-    Rejected;
-    PayoutProcessing;
-    Paid;
-    Closed;
+
+        Draft;
+
+        Submitted;
+
+        UnderReview;
+
+        InvestigationRequired;
+
+        PendingApproval;
+
+        Approved;
+
+        Rejected;
+
+        Paid;
+
     } default 'Draft';
  
-    priority : String(20) enum {Low;
-    Medium;
-    High;
-    Critical;
-    } default 'Medium';
  
- 
-    
 }
  
  
 entity ClaimDocuments : cuid {
  
-    
  
-    documentType : String(40) enum {
-        Photo;
-
-        PoliceReport;
-
-        MedicalReport;
-
-        Invoice;
-
-        RepairEstimate;
-
-        IdentityProof;
-
-        Other;
-
-    };
+    documentType : String(50);
  
     fileName : String(255);
  
     mediaType : String(100);
  
-    content : LargeBinary @Core.MediaType: mediaType;
- 
-    uploadedAt : Timestamp default $now;
+    content : LargeBinary
 
+        @Core.MediaType: mediaType;
+ 
 }
  
