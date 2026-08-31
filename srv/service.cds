@@ -1,4 +1,15 @@
-using claimsure as cl from '../db/schema';
+using { claimsure as cl  } from '../db/schema';
+ 
+ 
+service Investigation {
+ 
+ entity FraudRiskScores as projection on cl.FraudRiskScores;
+ entity Investigations as projection on cl.Investigations;
+ entity Approvals as projection on cl.Approvals;
+    
+ 
+}
+
 
 service InsuranceService{
     entity Policies as projection on cl.Policies;
