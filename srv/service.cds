@@ -1,10 +1,6 @@
 using { claimsure as db } from '../db/schema';
 
-<<<<<<< HEAD
 service MainService {
-=======
-service MyService {
->>>>>>> main
 
     entity Customers as projection on db.Customers;
 
