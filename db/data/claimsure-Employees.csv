@@ -1,0 +1,11 @@
+ID,employeeNumber,firstName,lastName,email,department,role,active
+b1000001-0001-0001-0001-000000000001,EMP001,Ajay,Sharma,ajay@claimsure.com,Claims,ClaimsAgent,true
+b1000002-0002-0002-0002-000000000002,EMP002,Divya,Rao,divya@claimsure.com,Claims,ClaimsAgent,true
+b1000003-0003-0003-0003-000000000003,Manoj,Patil,manoj@claimsure.com,Investigation,Investigator,true
+b1000004-0004-0004-0004-000000000004,Pooja,Menon,pooja@claimsure.com,Investigation,Investigator,true
+b1000005-0005-0005-0005-000000000005,Rahul,Joshi,rahul@claimsure.com,Management,ClaimsManager,true
+b1000006-0006-0006-0006-000000000006,Kavya,Iyer,kavya@claimsure.com,Management,ClaimsManager,true
+b1000007-0007-0007-0007-000000000007,Suresh,Nair,suresh@claimsure.com,Finance,FinanceOfficer,true
+b1000008-0008-0008-0008-000000000008,Meena,Reddy,meena@claimsure.com,Finance,FinanceOfficer,true
+b1000009-0009-0009-0009-000000000009,Anil,Kumar,anil@claimsure.com,Administration,Admin,true
+b1000010-0010-0010-0010-000000000010,EMP010,Swati,Shah,swati@claimsure.com,Claims,ClaimsAgent,true
