@@ -1,11 +1,4 @@
 ID,code,name,description,category,active
-<<<<<<< HEAD
-aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa,VEH001,Vehicle Accident,Vehicle accident related claim,Vehicle,true
-bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb,VEH002,Vehicle Theft,Vehicle theft related claim,Vehicle,true
-cccccccc-cccc-cccc-cccc-cccccccccccc,HLT001,Health Insurance,Medical and health related claim,Health,true
-dddddddd-dddd-dddd-dddd-dddddddddddd,PRP001,Property Damage,Property damage related claim,Property,true
-eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee,PRP002,Property Theft,Property theft related claim,Property,true
-=======
 a1000001-0001-0001-0001-000000000001,VEH001,Vehicle Accident,Vehicle accident claim,Vehicle,true
 a1000002-0002-0002-0002-000000000002,VEH002,Vehicle Theft,Vehicle theft claim,Vehicle,true
 a1000003-0003-0003-0003-000000000003,VEH003,Vehicle Damage,Vehicle damage claim,Vehicle,true
@@ -16,4 +9,3 @@ a1000007-0007-0007-0007-000000000007,PRO001,Property Damage,Property damage clai
 a1000008-0008-0008-0008-000000000008,PRO002,Fire Damage,Fire damage claim,Property,true
 a1000009-0009-0009-0009-000000000009,PRO003,Theft Damage,Property theft claim,Property,true
 a1000010-0010-0010-0010-000000000010,PRO004,Natural Disaster,Natural disaster claim,Property,true
->>>>>>> c4acea335cdd5a384e3d8edb9e72521ef9f9fd20
