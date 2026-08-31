@@ -9,13 +9,6 @@
   },
   "scripts": {
     "start": "cds-serve"
-  },
-<<<<<<< HEAD
-  "private": true,
-  "cds": {
-    "requires": {}
   }
-=======
-  "private": true
->>>>>>> 9292e41596a339642cf3b1e05f56788701642479
+
 }
