@@ -2,7 +2,6 @@ namespace claimsure;
 
 using { cuid } from '@sap/cds/common';
 
-
 entity Customers : cuid {
 
     customerNumber : String(30) @mandatory;
@@ -12,10 +11,10 @@ entity Customers : cuid {
     lastName : String(100) @mandatory;
 
     email : String(150)
-        @assert.format: '^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$';
+        @assert.format: '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+[.][A-Za-z]{2,}$';
 
     phone : String(30)
-        @assert.format: '^[0-9+\\-\\s()]{7,15}$';
+        @assert.format: '^[0-9+() -]{7,15}$';
 
     address : String(500);
 
@@ -25,7 +24,6 @@ entity Customers : cuid {
         Suspended;
     } default 'Active';
 }
-
 
 entity ClaimTypes : cuid {
 

@@ -9,9 +9,6 @@ module.exports = cds.service.impl(async function () {
     } = this.entities;
 
 
-    // =====================================================
-    // CUSTOMERS
-    // =====================================================
 
     // Check duplicate customer number
     this.before("CREATE", Customers, async (req) => {
@@ -31,9 +28,6 @@ module.exports = cds.service.impl(async function () {
     });
 
 
-    // =====================================================
-    // CLAIM TYPES
-    // =====================================================
 
     // Check duplicate claim type code
     this.before("CREATE", ClaimTypes, async (req) => {
@@ -53,9 +47,6 @@ module.exports = cds.service.impl(async function () {
     });
 
 
-    // =====================================================
-    // EMPLOYEES
-    // =====================================================
 
     // Check duplicate employee number
     this.before("CREATE", Employees, async (req) => {
@@ -98,5 +89,86 @@ module.exports = cds.service.impl(async function () {
             );
         }
     });
+    this.on("changeEmployeeStatus", async (req) => {
+
+        const {
+            employeeId,
+            active
+        } = req.data;
+
+        const employee = await SELECT.one
+            .from(Employees)
+            .where({ ID: employeeId });
+
+        if (!employee) {
+            req.error(
+                404,
+                "Employee not found"
+            );
+        }
+
+        await UPDATE(Employees)
+            .set({
+                active: active
+            })
+            .where({
+                ID: employeeId
+            });
+
+        return true;
+    });
+
+
+    this.on("changeClaimTypeStatus", async (req) => {
+
+        const {
+            claimTypeId,
+            active
+        } = req.data;
+
+        const claimType = await SELECT.one
+            .from(ClaimTypes)
+            .where({ ID: claimTypeId });
+
+        if (!claimType) {
+            req.error(
+                404,
+                "Claim type not found"
+            );
+        }
+
+        await UPDATE(ClaimTypes)
+            .set({
+                active: active
+            })
+            .where({
+                ID: claimTypeId
+            });
+
+        return true;
+    });
+
+
+    this.on("getActiveEmployeesByRole", async (req) => {
+
+        const { role } = req.data;
+
+        if (!role) {
+            req.error(
+                400,
+                "Employee role is required"
+            );
+        }
+
+        const employees = await SELECT
+            .from(Employees)
+            .where({
+                role: role,
+                active: true
+            });
+
+        return employees;
+    });
+
 
 });

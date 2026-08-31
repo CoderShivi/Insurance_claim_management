@@ -1,0 +1,185 @@
+### =====================================================
+### CUSTOMERS
+### =====================================================
+
+### Get all customers
+GET http://localhost:4004/odata/v4/main/Customers
+
+
+### Get customer by ID
+GET http://localhost:4004/odata/v4/main/Customers(22222222-2222-2222-2222-222222222222)
+
+
+### Create Customer
+POST http://localhost:4004/odata/v4/main/Customers
+Content-Type: application/json
+
+{
+    "customerNumber": "CUS1001",
+    "firstName": "Rahul",
+    "lastName": "Sharma",
+    "email": "rahulsharma@gmail.com",
+    "phone": "+919876543210",
+    "address": "Bangalore, Karnataka",
+    "status": "Active"
+}
+
+
+### Update Customer
+PATCH http://localhost:4004/odata/v4/main/Customers(22222222-2222-2222-2222-222222222222)
+Content-Type: application/json
+
+{
+    "phone": "+919876543211",
+    "address": "Bangalore, India"
+}
+
+
+### Delete Customer
+DELETE http://localhost:4004/odata/v4/main/Customers(22222222-2222-2222-2222-222222222222)
+
+
+### =====================================================
+### CLAIM TYPES
+### =====================================================
+
+### Get all claim types
+GET http://localhost:4004/odata/v4/main/ClaimTypes
+
+
+### Get claim type by ID
+GET http://localhost:4004/odata/v4/main/ClaimTypes(a1000003-0003-0003-0003-000000000003)
+
+
+### Create Claim Type
+POST http://localhost:4004/odata/v4/main/ClaimTypes
+Content-Type: application/json
+
+{
+    "code": "VEHICLE",
+    "name": "Vehicle Insurance",
+    "description": "Claims related to vehicle accidents and damages",
+    "category": "Vehicle",
+    "active": true
+}
+
+
+### Update Claim Type
+PATCH http://localhost:4004/odata/v4/main/ClaimTypes(a1000003-0003-0003-0003-000000000003)
+Content-Type: application/json
+
+{
+    "description": "Vehicle accident and damage insurance claims"
+}
+
+
+### Delete Claim Type
+DELETE http://localhost:4004/odata/v4/main/ClaimTypes(a1000003-0003-0003-0003-000000000003)
+
+
+### =====================================================
+### EMPLOYEES
+### =====================================================
+
+### Get all employees
+GET http://localhost:4004/odata/v4/main/Employees
+
+
+### Get employee by ID
+GET http://localhost:4004/odata/v4/main/Employees(b1000002-0002-0002-0002-000000000002)
+
+
+### Create Employee
+POST http://localhost:4004/odata/v4/main/Employees
+Content-Type: application/json
+
+{
+    "employeeNumber": "EMP1001",
+    "firstName": "Arun",
+    "lastName": "Kumar",
+    "email": "arun.kumar@claimsure.com",
+    "department": "Claims",
+    "role": "ClaimsAgent",
+    "active": true
+}
+
+
+### Update Employee
+PATCH http://localhost:4004/odata/v4/main/Employees(b1000002-0002-0002-0002-000000000002)
+Content-Type: application/json
+
+{
+    "department": "Claims Operations"
+}
+
+
+### Delete Employee
+DELETE http://localhost:4004/odata/v4/main/Employees(b1000002-0002-0002-0002-000000000002)
+
+
+### =====================================================
+### ACTION 1 - CHANGE EMPLOYEE STATUS
+### =====================================================
+
+### Deactivate Employee
+POST http://localhost:4004/odata/v4/main/changeEmployeeStatus
+Content-Type: application/json
+
+{
+    "employeeId": "b1000002-0002-0002-0002-000000000002",
+    "active": false
+}
+
+
+### Activate Employee
+POST http://localhost:4004/odata/v4/main/changeEmployeeStatus
+Content-Type: application/json
+
+{
+    "employeeId": "b1000002-0002-0002-0002-000000000002",
+    "active": true
+}
+
+
+### =====================================================
+### ACTION 2 - CHANGE CLAIM TYPE STATUS
+### =====================================================
+
+### Deactivate Claim Type
+POST http://localhost:4004/odata/v4/main/changeClaimTypeStatus
+Content-Type: application/json
+
+{
+    "claimTypeId": "a1000003-0003-0003-0003-000000000003",
+    "active": false
+}
+
+
+### Activate Claim Type
+POST http://localhost:4004/odata/v4/main/changeClaimTypeStatus
+Content-Type: application/json
+
+{
+    "claimTypeId": "a1000003-0003-0003-0003-000000000003",
+    "active": true
+}
+
+
+### =====================================================
+### FUNCTION - GET ACTIVE EMPLOYEES BY ROLE
+### =====================================================
+
+### Get active Claims Agents
+GET http://localhost:4004/odata/v4/main/getActiveEmployeesByRole(role='ClaimsAgent')
+
+
+### Get active Investigators
+GET http://localhost:4004/odata/v4/main/getActiveEmployeesByRole(role='Investigator')
+
+
+### Get active Claims Managers
+GET http://localhost:4004/odata/v4/main/getActiveEmployeesByRole(role='ClaimsManager')
+
+
+### Get active Finance Officers
+GET http://localhost:4004/odata/v4/main/getActiveEmployeesByRole(role='FinanceOfficer')
