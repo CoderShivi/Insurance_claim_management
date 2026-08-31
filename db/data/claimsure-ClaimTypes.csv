@@ -8,8 +8,3 @@ a1000006-0006-0006-0006-000000000006,HLT003,Emergency Treatment,Emergency treatm
 a1000007-0007-0007-0007-000000000007,PRO001,Property Damage,Property damage claim,Property,true
 a1000008-0008-0008-0008-000000000008,PRO002,Fire Damage,Fire damage claim,Property,true
 a1000009-0009-0009-0009-000000000009,PRO003,Theft Damage,Property theft claim,Property,true
-<<<<<<< HEAD
-a1000010-0010-0010-0010-000000000010,PRO004,Natural Disaster,Natural disaster claim,Property,true
-=======
-a1000010-0010-0010-0010-000000000010,PRO004,Natural Disaster,Natural disaster claim,Property,true
->>>>>>> 7cadc10d7cdc722ad1f27921bad11b559dfcde18
