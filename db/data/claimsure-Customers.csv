@@ -8,4 +8,8 @@ ID,customerNumber,firstName,lastName,email,phone,address,status
 77777777-7777-7777-7777-777777777777,CUST007,Karan,Mehta,karan.mehta@email.com,9876543216,Chennai,Active
 88888888-8888-8888-8888-888888888888,CUST008,Sneha,Iyer,sneha.iyer@email.com,9876543217,Kochi,Active
 99999999-9999-9999-9999-999999999999,CUST009,Rohit,Das,rohit.das@email.com,9876543218,Kolkata,Inactive
+<<<<<<< HEAD
 aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa,CUST010,Meera,Nair,meera.nair@email.com,9876543219,Bangalore,Active
+=======
+aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa,CUST010,Meera,Nair,meera.nair@email.com,9876543219,Bangalore,Active
+>>>>>>> 7cadc10d7cdc722ad1f27921bad11b559dfcde18
