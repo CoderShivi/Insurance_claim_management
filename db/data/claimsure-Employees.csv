@@ -1,0 +1,11 @@
+ID,employeeNumber,firstName,lastName,email,department,role,active
+28791874-388e-4876-bf11-41a49c768ad3,employeeNumber-28791874,firstName-28791874,lastName-28791874,email-28791874,department-28791874,FinanceOfficer,true
+29582785-59cc-432e-b71d-637a165a4b9a,employeeNumber-29582785,firstName-29582785,lastName-29582785,email-29582785,department-29582785,Investigator,false
+29582786-dc6e-4ab9-ad28-c3cb8375d704,employeeNumber-29582786,firstName-29582786,lastName-29582786,email-29582786,department-29582786,ClaimsManager,true
+29582787-ab40-4c70-9794-7f752d77d143,employeeNumber-29582787,firstName-29582787,lastName-29582787,email-29582787,department-29582787,ClaimsManager,false
+29582788-c552-4ada-bc86-cac500a2358f,employeeNumber-29582788,firstName-29582788,lastName-29582788,email-29582788,department-29582788,ClaimsAgent,true
+29582789-6a75-413e-b45d-a0be1975da4f,employeeNumber-29582789,firstName-29582789,lastName-29582789,email-29582789,department-29582789,ClaimsManager,false
+29582790-5919-4439-b081-b16ec429086f,employeeNumber-29582790,firstName-29582790,lastName-29582790,email-29582790,department-29582790,ClaimsAgent,true
+29582791-71ed-4fdb-bbd5-bb84839820fa,employeeNumber-29582791,firstName-29582791,lastName-29582791,email-29582791,department-29582791,FinanceOfficer,false
+29582792-3cda-4500-a4f5-88d3fcf49a3d,employeeNumber-29582792,firstName-29582792,lastName-29582792,email-29582792,department-29582792,Admin,true
+29582793-af8b-43e6-9c8a-0c177e9f0cdb,employeeNumber-29582793,firstName-29582793,lastName-29582793,email-29582793,department-29582793,FinanceOfficer,false

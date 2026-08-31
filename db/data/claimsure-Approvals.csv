@@ -1,0 +1,11 @@
+ID,approvalNumber,claim_ID,approver_ID,approvalLevel,decision,comments
+10109157-f9c0-4485-91ba-4d210b779016,approvalNumber-10109157,26204170-4939-41fd-834e-c11ad3f2cff0,29582793-af8b-43e6-9c8a-0c177e9f0cdb,ClaimsManager,Approved,comments-10109157
+10109158-7583-4776-9af1-4bc51108350f,approvalNumber-10109158,26204170-4939-41fd-834e-c11ad3f2cff0,29582793-af8b-43e6-9c8a-0c177e9f0cdb,ClaimsAgent,Pending,comments-10109158
+10109159-ad88-4829-a249-83e31504992b,approvalNumber-10109159,26204170-4939-41fd-834e-c11ad3f2cff0,29582793-af8b-43e6-9c8a-0c177e9f0cdb,ClaimsManager,Pending,comments-10109159
+10109160-534b-4a32-aad3-4b405396d5ba,approvalNumber-10109160,26204170-4939-41fd-834e-c11ad3f2cff0,29582793-af8b-43e6-9c8a-0c177e9f0cdb,ClaimsManager,Rejected,comments-10109160
+10109161-d0a8-4f68-8bc5-40af7231c046,approvalNumber-10109161,26204170-4939-41fd-834e-c11ad3f2cff0,29582793-af8b-43e6-9c8a-0c177e9f0cdb,FinanceOfficer,Approved,comments-10109161
+10109162-a387-450c-8154-69857fa38765,approvalNumber-10109162,26204170-4939-41fd-834e-c11ad3f2cff0,29582793-af8b-43e6-9c8a-0c177e9f0cdb,ClaimsManager,Rejected,comments-10109162
+10109163-07c0-4561-aae1-8de15d2cb2f0,approvalNumber-10109163,26204170-4939-41fd-834e-c11ad3f2cff0,29582793-af8b-43e6-9c8a-0c177e9f0cdb,ClaimsManager,Pending,comments-10109163
+10109164-2aad-4f8a-a514-27bb1bcdc402,approvalNumber-10109164,26204170-4939-41fd-834e-c11ad3f2cff0,29582793-af8b-43e6-9c8a-0c177e9f0cdb,ClaimsManager,Approved,comments-10109164
+10109165-a455-412e-bb2b-6dbbf3e538cd,approvalNumber-10109165,26204170-4939-41fd-834e-c11ad3f2cff0,29582793-af8b-43e6-9c8a-0c177e9f0cdb,ClaimsManager,Pending,comments-10109165
+10109166-b89f-49af-a29b-9c5304672b24,approvalNumber-10109166,26204170-4939-41fd-834e-c11ad3f2cff0,29582793-af8b-43e6-9c8a-0c177e9f0cdb,ClaimsManager,Approved,comments-10109166
