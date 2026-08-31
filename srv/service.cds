@@ -1,9 +1,11 @@
 using { claimsure as db  } from '../db/schema';
  
  
-service myService {
+service Investigation {
  
-    entity Customers as projection on db.Customers;
-    entity Policies as projection on db.Policies;
+ entity FraudRiskScores as projection on db.FraudRiskScores;
+ entity Investigations as projection on db.Investigations;
+ entity Approvals as projection on db.Approvals;
+    
  
 }
