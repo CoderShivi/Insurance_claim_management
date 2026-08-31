@@ -1,6 +1,6 @@
 const cds = require('@sap/cds');
 
-module.exports = class ClaimSureService extends cds.ApplicationService {
+module.exports = class PayoutService extends cds.ApplicationService {
     async init() {
         const {
             Payouts,

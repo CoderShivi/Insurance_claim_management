@@ -1,7 +1,7 @@
 using { claimsure as db } from '../db/schema';
 
+@impl:'srv/payout.js'
 service PayoutService {
-
     entity Payouts   as projection on db.Payouts;
     entity SLARules  as projection on db.SLARules;
     entity AlertLog  as projection on db.AlertLog;
