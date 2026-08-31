@@ -89,7 +89,7 @@ module.exports = cds.service.impl(async function () {
     // Process Payout
     // =========================================================
 
-    this.on('processPayout', async (req) => {
+        this.on('processPayout', async (req) => {
 
         const {
             payoutID
@@ -234,9 +234,7 @@ module.exports = cds.service.impl(async function () {
 
     this.on('calculateSLAStatus', async (req) => {
 
-        const {
-            claimID
-        } = req.data;
+            const { claimID } = req.data;
 
 
         // Find Claim
@@ -245,75 +243,66 @@ module.exports = cds.service.impl(async function () {
             .where({ ID: claimID });
 
 
-        if (!claim) {
-            return req.error(404, 'Claim not found');
-        }
+            if (!claim) {
+
+                return req.error(
+                    404,
+                    `Claim ${claimID} not found`
+                );
+            }
+
+            const slaRule = await SELECT.one
+                .from(SLARules)
+                .where({
+                    claimType_ID: claim.claimType_ID
+                });
 
 
-        // Find SLA Rule based on Claim Type
-        const slaRule = await SELECT.one
-            .from(SLARules)
-            .where({
-                claimType_ID: claim.claimType_ID
-            });
+            if (!slaRule) {
+
+                return req.error(
+                    404,
+                    'No SLA rule configured for this claim type'
+                );
+            }
 
 
-        if (!slaRule) {
-            return req.error(
-                404,
-                'SLA rule not found for this claim type'
-            );
-        }
+            const submittedTime =
+                new Date(claim.reportedDate);
+
+            const currentTime =
+                new Date();
 
 
-        // Calculate elapsed time
-        const submittedTime =
-            new Date(claim.reportedDate);
-
-        const currentTime =
-            new Date();
+            const elapsedHours =
+                (currentTime - submittedTime)
+                / (1000 * 60 * 60);
 
 
-        const elapsedHours =
-            (currentTime - submittedTime)
-            / (1000 * 60 * 60);
+            const resolutionHours =
+                slaRule.resolutionHours;
 
 
-        const resolutionHours =
-            slaRule.resolutionHours;
+            if (elapsedHours > resolutionHours) {
+
+                return 'SLA_BREACHED';
+            }
 
 
-        // SLA Breached
-        if (elapsedHours > resolutionHours) {
-
-            return 'SLA_BREACHED';
-
-        }
+            const remainingHours =
+                resolutionHours - elapsedHours;
 
 
-        // SLA Nearing Breach
-        const remainingHours =
-            resolutionHours - elapsedHours;
+            if (remainingHours <= 6) {
+
+                return 'SLA_NEARING_BREACH';
+            }
 
 
-        if (remainingHours <= 6) {
+            return 'WITHIN_SLA';
+        });
 
-            return 'SLA_NEARING_BREACH';
-
-        }
-
-
-        // SLA OK
-        return 'WITHIN_SLA';
-
-    });
-
-
-    // =========================================================
-    // Create Alert
-    // =========================================================
-
-    this.on('createAlert', async (req) => {
+        this.on('createAlert', async (req) => {
 
         const {
             claimID,
@@ -323,107 +312,106 @@ module.exports = cds.service.impl(async function () {
         } = req.data;
 
 
-        // Check Claim
-        if (claimID) {
+            if (claimID) {
 
-            const claim = await SELECT.one
-                .from(Claims)
-                .where({ ID: claimID });
+                const claim = await SELECT.one
+                    .from(Claims)
+                    .where({ ID: claimID });
 
+                if (!claim) {
 
-            if (!claim) {
-                return req.error(
-                    404,
-                    'Claim not found'
-                );
+                    return req.error(
+                        404,
+                        'Claim not found'
+                    );
+                }
             }
 
-        }
 
+            // Validate recipient if supplied
+            if (recipientID) {
 
-        // Check Employee
-        if (recipientID) {
+                const employee = await SELECT.one
+                    .from(Employees)
+                    .where({ ID: recipientID });
 
-            const employee = await SELECT.one
-                .from(Employees)
-                .where({ ID: recipientID });
+                if (!employee) {
 
-
-            if (!employee) {
-                return req.error(
-                    404,
-                    'Employee not found'
-                );
+                    return req.error(
+                        404,
+                        'Employee not found'
+                    );
+                }
             }
 
-        }
+
+            const alertID = cds.utils.uuid();
 
 
-        // Create Alert
-        await INSERT.into(AlertLog).entries({
+            await INSERT.into(AlertLog).entries({
 
-            claim_ID: claimID,
+                ID: alertID,
 
-            recipient_ID: recipientID,
+                claim_ID: claimID,
 
-            alertType: alertType,
+                recipient_ID: recipientID,
 
-            message: message,
+                alertType: alertType,
 
-            status: 'Created'
+                message: message,
 
+                status: 'Created'
+            });
+
+
+            return await SELECT.one
+                .from(AlertLog)
+                .where({ ID: alertID });
         });
 
 
-        return 'Alert created successfully';
+        // =====================================================
+        // 5. MARK ALERT AS READ
+        // =====================================================
 
-    });
+        this.on('markAsRead', async (req) => {
 
-
-    // =========================================================
-    // Mark Alert as Read
-    // =========================================================
-
-    this.on('markAsRead', async (req) => {
-
-        const {
-            alertID
-        } = req.data;
+            const { alertID } = req.data;
 
 
-        // Find Alert
-        const alert = await SELECT.one
-            .from(AlertLog)
-            .where({ ID: alertID });
+            const alert = await SELECT.one
+                .from(AlertLog)
+                .where({ ID: alertID });
 
 
-        if (!alert) {
-            return req.error(
-                404,
-                'Alert not found'
-            );
-        }
+            if (!alert) {
+
+                return req.error(
+                    404,
+                    `Alert ${alertID} not found`
+                );
+            }
 
 
-        // Check current status
-        if (alert.status === 'Read') {
-            return req.error(
-                400,
-                'Alert is already marked as Read'
-            );
-        }
+            if (alert.status === 'Read') {
+
+                return req.error(
+                    400,
+                    'Alert is already marked as Read'
+                );
+            }
 
 
-        // Update Alert
-        await UPDATE(AlertLog)
-            .set({
-                status: 'Read'
-            })
-            .where({ ID: alertID });
+            await UPDATE(AlertLog)
+                .set({
+                    status: 'Read'
+                })
+                .where({ ID: alertID });
 
 
-        return 'Alert marked as read successfully';
-
-    });
+            return await SELECT.one
+                .from(AlertLog)
+                .where({ ID: alertID });
+        });
 
 });
