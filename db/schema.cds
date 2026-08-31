@@ -1,23 +1,6 @@
 namespace claimsure;
 
-<<<<<<< HEAD
-using {cuid} from '@sap/cds/common';
 
-
-
-entity Customers : cuid {
-
-    customerNumber : String(30)  @mandatory;
-
-    firstName      : String(100) @mandatory;
-    lastName       : String(100) @mandatory;
-
-    email          : String(150);
-    phone          : String(30);
-    address        : String(500);
-
-    status         : String(20) enum {
-=======
 using { cuid } from '@sap/cds/common';
 
 entity Customers : cuid {
@@ -37,12 +20,10 @@ entity Customers : cuid {
     address : String(500);
 
     status : String(20) enum {
->>>>>>> 7cadc10d7cdc722ad1f27921bad11b559dfcde18
         Active;
         Inactive;
         Suspended;
     } default 'Active';
-<<<<<<< HEAD
 
     // Relationships
     policies       : Association to many Policies
@@ -54,17 +35,6 @@ entity Customers : cuid {
 
 
 
-entity ClaimTypes : cuid {
-
-    code        : String(30)  @mandatory;
-
-    name        : String(100) @mandatory;
-
-    description : String(500);
-
-    category    : String(30) enum {
-=======
-}
 
 entity ClaimTypes : cuid {
 
@@ -75,13 +45,11 @@ entity ClaimTypes : cuid {
     description : String(500);
 
     category : String(30) enum {
->>>>>>> 7cadc10d7cdc722ad1f27921bad11b559dfcde18
         Vehicle;
         Health;
         Property;
     };
 
-<<<<<<< HEAD
     active      : Boolean default true;
 
     // Relationships
@@ -97,21 +65,7 @@ entity ClaimTypes : cuid {
 
 
 
-entity Employees : cuid {
 
-    employeeNumber : String(30)  @mandatory;
-
-    firstName      : String(100) @mandatory;
-    lastName       : String(100) @mandatory;
-
-    email          : String(150) @mandatory;
-
-    department     : String(100);
-
-    role           : String(30) enum {
-=======
-    active : Boolean default true;
-}
 
 
 entity Employees : cuid {
@@ -128,7 +82,6 @@ entity Employees : cuid {
     department : String(100);
 
     role : String(30) enum {
->>>>>>> 7cadc10d7cdc722ad1f27921bad11b559dfcde18
         ClaimsAgent;
         Investigator;
         ClaimsManager;
@@ -136,7 +89,6 @@ entity Employees : cuid {
         Admin;
     };
 
-<<<<<<< HEAD
     active         : Boolean default true;
 
     // Relationships
@@ -371,7 +323,3 @@ entity AlertLog : cuid {
     } default 'Created';
 
 }
-=======
-    active : Boolean default true;
-}
->>>>>>> 7cadc10d7cdc722ad1f27921bad11b559dfcde18
