@@ -1,11 +1,6 @@
 ID,code,name,description,category,active
-29520624-7cf8-439b-b615-3095312d7be6,code-29520624,name-29520624,description-29520624,Vehicle,true
-23423055-cd17-4494-864d-fbe8bc643de2,code-23423055,name-23423055,description-23423055,Vehicle,false
-23423056-1d5e-4351-a494-f4a01b9d15e8,code-23423056,name-23423056,description-23423056,Property,true
-23423057-7f60-4a95-9774-ce61d62c4f20,code-23423057,name-23423057,description-23423057,Health,false
-23423058-54a2-40af-b3d5-5e7c81ac0f45,code-23423058,name-23423058,description-23423058,Property,true
-23423059-e8aa-4f4a-a9ec-6a58a48d0cca,code-23423059,name-23423059,description-23423059,Vehicle,false
-23423060-efd2-4d9f-b954-c99cdc214410,code-23423060,name-23423060,description-23423060,Health,true
-23423061-30b1-4a73-82a8-0c28ddb0c1e0,code-23423061,name-23423061,description-23423061,Property,false
-23423062-ee4e-47e2-8547-f0f018786f87,code-23423062,name-23423062,description-23423062,Vehicle,true
-23423063-e265-4022-bd2f-db39ccb6d428,code-23423063,name-23423063,description-23423063,Vehicle,false
+aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa,VEH001,Vehicle Accident,Vehicle accident related claim,Vehicle,true
+bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb,VEH002,Vehicle Theft,Vehicle theft related claim,Vehicle,true
+cccccccc-cccc-cccc-cccc-cccccccccccc,HLT001,Health Insurance,Medical and health related claim,Health,true
+dddddddd-dddd-dddd-dddd-dddddddddddd,PRP001,Property Damage,Property damage related claim,Property,true
+eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee,PRP002,Property Theft,Property theft related claim,Property,true

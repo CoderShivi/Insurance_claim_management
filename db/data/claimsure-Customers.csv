@@ -1,11 +1,6 @@
 ID,customerNumber,firstName,lastName,email,phone,address,status
-27677234-e632-43c6-9b94-0d27dc8a671e,customerNumber-27677234,firstName-27677234,lastName-27677234,email-27677234,phone-27677234,address-27677234,Active
-23461588-6160-49bb-9be2-9f1636220002,customerNumber-23461588,firstName-23461588,lastName-23461588,email-23461588,phone-23461588,address-23461588,Active
-23461589-e524-4b55-8014-84f3a2a1904c,customerNumber-23461589,firstName-23461589,lastName-23461589,email-23461589,phone-23461589,address-23461589,Suspended
-23461590-3838-4ee6-99d4-3d7af1db544c,customerNumber-23461590,firstName-23461590,lastName-23461590,email-23461590,phone-23461590,address-23461590,Suspended
-23461591-1906-4886-b17e-b413ecffc5dd,customerNumber-23461591,firstName-23461591,lastName-23461591,email-23461591,phone-23461591,address-23461591,Inactive
-23461592-32e4-4cd5-ae6c-81e692bb6cc1,customerNumber-23461592,firstName-23461592,lastName-23461592,email-23461592,phone-23461592,address-23461592,Inactive
-23461593-5a8e-4cb4-9e69-dcccc99915f8,customerNumber-23461593,firstName-23461593,lastName-23461593,email-23461593,phone-23461593,address-23461593,Suspended
-23461594-6870-4a1c-8d40-0c2bc2251905,customerNumber-23461594,firstName-23461594,lastName-23461594,email-23461594,phone-23461594,address-23461594,Suspended
-23461595-26aa-455e-881d-8341d567b278,customerNumber-23461595,firstName-23461595,lastName-23461595,email-23461595,phone-23461595,address-23461595,Suspended
-23461596-c478-44e8-9b29-19deaa09f4c0,customerNumber-23461596,firstName-23461596,lastName-23461596,email-23461596,phone-23461596,address-23461596,Active
+11111111-1111-1111-1111-111111111111,CUST001,Ravi,Kumar,ravi.kumar@email.com,9876543210,Chennai Tamil Nadu,Active
+22222222-2222-2222-2222-222222222222,CUST002,Priya,Sharma,priya.sharma@email.com,9876543211,Bangalore Karnataka,Active
+33333333-3333-3333-3333-333333333333,CUST003,Arun,Reddy,arun.reddy@email.com,9876543212,Hyderabad Telangana,Active
+44444444-4444-4444-4444-444444444444,CUST004,Sneha,Patel,sneha.patel@email.com,9876543213,Mumbai Maharashtra,Inactive
+55555555-5555-5555-5555-555555555555,CUST005,Kiran,Verma,kiran.verma@email.com,9876543214,Delhi India,Suspended
