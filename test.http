@@ -1,0 +1,90 @@
+@baseUrl = http://localhost:4004
+@service = {{baseUrl}}/odata/v4/payout
+
+
+### =========================================================
+### 1. READ PAYOUTS
+### =========================================================
+
+GET {{service}}/Payouts
+
+
+### =========================================================
+### 2. READ SLA RULES
+### =========================================================
+
+GET {{service}}/SLARules
+
+
+### =========================================================
+### 3. READ ALERT LOG
+### =========================================================
+
+GET {{service}}/AlertLog
+
+
+### =========================================================
+### 4. CREATE PAYOUT
+### =========================================================
+### IMPORTANT:
+### Replace claimID with an actual Claim ID
+### whose status is "Approved".
+
+POST {{service}}/createPayout
+Content-Type: application/json
+
+{
+    "claimID": "PUT-APPROVED-CLAIM-ID-HERE",
+    "amount": 50000
+}
+
+
+### =========================================================
+### 5. PROCESS PAYOUT
+### =========================================================
+### First create a payout.
+### Then copy its ID and put it below.
+
+POST {{service}}/processPayout
+Content-Type: application/json
+
+{
+    "payoutID": "PUT-PAYOUT-ID-HERE"
+}
+
+
+### =========================================================
+### 6. CALCULATE SLA STATUS
+### =========================================================
+### Replace with an actual Claim ID.
+
+GET {{service}}/calculateSLAStatus(claimID='PUT-CLAIM-ID-HERE')
+
+
+### =========================================================
+### 7. CREATE ALERT
+### =========================================================
+### Replace claimID and recipientID with real IDs.
+
+POST {{service}}/createAlert
+Content-Type: application/json
+
+{
+    "claimID": "PUT-CLAIM-ID-HERE",
+    "recipientID": "PUT-EMPLOYEE-ID-HERE",
+    "alertType": "ApprovalPending",
+    "message": "Claim approval is pending."
+}
+
+
+### =========================================================
+### 8. MARK ALERT AS READ
+### =========================================================
+### Replace with the AlertLog ID returned from createAlert.
+
+POST {{service}}/markAsRead
+Content-Type: application/json
+
+{
+    "alertID": "PUT-ALERT-ID-HERE"
+}

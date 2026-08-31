@@ -1,0 +1,398 @@
+const cds = require('@sap/cds');
+
+module.exports = class ClaimSureService extends cds.ApplicationService {
+    async init() {
+        const {
+            Payouts,
+            SLARules,
+            AlertLog,
+            Claims,
+            Employees,
+            ClaimTypes
+        } = this.entities;
+
+        this.on('createPayout', async (req) => {
+
+            const { claimID, amount } = req.data;
+
+            // Check claim
+            const claim = await SELECT.one
+                .from(Claims)
+                .where({ ID: claimID });
+
+            if (!claim) {
+                return req.error(
+                    404,
+                    `Claim ${claimID} not found`
+                );
+            }
+
+
+            // Claim must be approved
+            if (claim.status !== 'Approved') {
+
+                return req.error(
+                    400,
+                    `Payout cannot be created. Claim status is ${claim.status}`
+                );
+            }
+
+
+            // Check whether payout already exists
+            const existingPayout = await SELECT.one
+                .from(Payouts)
+                .where({ claim_ID: claimID });
+
+            if (existingPayout) {
+
+                return req.error(
+                    400,
+                    'Payout already exists for this claim'
+                );
+            }
+
+            if (!amount || amount <= 0) {
+
+                return req.error(
+                    400,
+                    'Payout amount must be greater than zero'
+                );
+            }
+
+
+            // Create payout
+            const payoutID = cds.utils.uuid();
+
+            await INSERT.into(Payouts).entries({
+
+                ID: payoutID,
+
+                payoutNumber:
+                    `PAY-${Date.now()}`,
+
+                claim_ID: claimID,
+
+                amount: amount,
+
+                status: 'Pending'
+            });
+
+
+            // Return created payout
+            return await SELECT.one
+                .from(Payouts)
+                .where({ ID: payoutID });
+        });
+
+        this.on('processPayout', async (req) => {
+
+            const { payoutID } = req.data;
+
+
+            const payout = await SELECT.one
+                .from(Payouts)
+                .where({ ID: payoutID });
+
+
+            if (!payout) {
+
+                return req.error(
+                    404,
+                    `Payout ${payoutID} not found`
+                );
+            }
+
+
+            // Payout must be Pending
+            if (payout.status !== 'Pending') {
+
+                return req.error(
+                    400,
+                    `Payout cannot be processed. Current status: ${payout.status}`
+                );
+            }
+
+
+            // Move to Processing
+            await UPDATE(Payouts)
+                .set({
+                    status: 'Processing'
+                })
+                .where({ ID: payoutID });
+
+            try {
+
+                const paymentSuccessful = true;
+
+
+                if (paymentSuccessful) {
+
+                    await UPDATE(Payouts)
+                        .set({
+                            status: 'Processed'
+                        })
+                        .where({ ID: payoutID });
+
+
+                    // Create success alert
+                    await INSERT.into(AlertLog).entries({
+
+                        ID: cds.utils.uuid(),
+
+                        claim_ID: payout.claim_ID,
+
+                        alertType: 'PayoutSuccess',
+
+                        message:
+                            `Payout ${payout.payoutNumber} processed successfully.`,
+
+                        status: 'Created'
+                    });
+
+                } else {
+
+                    await UPDATE(Payouts)
+                        .set({
+                            status: 'Failed'
+                        })
+                        .where({ ID: payoutID });
+
+
+                    await INSERT.into(AlertLog).entries({
+
+                        ID: cds.utils.uuid(),
+
+                        claim_ID: payout.claim_ID,
+
+                        alertType: 'PayoutFailed',
+
+                        message:
+                            `Payout ${payout.payoutNumber} failed.`,
+
+                        status: 'Created'
+                    });
+                }
+
+
+                return await SELECT.one
+                    .from(Payouts)
+                    .where({ ID: payoutID });
+
+
+            } catch (error) {
+
+                await UPDATE(Payouts)
+                    .set({
+                        status: 'Failed'
+                    })
+                    .where({ ID: payoutID });
+
+
+                await INSERT.into(AlertLog).entries({
+
+                    ID: cds.utils.uuid(),
+
+                    claim_ID: payout.claim_ID,
+
+                    alertType: 'PayoutFailed',
+
+                    message:
+                        `Payout processing failed: ${error.message}`,
+
+                    status: 'Created'
+                });
+
+
+                return req.error(
+                    500,
+                    'Payout processing failed'
+                );
+            }
+        });
+
+
+        this.on('calculateSLAStatus', async (req) => {
+
+            const { claimID } = req.data;
+
+
+            const claim = await SELECT.one
+                .from(Claims)
+                .where({ ID: claimID });
+
+
+            if (!claim) {
+
+                return req.error(
+                    404,
+                    `Claim ${claimID} not found`
+                );
+            }
+
+            const slaRule = await SELECT.one
+                .from(SLARules)
+                .where({
+                    claimType_ID: claim.claimType_ID
+                });
+
+
+            if (!slaRule) {
+
+                return req.error(
+                    404,
+                    'No SLA rule configured for this claim type'
+                );
+            }
+
+
+            const submittedTime =
+                new Date(claim.reportedDate);
+
+            const currentTime =
+                new Date();
+
+
+            const elapsedHours =
+                (currentTime - submittedTime)
+                / (1000 * 60 * 60);
+
+
+            const resolutionHours =
+                slaRule.resolutionHours;
+
+
+            if (elapsedHours > resolutionHours) {
+
+                return 'SLA_BREACHED';
+            }
+
+
+            const remainingHours =
+                resolutionHours - elapsedHours;
+
+
+            if (remainingHours <= 6) {
+
+                return 'SLA_NEARING_BREACH';
+            }
+
+
+            return 'WITHIN_SLA';
+        });
+
+        this.on('createAlert', async (req) => {
+
+            const {
+                claimID,
+                recipientID,
+                alertType,
+                message
+            } = req.data;
+
+
+            if (claimID) {
+
+                const claim = await SELECT.one
+                    .from(Claims)
+                    .where({ ID: claimID });
+
+                if (!claim) {
+
+                    return req.error(
+                        404,
+                        'Claim not found'
+                    );
+                }
+            }
+
+
+            // Validate recipient if supplied
+            if (recipientID) {
+
+                const employee = await SELECT.one
+                    .from(Employees)
+                    .where({ ID: recipientID });
+
+                if (!employee) {
+
+                    return req.error(
+                        404,
+                        'Employee not found'
+                    );
+                }
+            }
+
+
+            const alertID = cds.utils.uuid();
+
+
+            await INSERT.into(AlertLog).entries({
+
+                ID: alertID,
+
+                claim_ID: claimID,
+
+                recipient_ID: recipientID,
+
+                alertType: alertType,
+
+                message: message,
+
+                status: 'Created'
+            });
+
+
+            return await SELECT.one
+                .from(AlertLog)
+                .where({ ID: alertID });
+        });
+
+
+        // =====================================================
+        // 5. MARK ALERT AS READ
+        // =====================================================
+
+        this.on('markAsRead', async (req) => {
+
+            const { alertID } = req.data;
+
+
+            const alert = await SELECT.one
+                .from(AlertLog)
+                .where({ ID: alertID });
+
+
+            if (!alert) {
+
+                return req.error(
+                    404,
+                    `Alert ${alertID} not found`
+                );
+            }
+
+
+            if (alert.status === 'Read') {
+
+                return req.error(
+                    400,
+                    'Alert is already marked as Read'
+                );
+            }
+
+
+            await UPDATE(AlertLog)
+                .set({
+                    status: 'Read'
+                })
+                .where({ ID: alertID });
+
+
+            return await SELECT.one
+                .from(AlertLog)
+                .where({ ID: alertID });
+        });
+
+
+        return super.init();
+    }
+};
