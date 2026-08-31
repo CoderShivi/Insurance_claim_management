@@ -9,13 +9,10 @@ module.exports = cds.service.impl(async function () {
     } = this.entities;
 
 
-<<<<<<< HEAD
-=======
     // =====================================================
     // CUSTOMERS
     // =====================================================
 
->>>>>>> main
     // Check duplicate customer number
     this.before("CREATE", Customers, async (req) => {
 
@@ -33,14 +30,11 @@ module.exports = cds.service.impl(async function () {
         }
     });
 
-<<<<<<< HEAD
-=======
 
     // =====================================================
     // CLAIM TYPES
     // =====================================================
 
->>>>>>> main
     // Check duplicate claim type code
     this.before("CREATE", ClaimTypes, async (req) => {
 
@@ -59,13 +53,10 @@ module.exports = cds.service.impl(async function () {
     });
 
 
-<<<<<<< HEAD
-=======
     // =====================================================
     // EMPLOYEES
     // =====================================================
 
->>>>>>> main
     // Check duplicate employee number
     this.before("CREATE", Employees, async (req) => {
 
