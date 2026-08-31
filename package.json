@@ -2,13 +2,20 @@
   "name": "Insurance_claim_management",
   "version": "1.0.0",
   "dependencies": {
-    "@sap/cds": "^9"
+    "@sap/cds": "^9",
+    "@sap/xssec": "^4"
   },
   "devDependencies": {
     "@cap-js/sqlite": "^2.4"
   },
   "scripts": {
     "start": "cds-serve"
+  },
+  "cds": {
+    "requires": {
+      "[production]": {
+        "auth": "dummy"
+      }
+    }
   }
-
 }
