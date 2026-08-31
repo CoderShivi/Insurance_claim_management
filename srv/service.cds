@@ -1,4 +1,4 @@
-using { demo as db  } from '../db/schema';
+using { claimsure as db  } from '../db/schema';
  
  
 service myService {
