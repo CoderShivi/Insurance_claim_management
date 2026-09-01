@@ -1,4 +1,6 @@
 namespace claimsure;
+
+
 using { cuid } from '@sap/cds/common';
 
 entity Customers : cuid {
@@ -22,7 +24,6 @@ entity Customers : cuid {
         Inactive;
         Suspended;
     } default 'Active';
-
 
     // Relationships
     policies       : Association to many Policies
@@ -48,6 +49,7 @@ entity ClaimTypes : cuid {
         Health;
         Property;
     };
+
     active      : Boolean default true;
 
     // Relationships
@@ -60,6 +62,9 @@ entity ClaimTypes : cuid {
     slaRules    : Association to many SLARules
                       on slaRules.claimType = $self;
 }
+
+
+
 
 
 
