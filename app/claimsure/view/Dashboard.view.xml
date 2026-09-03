@@ -1,0 +1,145 @@
+<mvc:View
+    controllerName="claimsure.app.controller.Dashboard"
+    xmlns="sap.m"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:f="sap.f"
+    xmlns:core="sap.ui.core">
+
+    <Page title="{i18n>navDashboard}" showNavButton="false" class="csPage">
+        <content>
+            <VBox class="sapUiMediumMargin">
+
+                <Title text="{= 'Welcome back, ' + ${app>/currentUser/name} }" level="H2"/>
+                <Text text="{i18n>dashboardSub}" class="sapUiTinyMarginBottom sapUiMediumMarginBottom"/>
+
+                <f:GridContainer id="tileGrid">
+                    <f:layout>
+                        <f:GridContainerSettings rowSize="6rem" columnSize="14rem" gap="1rem"/>
+                    </f:layout>
+
+                    <GenericTile header="{i18n>navClaims}" subheader="View and manage claims" press="onNavClaims" class="sapUiTinyMargin" frameType="OneByOne">
+                        <TileContent>
+                            <ImageContent src="sap-icon://form"/>
+                        </TileContent>
+                    </GenericTile>
+
+                    <GenericTile header="{i18n>navPolicies}" subheader="View and manage policies" press="onNavPolicies" class="sapUiTinyMargin" frameType="OneByOne">
+                        <TileContent>
+                            <ImageContent src="sap-icon://shield"/>
+                        </TileContent>
+                    </GenericTile>
+
+                    <GenericTile header="{i18n>navAdmin}" subheader="Employees, customers, claim types" press="onNavAdministration" class="sapUiTinyMargin" frameType="OneByOne">
+                        <TileContent>
+                            <ImageContent src="sap-icon://official-service"/>
+                        </TileContent>
+                    </GenericTile>
+
+                </f:GridContainer>
+
+                <!-- KPI cards: flat colored cards instead of GenericTile -->
+                <HBox class="kpiRow sapUiMediumMarginTop" wrap="Wrap">
+                    <VBox class="kpiCard kpiNeutral">
+                        <Text text="Total claims" class="kpiLabel"/>
+                        <Text text="{dash>/totalClaims}" class="kpiValue"/>
+                    </VBox>
+                    <VBox class="kpiCard kpiWarning">
+                        <Text text="Pending approval" class="kpiLabel kpiLabelWarning"/>
+                        <Text text="{dash>/pendingApproval}" class="kpiValue kpiValueWarning"/>
+                    </VBox>
+                    <VBox class="kpiCard kpiDanger">
+                        <Text text="High fraud risk" class="kpiLabel kpiLabelDanger"/>
+                        <Text text="{dash>/highFraudRisk}" class="kpiValue kpiValueDanger"/>
+                    </VBox>
+                    <VBox class="kpiCard kpiSuccess">
+                        <Text text="Active policies" class="kpiLabel kpiLabelSuccess"/>
+                        <Text text="{dash>/activePolicies}" class="kpiValue kpiValueSuccess"/>
+                    </VBox>
+                </HBox>
+
+                <!-- Claims analytics — pie chart + legend + policies by type, side by side -->
+                <Panel headerText="Claims analytics" class="sapUiMediumMarginTop statusPanel">
+                    <HBox class="pieRow" wrap="Wrap">
+                        <VBox class="pieChartWrap" alignItems="Center" justifyContent="Center">
+                            <HBox press="onPieChartPress" class="pieClickArea">
+                               <core:HTML content="{
+                                    parts: [
+                                        { path: 'statusChart>/items' },
+                                        { path: 'statusChart>/pieBackground' }
+                                    ],
+                                    formatter: '.formatPieChartHtml'
+                                }"/>
+                            </HBox>
+                            <Text text="{statusChart>/selectedLabel}" class="pieSelectedLabel"/>
+                        </VBox>
+
+                        <VBox class="pieLegend">
+                            <core:HTML content="{ path: 'statusChart>/items', formatter: '.formatLegendListHtml' }"/>
+                        </VBox>
+
+                        <!-- Fills the remaining white space with Policies by type -->
+                        <VBox class="policyTypeCol">
+                            <Text text="Policies by type" class="policyTypeTitle"/>
+                            <core:HTML content="{ path: 'policyTypeChart>/items', formatter: '.formatPolicyTypeChartSvg' }"/>
+                        </VBox>
+                    </HBox>
+                </Panel>
+
+                <!-- Recent claims -->
+                <Panel headerText="Recent claims" class="sapUiMediumMarginTop statusPanel">
+                    <Table items="{recent>/}" noDataText="No recent claims" mode="None">
+                        <columns>
+                            <Column><Text text="Claim #"/></Column>
+                            <Column><Text text="Customer"/></Column>
+                            <Column><Text text="Claim type"/></Column>
+                            <Column hAlign="End"><Text text="Amount"/></Column>
+                            <Column><Text text="Status"/></Column>
+                        </columns>
+                        <items>
+                            <ColumnListItem type="Active" press="onClaimPress">
+                                <cells>
+                                    <Text text="{recent>claimNumber}"/>
+                                    <Text text="{recent>customerName}"/>
+                                    <Text text="{recent>claimTypeName}"/>
+                                    <Text text="{recent>claimedAmount}"/>
+                                    <ObjectStatus text="{recent>status}"/>
+                                </cells>
+                            </ColumnListItem>
+                        </items>
+                    </Table>
+                </Panel>
+
+                <!-- Claims by status + Policies by status, side by side -->
+              <!-- Claims by status -->
+                <!-- <Panel headerText="Claims by status" class="sapUiMediumMarginTop statusPanel">
+                    <List items="{statusChart>/items}" showSeparators="None" class="statusList">
+                        <CustomListItem>
+                            <HBox alignItems="Center" class="statusRow">
+                                <Text text="{statusChart>status}" class="statusLabel"/>
+                                <HBox class="statusTrack">
+                                    <core:HTML content="{statusChart>barHtml}"/>
+                                </HBox>
+                                <Text text="{statusChart>count}" class="statusCount"/>
+                            </HBox>
+                        </CustomListItem>
+                    </List>
+                </Panel> -->
+
+                <!-- Policies by status -->
+                <!-- <Panel headerText="Policies by status" class="sapUiMediumMarginTop statusPanel">
+                    <List items="{policyChart>/items}" showSeparators="None" class="statusList">
+                        <CustomListItem>
+                            <HBox alignItems="Center" class="statusRow">
+                                <Text text="{policyChart>status}" class="statusLabel"/>
+                                <HBox class="statusTrack">
+                                    <core:HTML content="{policyChart>barHtml}"/>
+                                </HBox>
+                                <Text text="{policyChart>count}" class="statusCount"/>
+                            </HBox>
+                        </CustomListItem>
+                </List>
+            </Panel> -->
+            </VBox>
+        </content>
+    </Page>
+</mvc:View>
