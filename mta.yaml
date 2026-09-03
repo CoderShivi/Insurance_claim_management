@@ -10,6 +10,8 @@ build-parameters:
       commands:
         - npm ci
         - npx cds build --production
+        - mkdir -p app/router/webapp
+        - cp -r app/claimsure app/router/webapp/claimsure
 modules:
   - name: Insurance_claim_management-srv
     type: nodejs
@@ -24,8 +26,9 @@ modules:
         properties:
           srv-url: ${default-url}
     requires:
+      - name: Insurance_claim_management-auth
       - name: Insurance_claim_management-db
-
+ 
   - name: Insurance_claim_management-db-deployer
     type: hdb
     path: gen/db
@@ -33,8 +36,45 @@ modules:
       buildpack: nodejs_buildpack
     requires:
       - name: Insurance_claim_management-db
-
+  - name: Insurance_claim_management
+    type: approuter.nodejs
+    path: app/router
+    parameters:
+      keep-existing-routes: true
+      disk-quota: 256M
+      memory: 256M
+    requires:
+      - name: srv-api
+        group: destinations
+        properties:
+          name: srv-api # must be used in xs-app.json as well
+          url: ~{srv-url}
+          forwardAuthToken: true
+      - name: Insurance_claim_management-auth
+    provides:
+      - name: app-api
+        properties:
+          app-protocol: ${protocol}
+          app-uri: ${default-uri}
+ 
 resources:
+  - name: Insurance_claim_management-auth
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: xsuaa
+      service-plan: application
+      path: ./xs-security.json
+      config:
+        xsappname: Insurance_claim_management-${org}-${space}
+        tenant-mode: dedicated
+        oauth2-configuration:
+          credential-types:
+            - "binding-secret"
+            - "x509"
+          redirect-uris:
+            - https://*~{app-api/app-uri}/**
+    requires:
+      - name: app-api
   - name: Insurance_claim_management-db
     type: com.sap.xs.hdi-container
     parameters:
