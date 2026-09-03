@@ -47,7 +47,8 @@
         "sap.ui.core": {},
         "sap.ui.layout": {},
         "sap.f": {},
-        "sap.tnt": {}
+        "sap.tnt": {},
+        "sap.suite.ui.microchart": {}
       }
     },
     "handleValidation": true,
