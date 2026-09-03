@@ -1,0 +1,201 @@
+.csPage .sapMPageHeader {
+    font-weight: 600;
+}
+
+.sapMObjectStatusLarge .sapMObjStatusText {
+    font-size: 1.1rem;
+}
+
+#sideNav .sapTntNavLI {
+    font-weight: 500;
+}
+
+/* Prevent wide tables/toolbars from forcing a page-level horizontal scrollbar;
+   the affected control (e.g. sap.m.Table) scrolls internally instead. */
+html, body {
+    overflow-x: auto;
+    max-width: 100%;
+}
+
+.kpiRow {
+    gap: 1rem;
+}
+
+.kpiCard {
+    flex: 1 1 200px;
+    min-width: 180px;
+    padding: 1.25rem 1.5rem;
+    border-radius: 12px;
+    background: #F5F5F0;
+}
+
+.kpiNeutral { background: #F5F5F0; }
+.kpiWarning { background: #FBE7C6; }
+.kpiDanger  { background: #F9D3D3; }
+.kpiSuccess { background: #D9EAD3; }
+
+.kpiLabel {
+    font-size: 0.9rem;
+    color: #6E6E6E;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+.kpiLabelWarning { color: #8A5A00; }
+.kpiLabelDanger  { color: #A61C1C; }
+.kpiLabelSuccess { color: #1E7A34; }
+
+.kpiValue {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #1A1A1A;
+    display: block;
+}
+.kpiValueWarning { color: #B36B00; }
+.kpiValueDanger  { color: #C0271F; }
+.kpiValueSuccess { color: #1E7A34; }
+
+.statusPanel .statusList {
+    background: transparent;
+}
+
+.statusRow {
+    gap: 1rem;
+    padding: 0.5rem 0;
+    width: 100%;
+}
+
+.statusLabel {
+    width: 140px;
+    flex-shrink: 0;
+    color: #4A4A4A;
+}
+
+.statusTrack {
+    flex: 1;
+    height: 8px;
+    background: #EDEDE8;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+/* sap.ui.core.HTML does not stretch to fill a flex parent by default,
+   so the percentage-width fill div inside it was computing against zero
+   width and never showing. Force the wrapper to fill .statusTrack.
+   Still used by the "Claims by status" / "Policies by status" panels
+   if you re-enable them — not used by Policies by type anymore. */
+.statusTrack > .statusTrackHtml {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.statusCount {
+    width: 32px;
+    text-align: right;
+    flex-shrink: 0;
+}
+
+/* Pie chart + legend */
+.pieRow {
+    gap: 2rem;
+    align-items: center;
+}
+
+.pieChartWrap {
+    padding: 1rem;
+    flex-shrink: 0;
+}
+
+.pieChart {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    position: relative; /* needed so slice labels position relative to the pie, not the page */
+}
+
+/* don't let the legend column stretch across the whole panel,
+   otherwise the label eats all the leftover space and pushes percent/count
+   off to the far right edge */
+.pieLegend {
+    flex: 0 1 auto;
+    min-width: 220px;
+    max-width: 320px;
+}
+
+/* tight row (not full width) so percent/count sit right after the label */
+.legendRow {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.4rem 0;
+    width: auto;
+}
+
+.legendDot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+/* fixed width instead of flex:1, so it doesn't consume all remaining space.
+   Widened from 140px so "InvestigationRequired" no longer overlaps its percentage. */
+.legendLabel {
+    width: 170px;
+    flex-shrink: 0;
+    color: #4A4A4A;
+}
+
+/* left-aligned so it sits immediately next to the label */
+.legendPercent {
+    width: 36px;
+    text-align: left;
+    color: #6E6E6E;
+    flex-shrink: 0;
+}
+
+/* Third column inside the Claims analytics panel, holds the
+   Policies by type SVG bar chart */
+.policyTypeCol {
+    flex: 1;
+    min-width: 220px;
+    border-left: 0.5px solid #EDEDE8;
+    padding-left: 1.5rem;
+    /* NEW — the SVG bar chart widens with the number of policy types;
+       scroll horizontally instead of squeezing or overflowing the panel */
+    overflow-x: auto;
+}
+
+.policyTypeTitle {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #4A4A4A;
+    margin-bottom: 0.75rem;
+    display: block;
+}
+
+.pieClickArea {
+    cursor: pointer;
+}
+
+.pieSelectedLabel {
+    margin-top: 0.75rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #2C2C2A;
+    min-height: 1.2em;
+    text-align: center;
+}
+
+.pieSliceLabel {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.35);
+    pointer-events: none;   /* clicks pass through to the pie for onPieChartPress */
+    white-space: nowrap;
+    text-align: center;
+}

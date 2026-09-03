@@ -1,10 +1,11 @@
 const cds = require('@sap/cds')
 const { executeHttpRequest } = require('@sap-cloud-sdk/http-client');
+
+
 module.exports = cds.service.impl(function () {
 
+
  
-    // FraudRiskScores
-  
     const { Policies, Claims, ClaimDocuments } = this.entities;
     this.before('CREATE', 'FraudRiskScores', async (req) => {
 
@@ -30,7 +31,9 @@ module.exports = cds.service.impl(function () {
     });
 
 
+
     // Investigations
+
 
     this.before('UPDATE', 'Investigations', async (req) => {
 
@@ -48,7 +51,9 @@ module.exports = cds.service.impl(function () {
     });
 
 
+
     // Approvals
+
 
     this.before('UPDATE', 'Approvals', async (req) => {
 
@@ -230,22 +235,27 @@ module.exports = cds.service.impl(function () {
 
         const { claimID } = req.data;
 
-        // Validate request
+        // ------------------------------------------------------------
+
         if (!claimID) {
             return req.reject(400, "Claim ID is required");
         }
 
-        // Get claim
+
+
         const claim = await SELECT
             .one
             .from(Claims)
-            .where({ ID: claimID });
+            .where({
+                ID: claimID
+            });
 
         if (!claim) {
             return req.reject(404, "Claim not found");
         }
 
-        // Check claim status
+
+
         if (claim.status !== "Draft") {
             return req.reject(
                 400,
@@ -253,20 +263,23 @@ module.exports = cds.service.impl(function () {
             );
         }
 
+
         try {
 
-            // Start SBPA process
+
+
             const response = await executeHttpRequest(
                 {
                     destinationName: "ClaimProcess"
                 },
                 {
-                    method: "POST",
+                    method: "GET",
 
                     url: "/workflow/rest/v1/workflow-instances",
 
                     data: {
-                        definitionId:"us10.547c31aatrial.claimsureclaimmanagement.claimApprovalProcess",
+                        definitionId:
+                            "us10.547c31aatrial.claimsureclaimmanagement.claimApprovalProcess",
 
                         context: {
                             claimid: claim.ID,
@@ -281,7 +294,10 @@ module.exports = cds.service.impl(function () {
                 }
             );
 
-            // Update claim status
+            console.log(response);
+            
+
+
             await UPDATE(Claims)
                 .set({
                     status: "PendingApproval"
@@ -290,7 +306,6 @@ module.exports = cds.service.impl(function () {
                     ID: claimID
                 });
 
-            // Log SBPA response
             console.log(
                 "SBPA STATUS:",
                 response.status
@@ -301,12 +316,18 @@ module.exports = cds.service.impl(function () {
                 JSON.stringify(response.data, null, 2)
             );
 
-            console.log(
-                "response from bpa:",
-                response
-            );
 
-            return true;
+
+            const updatedClaim = await SELECT
+                .one
+                .from(Claims)
+                .where({
+                    ID: claimID
+                });
+
+
+            return updatedClaim;
+
 
         } catch (error) {
 
@@ -318,15 +339,6 @@ module.exports = cds.service.impl(function () {
             console.error(
                 "SBPA ERROR CAUSE:",
                 error.cause
-            );
-
-            console.error(
-                "SBPA ERROR FULL:",
-                JSON.stringify(
-                    error,
-                    Object.getOwnPropertyNames(error),
-                    2
-                )
             );
 
             console.error(

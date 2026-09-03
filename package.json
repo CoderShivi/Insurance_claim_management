@@ -14,8 +14,12 @@
   "scripts": {
     "start": "cds-serve"
   },
+  "private": true,
   "cds": {
     "requires": {
+      "db": {
+        "kind": "sqlite"
+      },
       "[production]": {
         "auth": "dummy"
       }
