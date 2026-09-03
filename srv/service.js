@@ -229,32 +229,123 @@ module.exports = cds.service.impl(function () {
         return Number(result.count);
     });
 
-       this.on('submitClaim', async (req) => {
+this.on("submitClaim", async (req) => {
 
         const { claimID } = req.data;
 
-        const claim = await SELECT.one.from(Claims)
+        // Validate request
+        if (!claimID) {
+            return req.reject(400, "Claim ID is required");
+        }
+
+        // Get claim
+        const claim = await SELECT
+            .one
+            .from(Claims)
             .where({ ID: claimID });
 
         if (!claim) {
-            return req.error(404, 'Claim not found');
+            return req.reject(404, "Claim not found");
         }
 
-        if (claim.status !== 'Draft') {
-            return req.error(
+        // Check claim status
+        if (claim.status !== "Draft") {
+            return req.reject(
                 400,
-                'Only Draft claims can be submitted'
+                "Only Draft claims can be submitted for approval"
             );
         }
 
-        await UPDATE(Claims)
-            .set({
-                status: 'Submitted'
-            })
-            .where({ ID: claimID });
+        try {
 
-        return await SELECT.one.from(Claims)
-            .where({ ID: claimID });
+            // Start SBPA process
+            const response = await executeHttpRequest(
+                {
+                    destinationName: "ClaimProcess"
+                },
+                {
+                    method: "POST",
+
+                    url: "/workflow/rest/v1/workflow-instances",
+
+                    data: {
+                        definitionId:"us10.547c31aatrial.claimsureclaimmanagement.claimApprovalProcess",
+
+                        context: {
+                            claimid: claim.ID,
+                            claimnumber: claim.claimNumber,
+                            claimedamount: Number(claim.claimedAmount),
+                            description: claim.description || ""
+                        }
+                    }
+                },
+                {
+                    fetchCsrfToken: false
+                }
+            );
+
+            // Update claim status
+            await UPDATE(Claims)
+                .set({
+                    status: "PendingApproval"
+                })
+                .where({
+                    ID: claimID
+                });
+
+            // Log SBPA response
+            console.log(
+                "SBPA STATUS:",
+                response.status
+            );
+
+            console.log(
+                "SBPA RESPONSE DATA:",
+                JSON.stringify(response.data, null, 2)
+            );
+
+            console.log(
+                "response from bpa:",
+                response
+            );
+
+            return true;
+
+        } catch (error) {
+
+            console.error(
+                "SBPA ERROR MESSAGE:",
+                error.message
+            );
+
+            console.error(
+                "SBPA ERROR CAUSE:",
+                error.cause
+            );
+
+            console.error(
+                "SBPA ERROR FULL:",
+                JSON.stringify(
+                    error,
+                    Object.getOwnPropertyNames(error),
+                    2
+                )
+            );
+
+            console.error(
+                "SBPA RESPONSE DATA:",
+                JSON.stringify(
+                    error.response?.data,
+                    null,
+                    2
+                )
+            );
+
+            return req.reject(
+                502,
+                `Failed to start approval process: ${error.message}`
+            );
+        }
     });
 
       this.on('approveClaim', async (req) => {
