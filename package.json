@@ -2,17 +2,34 @@
   "name": "Insurance_claim_management",
   "version": "1.0.0",
   "dependencies": {
-    "@sap/cds": "^9"
+    "@cap-js/hana": "^2",
+    "@sap/cds": "^9",
+    "@sap/xssec": "^4"
   },
   "devDependencies": {
-    "@cap-js/sqlite": "^2.4"
+    "@cap-js/sqlite": "^2.4",
+    "@sap/cds-dk": "^9"
   },
   "scripts": {
     "start": "cds-serve"
   },
   "private": true,
   "cds": {
-    "requires": {}
+    "requires": {
+      "db": {
+        "kind": "hana"
+      },
+      "[production]": {
+        "auth": {
+          "kind": "dummy"
+        },
+        "db": {
+          "kind": "hana"
+        }
+      }
+    },
+    "server": {
+      "index": true
+    }
   }
-
 }

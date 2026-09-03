@@ -1,0 +1,86 @@
+<mvc:View controllerName="claimsure.app.controller.Claims" xmlns="sap.m" xmlns:mvc="sap.ui.core.mvc" xmlns:core="sap.ui.core">
+    <Page title="{i18n>navClaims}" showNavButton="false" class="csPage">
+        <content>
+            <Table
+                id="claimsTable"
+                growing="true"
+                growingThreshold="20"
+                class="sapUiResponsiveMargin"
+                items="{
+                    path: '/Claims',
+                    parameters: {
+                        $select: 'ID,claimNumber,claimedAmount,status,incidentDate,customer_ID,claimType_ID,policy_ID',
+                        $orderby: 'claimNumber desc',
+                        $$operationMode: 'Server'
+                    }
+                }"
+                noDataText="{i18n>noClaims}">
+
+                <headerToolbar>
+                    <OverflowToolbar>
+                        <Title text="{i18n>navClaims}" level="H2"/>
+                        <ToolbarSpacer/>
+                        <SearchField
+                            id="claimsSearch"
+                            width="16rem"
+                            liveChange="onSearch"
+                            search="onSearch"
+                            placeholder="{i18n>searchClaims}"/>
+                        <ComboBox
+                            id="statusFilter"
+                            width="10rem"
+                            placeholder="{i18n>filterStatus}"
+                            selectionChange="onStatusFilterChange">
+                            <core:Item text="Draft" key="Draft"/>
+                            <core:Item text="Submitted" key="Submitted"/>
+                            <core:Item text="UnderReview" key="UnderReview"/>
+                            <core:Item text="InvestigationRequired" key="InvestigationRequired"/>
+                            <core:Item text="PendingApproval" key="PendingApproval"/>
+                            <core:Item text="Approved" key="Approved"/>
+                            <core:Item text="Rejected" key="Rejected"/>
+                            <core:Item text="Paid" key="Paid"/>
+                        </ComboBox>
+                        <Button
+                            icon="sap-icon://add"
+                            text="{i18n>newClaim}"
+                            type="Emphasized"
+                            press="onCreateClaim"/>
+                    </OverflowToolbar>
+                </headerToolbar>
+
+                <columns>
+                    <Column><Text text="{i18n>colClaimNumber}"/></Column>
+                    <Column><Text text="{i18n>colCustomer}"/></Column>
+                    <Column><Text text="{i18n>colClaimType}"/></Column>
+                    <Column hAlign="End"><Text text="{i18n>colAmount}"/></Column>
+                    <Column><Text text="{i18n>colIncidentDate}"/></Column>
+                    <Column><Text text="{i18n>colStatus}"/></Column>
+                </columns>
+
+                <items>
+                    <ColumnListItem type="Navigation" press="onClaimPress">
+                        <cells>
+                            <ObjectIdentifier title="{claimNumber}"/>
+                            <Text text="{
+                                parts: [{path: 'customer_ID'}, {path: 'lookups>/customers'}],
+                                formatter: '.formatter.idToName'
+                            }"/>
+                            <Text text="{
+                                parts: [{path: 'claimType_ID'}, {path: 'lookups>/claimTypes'}],
+                                formatter: '.formatter.idToName'
+                            }"/>
+                            <ObjectNumber
+                                number="{ path: 'claimedAmount', formatter: '.formatter.currency' }"
+                                unit="USD"/>
+                            <Text text="{ path: 'incidentDate', formatter: '.formatter.shortDate' }"/>
+                            <ObjectStatus
+                                text="{status}"
+                                state="{ path: 'status', formatter: '.formatter.statusState' }"
+                                icon="{ path: 'status', formatter: '.formatter.statusIcon' }"/>
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </content>
+    </Page>
+</mvc:View>

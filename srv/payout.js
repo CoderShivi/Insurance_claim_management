@@ -11,9 +11,9 @@ module.exports = cds.service.impl(async function () {
     } = this.entities;
 
 
-    // =========================================================
+    
     // Create Payout
-    // =========================================================
+    
 
     this.on('createPayout', async (req) => {
 
@@ -85,9 +85,9 @@ module.exports = cds.service.impl(async function () {
     });
 
 
-    // =========================================================
+  
     // Process Payout
-    // =========================================================
+   
 
         this.on('processPayout', async (req) => {
 
@@ -228,9 +228,9 @@ module.exports = cds.service.impl(async function () {
     });
 
 
-    // =========================================================
+   
     // Calculate SLA Status
-    // =========================================================
+    
 
     this.on('calculateSLAStatus', async (req) => {
 
@@ -370,9 +370,9 @@ module.exports = cds.service.impl(async function () {
         });
 
 
-        // =====================================================
+     
         // 5. MARK ALERT AS READ
-        // =====================================================
+      
 
         this.on('markAsRead', async (req) => {
 

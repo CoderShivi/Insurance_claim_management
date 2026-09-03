@@ -1,0 +1,66 @@
+<mvc:View controllerName="claimsure.app.controller.Policies" xmlns="sap.m" xmlns:mvc="sap.ui.core.mvc" xmlns:core="sap.ui.core">
+    <Page title="{i18n>navPolicies}" showNavButton="false" class="csPage">
+        <content>
+            <Table
+                id="policiesTable"
+                growing="true"
+                growingThreshold="20"
+                class="sapUiResponsiveMargin"
+                items="{
+                    path: '/Policies',
+                    parameters: {
+                        $select: 'ID,policyNumber,coverageLimit,startDate,endDate,status,customer_ID,claimType_ID',
+                        $orderby: 'policyNumber desc',
+                        $$operationMode: 'Server'
+                    }
+                }"
+                noDataText="{i18n>noClaims}">
+
+                <headerToolbar>
+                    <OverflowToolbar>
+                        <Title text="{i18n>navPolicies}" level="H2"/>
+                        <ToolbarSpacer/>
+                        <SearchField id="policiesSearch" width="16rem" search="onSearch" placeholder="Search policies..."/>
+                    </OverflowToolbar>
+                </headerToolbar>
+
+                <columns>
+                    <Column><Text text="{i18n>colPolicyNumber}"/></Column>
+                    <Column><Text text="{i18n>colCustomer}"/></Column>
+                    <Column><Text text="{i18n>colClaimType}"/></Column>
+                    <Column hAlign="End"><Text text="{i18n>colCoverage}"/></Column>
+                    <Column><Text text="{i18n>colStartDate}"/></Column>
+                    <Column><Text text="{i18n>colEndDate}"/></Column>
+                    <Column><Text text="{i18n>colStatus}"/></Column>
+                    <Column><Text text="Actions"/></Column>
+                </columns>
+
+                <items>
+                    <ColumnListItem>
+                        <cells>
+                            <ObjectIdentifier title="{policyNumber}"/>
+                            <Text text="{
+                                parts: [{path: 'customer_ID'}, {path: 'lookups>/customers'}],
+                                formatter: '.formatter.idToName'
+                            }"/>
+                            <Text text="{
+                                parts: [{path: 'claimType_ID'}, {path: 'lookups>/claimTypes'}],
+                                formatter: '.formatter.idToName'
+                            }"/>
+                            <ObjectNumber number="{ path: 'coverageLimit', formatter: '.formatter.currency' }" unit="USD"/>
+                            <Text text="{ path: 'startDate', formatter: '.formatter.shortDate' }"/>
+                            <Text text="{ path: 'endDate', formatter: '.formatter.shortDate' }"/>
+                            <ObjectStatus text="{status}" state="{ path: 'status', formatter: '.formatter.statusState' }"/>
+                            <HBox>
+                                <Button text="{i18n>btnRenew}" press="onRenewPolicy"
+                                    visible="{ path: 'status', formatter: '.formatter.canRenew' }" class="sapUiTinyMarginEnd"/>
+                                <Button text="{i18n>btnCancel}" press="onCancelPolicy"
+                                    visible="{ path: 'status', formatter: '.formatter.canCancel' }"/>
+                            </HBox>
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </content>
+    </Page>
+</mvc:View>

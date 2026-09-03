@@ -1,9 +1,9 @@
 const cds=require('@sap/cds')
 module.exports = cds.service.impl(function () {
 
-    // ==============================
+   
     // FraudRiskScores
-    // ==============================
+   
     const{	Policies, Claims, ClaimDocuments } =this.entities;
     this.before('CREATE', 'FraudRiskScores', async (req) => {
 
@@ -29,9 +29,9 @@ module.exports = cds.service.impl(function () {
     });
 
 
-    // ==============================
+  
     // Investigations
-    // ==============================
+    
 
     this.before('UPDATE', 'Investigations', async (req) => {
 
@@ -49,9 +49,9 @@ module.exports = cds.service.impl(function () {
     });
 
 
-    // ==============================
+    
     // Approvals
-    // ==============================
+   
 
     this.before('UPDATE', 'Approvals', async (req) => {
 
