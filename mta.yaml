@@ -28,7 +28,8 @@ modules:
     requires:
       - name: Insurance_claim_management-auth
       - name: Insurance_claim_management-db
- 
+      - name: Insurance_claim_management-destination
+
   - name: Insurance_claim_management-db-deployer
     type: hdb
     path: gen/db
@@ -51,12 +52,13 @@ modules:
           url: ~{srv-url}
           forwardAuthToken: true
       - name: Insurance_claim_management-auth
+      - name: Insurance_claim_management-destination
     provides:
       - name: app-api
         properties:
           app-protocol: ${protocol}
           app-uri: ${default-uri}
- 
+
 resources:
   - name: Insurance_claim_management-auth
     type: org.cloudfoundry.managed-service
@@ -80,3 +82,8 @@ resources:
     parameters:
       service: hana
       service-plan: hdi-shared
+  - name: Insurance_claim_management-destination
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: destination
+      service-plan: lite
