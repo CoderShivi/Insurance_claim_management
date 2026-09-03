@@ -1,10 +1,11 @@
-const cds=require('@sap/cds')
+const cds = require('@sap/cds')
+const { executeHttpRequest } = require('@sap-cloud-sdk/http-client');
 module.exports = cds.service.impl(function () {
 
-    // ==============================
+ 
     // FraudRiskScores
-    // ==============================
-    const{	Policies, Claims, ClaimDocuments } =this.entities;
+  
+    const { Policies, Claims, ClaimDocuments } = this.entities;
     this.before('CREATE', 'FraudRiskScores', async (req) => {
 
         const score = req.data.riskScore;
@@ -29,9 +30,7 @@ module.exports = cds.service.impl(function () {
     });
 
 
-    // ==============================
     // Investigations
-    // ==============================
 
     this.before('UPDATE', 'Investigations', async (req) => {
 
@@ -49,9 +48,7 @@ module.exports = cds.service.impl(function () {
     });
 
 
-    // ==============================
     // Approvals
-    // ==============================
 
     this.before('UPDATE', 'Approvals', async (req) => {
 
@@ -60,7 +57,7 @@ module.exports = cds.service.impl(function () {
 
         if (
             (req.data.decision === 'Approved' ||
-             req.data.decision === 'Rejected') &&
+                req.data.decision === 'Rejected') &&
             !req.data.approver_ID
         ) {
             req.error(
@@ -145,7 +142,7 @@ module.exports = cds.service.impl(function () {
         }
     });
 
-     this.on('renewPolicy', async (req) => {
+    this.on('renewPolicy', async (req) => {
 
         const { policyID } = req.data;
 
@@ -170,7 +167,7 @@ module.exports = cds.service.impl(function () {
             .where({ ID: policyID });
     });
 
-      this.on('cancelPolicy', async (req) => {
+    this.on('cancelPolicy', async (req) => {
 
         const { policyID } = req.data;
 
@@ -195,7 +192,7 @@ module.exports = cds.service.impl(function () {
             .where({ ID: policyID });
     });
 
-     this.on('getPolicyStatus', async (req) => {
+    this.on('getPolicyStatus', async (req) => {
 
         const { policyID } = req.data;
 
@@ -210,7 +207,7 @@ module.exports = cds.service.impl(function () {
         return policy.status;
     });
 
-     this.on('getPolicyClaimsCount', async (req) => {
+    this.on('getPolicyClaimsCount', async (req) => {
 
         const { policyID } = req.data;
 
@@ -229,35 +226,126 @@ module.exports = cds.service.impl(function () {
         return Number(result.count);
     });
 
-       this.on('submitClaim', async (req) => {
+    this.on("submitClaim", async (req) => {
 
         const { claimID } = req.data;
 
-        const claim = await SELECT.one.from(Claims)
+        // Validate request
+        if (!claimID) {
+            return req.reject(400, "Claim ID is required");
+        }
+
+        // Get claim
+        const claim = await SELECT
+            .one
+            .from(Claims)
             .where({ ID: claimID });
 
         if (!claim) {
-            return req.error(404, 'Claim not found');
+            return req.reject(404, "Claim not found");
         }
 
-        if (claim.status !== 'Draft') {
-            return req.error(
+        // Check claim status
+        if (claim.status !== "Draft") {
+            return req.reject(
                 400,
-                'Only Draft claims can be submitted'
+                "Only Draft claims can be submitted for approval"
             );
         }
 
-        await UPDATE(Claims)
-            .set({
-                status: 'Submitted'
-            })
-            .where({ ID: claimID });
+        try {
 
-        return await SELECT.one.from(Claims)
-            .where({ ID: claimID });
+            // Start SBPA process
+            const response = await executeHttpRequest(
+                {
+                    destinationName: "ClaimProcess"
+                },
+                {
+                    method: "POST",
+
+                    url: "/workflow/rest/v1/workflow-instances",
+
+                    data: {
+                        definitionId:"us10.547c31aatrial.claimsureclaimmanagement.claimApprovalProcess",
+
+                        context: {
+                            claimid: claim.ID,
+                            claimnumber: claim.claimNumber,
+                            claimedamount: Number(claim.claimedAmount),
+                            description: claim.description || ""
+                        }
+                    }
+                },
+                {
+                    fetchCsrfToken: false
+                }
+            );
+
+            // Update claim status
+            await UPDATE(Claims)
+                .set({
+                    status: "PendingApproval"
+                })
+                .where({
+                    ID: claimID
+                });
+
+            // Log SBPA response
+            console.log(
+                "SBPA STATUS:",
+                response.status
+            );
+
+            console.log(
+                "SBPA RESPONSE DATA:",
+                JSON.stringify(response.data, null, 2)
+            );
+
+            console.log(
+                "response from bpa:",
+                response
+            );
+
+            return true;
+
+        } catch (error) {
+
+            console.error(
+                "SBPA ERROR MESSAGE:",
+                error.message
+            );
+
+            console.error(
+                "SBPA ERROR CAUSE:",
+                error.cause
+            );
+
+            console.error(
+                "SBPA ERROR FULL:",
+                JSON.stringify(
+                    error,
+                    Object.getOwnPropertyNames(error),
+                    2
+                )
+            );
+
+            console.error(
+                "SBPA RESPONSE DATA:",
+                JSON.stringify(
+                    error.response?.data,
+                    null,
+                    2
+                )
+            );
+
+            return req.reject(
+                502,
+                `Failed to start approval process: ${error.message}`
+            );
+        }
     });
 
-      this.on('approveClaim', async (req) => {
+    this.on('approveClaim', async (req) => {
 
         const { claimID } = req.data;
 
@@ -320,7 +408,7 @@ module.exports = cds.service.impl(function () {
             .where({ ID: claimID });
     });
 
-     this.on('getClaimStatus', async (req) => {
+    this.on('getClaimStatus', async (req) => {
 
         const { claimID } = req.data;
 
@@ -335,7 +423,7 @@ module.exports = cds.service.impl(function () {
         return claim.status;
     });
 
-       this.on('getClaimAmount', async (req) => {
+    this.on('getClaimAmount', async (req) => {
 
         const { claimID } = req.data;
 
@@ -350,7 +438,7 @@ module.exports = cds.service.impl(function () {
         return claim.claimedAmount;
     });
 
-      this.on('getClaimDocumentsCount', async (req) => {
+    this.on('getClaimDocumentsCount', async (req) => {
 
         const { claimID } = req.data;
 
@@ -369,7 +457,7 @@ module.exports = cds.service.impl(function () {
         return Number(result.count);
     });
 
-     this.on('deleteDocument', async (req) => {
+    this.on('deleteDocument', async (req) => {
 
         const { documentID } = req.data;
 
@@ -387,7 +475,7 @@ module.exports = cds.service.impl(function () {
         return true;
     });
 
-      this.on('getDocumentInfo', async (req) => {
+    this.on('getDocumentInfo', async (req) => {
 
         const { documentID } = req.data;
 
@@ -407,7 +495,7 @@ module.exports = cds.service.impl(function () {
         return `File: ${document.fileName}, Type: ${document.documentType}, Media Type: ${document.mediaType}`;
     });
 
-    
+
 
 
 
