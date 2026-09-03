@@ -1,0 +1,74 @@
+<mvc:View
+    controllerName="claimsure.app.controller.Dashboard"
+    xmlns="sap.m"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:f="sap.f"
+    xmlns:core="sap.ui.core">
+
+    <Page title="{i18n>navDashboard}" showNavButton="false" class="csPage">
+        <content>
+            <VBox class="sapUiMediumMargin">
+
+                <Title text="{= 'Welcome back, ' + ${app>/currentUser/name} }" level="H2"/>
+                <Text text="{i18n>dashboardSub}" class="sapUiTinyMarginBottom sapUiMediumMarginBottom"/>
+
+                <f:GridContainer id="tileGrid">
+                    <f:layout>
+                        <f:GridContainerSettings rowSize="6rem" columnSize="14rem" gap="1rem"/>
+                    </f:layout>
+
+                    <GenericTile header="{i18n>tileTotalClaims}" press="onNavClaims" class="sapUiTinyMargin">
+                        <TileContent unit="Claims">
+                            <NumericContent value="{dash>/totalClaims}" icon="sap-icon://form" withMargin="false"/>
+                        </TileContent>
+                    </GenericTile>
+
+                    <GenericTile header="{i18n>tilePendingApproval}" press="onNavClaims" class="sapUiTinyMargin">
+                        <TileContent unit="Claims">
+                            <NumericContent value="{dash>/pendingApproval}" icon="sap-icon://pending" withMargin="false"/>
+                        </TileContent>
+                    </GenericTile>
+
+                    <GenericTile header="{i18n>tileHighFraudRisk}" press="onNavClaims" class="sapUiTinyMargin">
+                        <TileContent unit="Claims">
+                            <NumericContent value="{dash>/highFraudRisk}" icon="sap-icon://alert" valueColor="{= ${dash>/highFraudRisk} > 0 ? 'Error' : 'Neutral'}" withMargin="false"/>
+                        </TileContent>
+                    </GenericTile>
+
+                    <GenericTile header="{i18n>tileActivePolicies}" press="onNavPolicies" class="sapUiTinyMargin">
+                        <TileContent unit="Policies">
+                            <NumericContent value="{dash>/activePolicies}" icon="sap-icon://shield" withMargin="false"/>
+                        </TileContent>
+                    </GenericTile>
+                </f:GridContainer>
+
+                <Panel headerText="{i18n>recentClaims}" class="sapUiMediumMarginTop">
+                    <Table id="recentClaimsTable" items="{recent>/}" noDataText="{i18n>noClaims}">
+                        <columns>
+                            <Column><Text text="{i18n>colClaimNumber}"/></Column>
+                            <Column><Text text="{i18n>colCustomer}"/></Column>
+                            <Column><Text text="{i18n>colClaimType}"/></Column>
+                            <Column hAlign="End"><Text text="{i18n>colAmount}"/></Column>
+                            <Column><Text text="{i18n>colStatus}"/></Column>
+                        </columns>
+                        <items>
+                            <ColumnListItem type="Navigation" press="onClaimPress">
+                                <cells>
+                                    <ObjectIdentifier title="{recent>claimNumber}"/>
+                                    <Text text="{recent>customerName}"/>
+                                    <Text text="{recent>claimTypeName}"/>
+                                    <ObjectNumber number="{recent>claimedAmount}" unit="USD"/>
+                                    <ObjectStatus text="{recent>status}"
+                                        state="{= ${recent>status} === 'Rejected' ? 'Error'
+                                                 : ${recent>status} === 'Approved' ? 'Success'
+                                                 : ${recent>status} === 'PendingApproval' || ${recent>status} === 'UnderReview' ? 'Warning'
+                                                 : 'None' }"/>
+                                </cells>
+                            </ColumnListItem>
+                        </items>
+                    </Table>
+                </Panel>
+            </VBox>
+        </content>
+    </Page>
+</mvc:View>

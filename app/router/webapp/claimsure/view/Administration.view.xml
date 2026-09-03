@@ -1,0 +1,80 @@
+<mvc:View controllerName="claimsure.app.controller.Administration" xmlns="sap.m" xmlns:mvc="sap.ui.core.mvc" xmlns:core="sap.ui.core">
+    <Page title="{i18n>navAdmin}" showNavButton="false" class="csPage">
+        <content>
+            <IconTabBar id="adminTabBar" expandable="false" class="sapUiResponsiveMargin">
+                <items>
+
+                    <IconTabFilter text="{i18n>tabEmployees}" key="employees" icon="sap-icon://employee">
+                        <Table id="employeesTable" items="{admin>/Employees}" noDataText="No employees found">
+                            <columns>
+                                <Column><Text text="{i18n>colEmployeeNo}"/></Column>
+                                <Column><Text text="{i18n>colName}"/></Column>
+                                <Column><Text text="{i18n>colEmail}"/></Column>
+                                <Column><Text text="{i18n>colDepartment}"/></Column>
+                                <Column><Text text="{i18n>colRole}"/></Column>
+                                <Column><Text text="{i18n>colActive}"/></Column>
+                            </columns>
+                            <items>
+                                <ColumnListItem>
+                                    <cells>
+                                        <Text text="{admin>employeeNumber}"/>
+                                        <Text text="{admin>firstName} {admin>lastName}"/>
+                                        <Text text="{admin>email}"/>
+                                        <Text text="{admin>department}"/>
+                                        <Text text="{admin>role}"/>
+                                        <Switch state="{admin>active}" change="onEmployeeActiveChange"/>
+                                    </cells>
+                                </ColumnListItem>
+                            </items>
+                        </Table>
+                    </IconTabFilter>
+
+                    <IconTabFilter text="{i18n>tabCustomers}" key="customers" icon="sap-icon://customer">
+                        <Table id="customersTable" items="{admin>/Customers}" noDataText="No customers found">
+                            <columns>
+                                <Column><Text text="{i18n>colCustomerNo}"/></Column>
+                                <Column><Text text="{i18n>colName}"/></Column>
+                                <Column><Text text="{i18n>colEmail}"/></Column>
+                                <Column><Text text="{i18n>colPhone}"/></Column>
+                                <Column><Text text="{i18n>colStatus}"/></Column>
+                            </columns>
+                            <items>
+                                <ColumnListItem>
+                                    <cells>
+                                        <Text text="{admin>customerNumber}"/>
+                                        <Text text="{admin>firstName} {admin>lastName}"/>
+                                        <Text text="{admin>email}"/>
+                                        <Text text="{admin>phone}"/>
+                                        <ObjectStatus text="{admin>status}" state="{ path: 'admin>status', formatter: '.formatter.statusState' }"/>
+                                    </cells>
+                                </ColumnListItem>
+                            </items>
+                        </Table>
+                    </IconTabFilter>
+
+                    <IconTabFilter text="{i18n>tabClaimTypes}" key="claimTypes" icon="sap-icon://form">
+                        <Table id="claimTypesTable" items="{admin>/ClaimTypes}" noDataText="No claim types found">
+                            <columns>
+                                <Column><Text text="{i18n>colCode}"/></Column>
+                                <Column><Text text="{i18n>colName}"/></Column>
+                                <Column><Text text="{i18n>colCategory}"/></Column>
+                                <Column><Text text="{i18n>colActive}"/></Column>
+                            </columns>
+                            <items>
+                                <ColumnListItem>
+                                    <cells>
+                                        <Text text="{admin>code}"/>
+                                        <Text text="{admin>name}"/>
+                                        <Text text="{admin>category}"/>
+                                        <Switch state="{admin>active}" change="onClaimTypeActiveChange"/>
+                                    </cells>
+                                </ColumnListItem>
+                            </items>
+                        </Table>
+                    </IconTabFilter>
+
+                </items>
+            </IconTabBar>
+        </content>
+    </Page>
+</mvc:View>
