@@ -1,10 +1,9 @@
 ID,employeeNumber,firstName,lastName,email,department,role,active
-b1000001-0001-0001-0001-000000000001,EMP001,Ajay,Sharma,ajay@claimsure.com,Claims,ClaimsAgent,true
-b1000002-0002-0002-0002-000000000002,EMP002,Divya,Rao,divya@claimsure.com,Claims,ClaimsAgent,true
-b1000003-0003-0003-0003-000000000003,Manoj,Patil,manoj@claimsure.com,Investigation,Investigator,true
-b1000004-0004-0004-0004-000000000004,Pooja,Menon,pooja@claimsure.com,Investigation,Investigator,true
-b1000005-0005-0005-0005-000000000005,Rahul,Joshi,rahul@claimsure.com,Management,ClaimsManager,true
-b1000006-0006-0006-0006-000000000006,Kavya,Iyer,kavya@claimsure.com,Management,ClaimsManager,true
-b1000007-0007-0007-0007-000000000007,Suresh,Nair,suresh@claimsure.com,Finance,FinanceOfficer,true
-b1000008-0008-0008-0008-000000000008,Meena,Reddy,meena@claimsure.com,Finance,FinanceOfficer,true
-b1000009-0009-0009-0009-000000000009,Anil,Kumar,anil@claimsure.com,Administration,Admin,true
+e1111111-1111-1111-1111-111111111111,EMP-1001,Sam,Agent,sam.agent@claimsure.com,Claims Operations,ClaimsAgent,true
+e2222222-2222-2222-2222-222222222222,EMP-1002,Ivy,Investigator,ivy.investigator@claimsure.com,Fraud Investigation,Investigator,true
+e3333333-3333-3333-3333-333333333333,EMP-1003,Mona,Manager,mona.manager@claimsure.com,Claims Operations,ClaimsManager,true
+e4444444-4444-4444-4444-444444444444,EMP-1004,Fred,Finance,fred.finance@claimsure.com,Finance,FinanceOfficer,true
+e5555555-5555-5555-5555-555555555555,EMP-1005,Nora,Nelson,nora.nelson@claimsure.com,Claims Operations,ClaimsAgent,true
+e6666666-6666-6666-6666-666666666666,EMP-1006,Ian,Roy,ian.roy@claimsure.com,Fraud Investigation,Investigator,true
+e7777777-7777-7777-7777-777777777777,EMP-1007,Priya,Shah,priya.shah@claimsure.com,Claims Operations,ClaimsManager,true
+e8888888-8888-8888-8888-888888888888,EMP-1008,Carlos,Diaz,carlos.diaz@claimsure.com,Finance,FinanceOfficer,false

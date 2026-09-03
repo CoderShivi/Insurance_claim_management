@@ -7,4 +7,3 @@ ID,customerNumber,firstName,lastName,email,phone,address,status
 66666666-6666-6666-6666-666666666666,CUST006,Neha,Verma,neha.verma@email.com,9876543215,Pune,Active
 77777777-7777-7777-7777-777777777777,CUST007,Karan,Mehta,karan.mehta@email.com,9876543216,Chennai,Active
 88888888-8888-8888-8888-888888888888,CUST008,Sneha,Iyer,sneha.iyer@email.com,9876543217,Kochi,Active
-99999999-9999-9999-9999-999999999999,CUST009,Rohit,Das,rohit.das@email.com,9876543218,Kolkata,Inactive
