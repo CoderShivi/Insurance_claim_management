@@ -78,11 +78,9 @@ html, body {
     overflow: hidden;
 }
 
-/* sap.ui.core.HTML does not stretch to fill a flex parent by default,
+/* NEW — sap.ui.core.HTML does not stretch to fill a flex parent by default,
    so the percentage-width fill div inside it was computing against zero
-   width and never showing. Force the wrapper to fill .statusTrack.
-   Still used by the "Claims by status" / "Policies by status" panels
-   if you re-enable them — not used by Policies by type anymore. */
+   width and never showing. Force the wrapper to fill .statusTrack. */
 .statusTrack > .statusTrackHtml {
     display: block;
     width: 100%;
@@ -113,7 +111,7 @@ html, body {
     position: relative; /* needed so slice labels position relative to the pie, not the page */
 }
 
-/* don't let the legend column stretch across the whole panel,
+/* CHANGED — don't let the legend column stretch across the whole panel,
    otherwise the label eats all the leftover space and pushes percent/count
    off to the far right edge */
 .pieLegend {
@@ -122,7 +120,7 @@ html, body {
     max-width: 320px;
 }
 
-/* tight row (not full width) so percent/count sit right after the label */
+/* CHANGED — tight row (not full width) so percent/count sit right after the label */
 .legendRow {
     display: flex;
     align-items: center;
@@ -139,7 +137,7 @@ html, body {
     flex-shrink: 0;
 }
 
-/* fixed width instead of flex:1, so it doesn't consume all remaining space.
+/* CHANGED — fixed width instead of flex:1, so it doesn't consume all remaining space.
    Widened from 140px so "InvestigationRequired" no longer overlaps its percentage. */
 .legendLabel {
     width: 170px;
@@ -147,7 +145,7 @@ html, body {
     color: #4A4A4A;
 }
 
-/* left-aligned so it sits immediately next to the label */
+/* CHANGED — left-aligned so it sits immediately next to the label */
 .legendPercent {
     width: 36px;
     text-align: left;
@@ -155,16 +153,13 @@ html, body {
     flex-shrink: 0;
 }
 
-/* Third column inside the Claims analytics panel, holds the
-   Policies by type SVG bar chart */
+/* NEW — third column inside the Claims analytics panel, fills the leftover
+   white space with the Policies by type breakdown */
 .policyTypeCol {
     flex: 1;
     min-width: 220px;
     border-left: 0.5px solid #EDEDE8;
     padding-left: 1.5rem;
-    /* NEW — the SVG bar chart widens with the number of policy types;
-       scroll horizontally instead of squeezing or overflowing the panel */
-    overflow-x: auto;
 }
 
 .policyTypeTitle {
