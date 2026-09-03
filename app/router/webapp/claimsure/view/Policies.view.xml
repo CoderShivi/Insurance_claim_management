@@ -3,6 +3,7 @@
         <content>
             <Table
                 id="policiesTable"
+                width="100%"
                 growing="true"
                 growingThreshold="20"
                 class="sapUiResponsiveMargin"
@@ -20,19 +21,25 @@
                     <OverflowToolbar>
                         <Title text="{i18n>navPolicies}" level="H2"/>
                         <ToolbarSpacer/>
-                        <SearchField id="policiesSearch" width="16rem" search="onSearch" placeholder="Search policies..."/>
+                        <SearchField id="policiesSearch" width="12rem" search="onSearch" placeholder="Search policies..."/>
+                        <Button
+                            text="Create Policy"
+                            type="Emphasized"
+                            icon="sap-icon://add"
+                            class="sapUiResponsiveMargin"
+                            press="onCreatePolicy"/>
                     </OverflowToolbar>
                 </headerToolbar>
 
                 <columns>
                     <Column><Text text="{i18n>colPolicyNumber}"/></Column>
                     <Column><Text text="{i18n>colCustomer}"/></Column>
-                    <Column><Text text="{i18n>colClaimType}"/></Column>
+                    <Column demandPopin="true" minScreenWidth="Tablet"><Text text="{i18n>colClaimType}"/></Column>
                     <Column hAlign="End"><Text text="{i18n>colCoverage}"/></Column>
-                    <Column><Text text="{i18n>colStartDate}"/></Column>
-                    <Column><Text text="{i18n>colEndDate}"/></Column>
+                    <Column demandPopin="true" minScreenWidth="Desktop"><Text text="{i18n>colStartDate}"/></Column>
+                    <Column demandPopin="true" minScreenWidth="Desktop"><Text text="{i18n>colEndDate}"/></Column>
                     <Column><Text text="{i18n>colStatus}"/></Column>
-                    <Column><Text text="Actions"/></Column>
+                    <Column demandPopin="true" minScreenWidth="Tablet" hAlign="Begin"><Text text="Actions"/></Column>
                 </columns>
 
                 <items>
@@ -41,26 +48,88 @@
                             <ObjectIdentifier title="{policyNumber}"/>
                             <Text text="{
                                 parts: [{path: 'customer_ID'}, {path: 'lookups>/customers'}],
-                                formatter: '.formatter.idToName'
+                                formatter: '.idToName'
                             }"/>
                             <Text text="{
                                 parts: [{path: 'claimType_ID'}, {path: 'lookups>/claimTypes'}],
-                                formatter: '.formatter.idToName'
+                                formatter: '.idToName'
                             }"/>
-                            <ObjectNumber number="{ path: 'coverageLimit', formatter: '.formatter.currency' }" unit="USD"/>
-                            <Text text="{ path: 'startDate', formatter: '.formatter.shortDate' }"/>
-                            <Text text="{ path: 'endDate', formatter: '.formatter.shortDate' }"/>
-                            <ObjectStatus text="{status}" state="{ path: 'status', formatter: '.formatter.statusState' }"/>
-                            <HBox>
-                                <Button text="{i18n>btnRenew}" press="onRenewPolicy"
-                                    visible="{ path: 'status', formatter: '.formatter.canRenew' }" class="sapUiTinyMarginEnd"/>
+                            <ObjectNumber number="{ path: 'coverageLimit', formatter: '.formatCurrency' }" unit="USD"/>
+                            <Text text="{ path: 'startDate', formatter: '.formatShortDate' }"/>
+                            <Text text="{ path: 'endDate', formatter: '.formatShortDate' }"/>
+                            <ObjectStatus text="{status}" state="{ path: 'status', formatter: '.formatStatusState' }"/>
+                            <HBox wrap="Wrap" class="sapUiTinyGap" justifyContent="Start">
+                                <Button text="Edit" press="onEditPolicy"
+                                    visible="{ path: 'status', formatter: '.canEditPolicy' }" class="sapUiResponsiveMargin"/>
                                 <Button text="{i18n>btnCancel}" press="onCancelPolicy"
-                                    visible="{ path: 'status', formatter: '.formatter.canCancel' }"/>
+                                    visible="{ path: 'status', formatter: '.canCancelPolicy' }" class="sapUiResponsiveMargin"/>
+                                <Button text="Delete" type="Reject" press="onDeletePolicy" class="sapUiResponsiveMargin"/>
                             </HBox>
                         </cells>
                     </ColumnListItem>
                 </items>
             </Table>
+
+            <!-- Inline Create / Edit dialog (no separate fragment file) -->
+            <Dialog
+                id="policyDialog"
+                title="{policyDialog>/dialogTitle}"
+                contentWidth="28rem"
+                busy="{policyDialog>/busy}"
+                busyIndicatorDelay="0">
+                <content>
+                    <VBox class="sapUiSmallMargin">
+
+                        <Label text="Policy Number" required="true"/>
+                        <Input value="{policyDialog>/policyNumber}" />
+
+                        <Label text="Customer" required="true" class="sapUiTinyMarginTop"/>
+                        <ComboBox
+                            selectedKey="{policyDialog>/customer_ID}"
+                            items="{lookups>/customers}">
+                            <core:Item key="{lookups>ID}" text="{lookups>name}"/>
+                        </ComboBox>
+
+                        <Label text="Claim Type" required="true" class="sapUiTinyMarginTop"/>
+                        <ComboBox
+                            selectedKey="{policyDialog>/claimType_ID}"
+                            items="{lookups>/claimTypes}">
+                            <core:Item key="{lookups>ID}" text="{lookups>name}"/>
+                        </ComboBox>
+
+                        <Label text="Coverage Limit (USD)" required="true" class="sapUiTinyMarginTop"/>
+                        <Input value="{policyDialog>/coverageLimit}" type="Number"/>
+
+                        <Label text="Start Date" required="true" class="sapUiTinyMarginTop"/>
+                        <DatePicker
+                            value="{policyDialog>/startDate}"
+                            valueFormat="yyyy-MM-dd"
+                            displayFormat="dd/MM/yyyy"/>
+
+                        <Label text="End Date" required="true" class="sapUiTinyMarginTop"/>
+                        <DatePicker
+                            value="{policyDialog>/endDate}"
+                            valueFormat="yyyy-MM-dd"
+                            displayFormat="dd/MM/yyyy"/>
+
+                        <Label text="Status" required="true" class="sapUiTinyMarginTop"/>
+                        <Select selectedKey="{policyDialog>/status}">
+                            <core:Item key="Active" text="Active"/>
+                            <core:Item key="Pending" text="Pending"/>
+                            <core:Item key="Cancelled" text="Cancelled"/>
+                            <core:Item key="Expired" text="Expired"/>
+                        </Select>
+
+                    </VBox>
+                </content>
+                <beginButton>
+                    <Button text="Save" type="Emphasized" press="onSavePolicy"/>
+                </beginButton>
+                <endButton>
+                    <Button text="Cancel" press="onCancelPolicyDialog"/>
+                </endButton>
+            </Dialog>
+
         </content>
     </Page>
 </mvc:View>

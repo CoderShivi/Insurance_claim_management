@@ -80,17 +80,7 @@
                         <!-- Fills the remaining white space with Policies by type -->
                         <VBox class="policyTypeCol">
                             <Text text="Policies by type" class="policyTypeTitle"/>
-                            <List items="{policyTypeChart>/items}" showSeparators="None" class="statusList">
-                                <CustomListItem>
-                                    <HBox alignItems="Center" class="statusRow">
-                                        <Text text="{policyTypeChart>type}" class="statusLabel"/>
-                                        <HBox class="statusTrack">
-                                            <core:HTML class="statusTrackHtml" content="{policyTypeChart>barHtml}"/>
-                                        </HBox>
-                                        <Text text="{policyTypeChart>percentOfTotal}%" class="statusCount"/>
-                                    </HBox>
-                                </CustomListItem>
-                            </List>
+                            <core:HTML content="{ path: 'policyTypeChart>/items', formatter: '.formatPolicyTypeChartSvg' }"/>
                         </VBox>
                     </HBox>
                 </Panel>
