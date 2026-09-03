@@ -11,9 +11,7 @@ module.exports = cds.service.impl(async function () {
     } = this.entities;
 
 
-    // =========================================================
     // Create Payout
-    // =========================================================
 
     this.on('createPayout', async (req) => {
 
@@ -85,9 +83,7 @@ module.exports = cds.service.impl(async function () {
     });
 
 
-    // =========================================================
     // Process Payout
-    // =========================================================
 
         this.on('processPayout', async (req) => {
 
@@ -126,13 +122,6 @@ module.exports = cds.service.impl(async function () {
 
         try {
 
-            /*
-             * In a real enterprise project,
-             * external payment/finance system
-             * can be called here using Destination Service.
-             *
-             * Currently payment is simulated.
-             */
 
             const paymentSuccessful = true;
 
@@ -228,9 +217,9 @@ module.exports = cds.service.impl(async function () {
     });
 
 
-    // =========================================================
+  
     // Calculate SLA Status
-    // =========================================================
+
 
     this.on('calculateSLAStatus', async (req) => {
 
@@ -370,9 +359,9 @@ module.exports = cds.service.impl(async function () {
         });
 
 
-        // =====================================================
+     
         // 5. MARK ALERT AS READ
-        // =====================================================
+     
 
         this.on('markAsRead', async (req) => {
 

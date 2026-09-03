@@ -47,7 +47,6 @@ service PayoutService {
     entity SLARules as projection on cl.SLARules;
     entity AlertLog as projection on cl.AlertLog;
  
-    // PAYOUT ACTIONS
  
     action createPayout(
         claimID : UUID,
@@ -58,13 +57,11 @@ service PayoutService {
         payoutID : UUID
     ) returns Payouts;
  
-    // SLA FUNCTION
  
     function calculateSLAStatus(
         claimID : UUID
     ) returns String;
  
-    // ALERT ACTIONS
  
     action createAlert(
         claimID : UUID,
