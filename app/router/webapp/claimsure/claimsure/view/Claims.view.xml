@@ -1,5 +1,14 @@
-<mvc:View controllerName="claimsure.app.controller.Claims" xmlns="sap.m" xmlns:mvc="sap.ui.core.mvc" xmlns:core="sap.ui.core">
-    <Page title="{i18n>navClaims}" showNavButton="false" class="csPage">
+<mvc:View
+    controllerName="claimsure.app.controller.Claims"
+    xmlns="sap.m"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:core="sap.ui.core"
+>
+    <Page
+        title="{i18n>navClaims}"
+        showNavButton="false"
+        class="csPage"
+    >
         <content>
             <Table
                 id="claimsTable"
@@ -14,70 +23,205 @@
                         $$operationMode: 'Server'
                     }
                 }"
-                noDataText="{i18n>noClaims}">
+                noDataText="{i18n>noClaims}"
+            >
+                <!-- ========================= -->
+                <!-- HEADER TOOLBAR             -->
+                <!-- ========================= -->
 
-                <headerToolbar >
-                    <OverflowToolbar  >
-                        <Title text="{i18n>navClaims}" level="H2"/>
-                        <ToolbarSpacer/>
+                <headerToolbar>
+                    <OverflowToolbar>
+                        <Title
+                            text="{i18n>navClaims}"
+                            level="H2"
+                        />
+
+                        <ToolbarSpacer />
+
                         <SearchField
                             id="claimsSearch"
                             width="12rem"
                             liveChange="onSearch"
                             search="onSearch"
-                            placeholder="{i18n>searchClaims}"/>
+                            placeholder="{i18n>searchClaims}"
+                        />
+
                         <ComboBox
                             id="statusFilter"
                             width="10rem"
                             placeholder="{i18n>filterStatus}"
-                            selectionChange="onStatusFilterChange">
-                            <core:Item text="Draft" key="Draft"/>
-                            <core:Item text="Submitted" key="Submitted"/>
-                            <core:Item text="UnderReview" key="UnderReview"/>
-                            <core:Item text="InvestigationRequired" key="InvestigationRequired"/>
-                            <core:Item text="PendingApproval" key="PendingApproval"/>
-                            <core:Item text="Approved" key="Approved"/>
-                            <core:Item text="Rejected" key="Rejected"/>
-                            <core:Item text="Paid" key="Paid"/>
+                            selectionChange="onStatusFilterChange"
+                        >
+                            <core:Item
+                                text="Draft"
+                                key="Draft"
+                            />
+
+                            <core:Item
+                                text="Submitted"
+                                key="Submitted"
+                            />
+
+                            <core:Item
+                                text="UnderReview"
+                                key="UnderReview"
+                            />
+
+                            <core:Item
+                                text="InvestigationRequired"
+                                key="InvestigationRequired"
+                            />
+
+                            <core:Item
+                                text="PendingApproval"
+                                key="PendingApproval"
+                            />
+
+                            <core:Item
+                                text="Approved"
+                                key="Approved"
+                            />
+
+                            <core:Item
+                                text="Rejected"
+                                key="Rejected"
+                            />
+
+                            <core:Item
+                                text="Paid"
+                                key="Paid"
+                            />
                         </ComboBox>
+
                         <Button
                             id="newClaimButton"
-                            
                             icon="sap-icon://add"
                             text="{i18n>newClaim}"
                             type="Emphasized"
                             class="sapUiLargeMarginEnd"
-                            press="onCreateClaim"/>
+                            press="onCreateClaim"
+                        />
                     </OverflowToolbar>
                 </headerToolbar>
 
+                <!-- ========================= -->
+                <!-- TABLE COLUMNS              -->
+                <!-- ========================= -->
+
                 <columns>
-                    <Column><Text text="{i18n>colClaimNumber}"/></Column>
-                    <Column><Text text="{i18n>colCustomer}"/></Column>
-                    <Column demandPopin="true" minScreenWidth="Tablet"><Text text="{i18n>colClaimType}"/></Column>
-                    <Column hAlign="End"><Text text="{i18n>colAmount}"/></Column>
-                    <Column demandPopin="true" minScreenWidth="Desktop"><Text text="{i18n>colIncidentDate}"/></Column>
-                    <Column><Text text="{i18n>colStatus}"/></Column>
+                    <Column>
+                        <Text text="{i18n>colClaimNumber}" />
+                    </Column>
+
+                    <Column>
+                        <Text text="{i18n>colCustomer}" />
+                    </Column>
+
+                    <Column
+                        demandPopin="true"
+                        minScreenWidth="Tablet"
+                    >
+                        <Text text="{i18n>colClaimType}" />
+                    </Column>
+
+                    <Column hAlign="End">
+                        <Text text="{i18n>colAmount}" />
+                    </Column>
+
+                    <Column
+                        demandPopin="true"
+                        minScreenWidth="Desktop"
+                    >
+                        <Text text="{i18n>colIncidentDate}" />
+                    </Column>
+
+                    <Column>
+                        <Text text="{i18n>colStatus}" />
+                    </Column>
+
+                    <!-- NEW ACTION COLUMN -->
+                    <Column
+                        hAlign="Center"
+                        demandPopin="true"
+                        minScreenWidth="Tablet"
+                    >
+                        <Text text="Action" />
+                    </Column>
                 </columns>
 
+                <!-- ========================= -->
+                <!-- TABLE ROWS                 -->
+                <!-- ========================= -->
+
                 <items>
-                    <ColumnListItem type="Navigation" press="onClaimPress">
+                    <ColumnListItem
+                        type="Navigation"
+                        press="onClaimPress"
+                    >
                         <cells>
-                            <ObjectIdentifier title="{claimNumber}"/>
-                            <Text text="{
-                                parts: [{path: 'customer_ID'}, {path: 'lookups>/customers'}],
-                                formatter: '.formatter.idToName'
-                            }"/>
-                            <Text text="{
-                                parts: [{path: 'claimType_ID'}, {path: 'lookups>/claimTypes'}],
-                                formatter: '.formatter.idToName'
-                            }"/>
-                            <ObjectNumber number="{claimedAmount}" unit="USD"/>
-                            <Text text="{ path: 'incidentDate', formatter: '.formatter.shortDate' }"/>
+                            <!-- Claim Number -->
+                            <ObjectIdentifier title="{claimNumber}" />
+
+                            <!-- Customer -->
+                            <Text
+                                text="{
+                                    parts: [
+                                        {path: 'customer_ID'},
+                                        {path: 'lookups>/customers'}
+                                    ],
+                                    formatter: '.formatter.idToName'
+                                }"
+                            />
+
+                            <!-- Claim Type -->
+                            <Text
+                                text="{
+                                    parts: [
+                                        {path: 'claimType_ID'},
+                                        {path: 'lookups>/claimTypes'}
+                                    ],
+                                    formatter: '.formatter.idToName'
+                                }"
+                            />
+
+                            <!-- Amount -->
+                            <ObjectNumber
+                                number="{claimedAmount}"
+                                unit="USD"
+                            />
+
+                            <!-- Incident Date -->
+                            <Text
+                                text="{
+                                    path: 'incidentDate',
+                                    formatter: '.formatter.shortDate'
+                                }"
+                            />
+
+                            <!-- Status -->
                             <ObjectStatus
                                 text="{status}"
-                                state="{ path: 'status', formatter: '.formatter.statusState' }"
-                                icon="{ path: 'status', formatter: '.formatter.statusIcon' }"/>
+                                state="{
+                                    path: 'status',
+                                    formatter: '.formatter.statusState'
+                                }"
+                                icon="{ 
+    path: 'status', 
+    formatter: '.formatter.statusIcon'
+}"
+                            />
+
+                            <!-- ========================= -->
+                            <!-- GO FOR APPROVAL BUTTON     -->
+                            <!-- ========================= -->
+
+                            <Button
+                                text="Go for Approval"
+                                icon="sap-icon://approvals"
+                                type="Emphasized"
+                                visible="{= ${status} === 'Draft' }"
+                                press="onGoForApproval"
+                            />
                         </cells>
                     </ColumnListItem>
                 </items>
