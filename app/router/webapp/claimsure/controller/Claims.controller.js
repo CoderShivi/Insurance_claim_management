@@ -317,10 +317,10 @@ sap.ui.define([
                 // Validate Status
                 // --------------------------------------------------------
 
-                if (sStatus !== "Draft") {
+                if (sStatus !== "Submitted") {
 
                     MessageToast.show(
-                        "Only Draft claims can be submitted for approval."
+                        "Only Submitted claims can be for approval."
                     );
 
                     return;
@@ -832,7 +832,7 @@ sap.ui.define([
                             sDescription,
 
                         status:
-                            "Draft"
+                            "Submitted"
                     });
 
 

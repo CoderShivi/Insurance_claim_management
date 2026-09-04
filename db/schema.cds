@@ -152,7 +152,6 @@ entity Claims : cuid {
     claimedAmount   : Decimal(15, 2)            @mandatory;
 
     status          : String(30) enum {
-        Draft;
         Submitted;
         UnderReview;
         InvestigationRequired;
@@ -160,7 +159,7 @@ entity Claims : cuid {
         Approved;
         Rejected;
         Paid;
-    } default 'Draft';
+    } default 'Submitted';
 
     // Claims Agent
     assignedAgent   : Association to Employees;
