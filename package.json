@@ -2,7 +2,7 @@
   "name": "Insurance_claim_management",
   "version": "1.0.0",
   "dependencies": {
-    "@cap-js/hana": "^2",
+    "@cap-js/hana": "^2.8.1",
     "@sap-cloud-sdk/http-client": "^4.9.1",
     "@sap/cds": "^9",
     "@sap/xssec": "^4"
@@ -18,11 +18,12 @@
   "cds": {
     "requires": {
       "db": {
-        "kind": "sqlite"
+        "kind": "hana"
       },
       "[production]": {
         "auth": "dummy"
-      }
+      },
+      "destinations": true
     },
     "server": {
       "index": true
