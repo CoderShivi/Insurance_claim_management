@@ -130,7 +130,7 @@
                                 parts: [{path: 'claimType_ID'}, {path: 'lookups>/claimTypes'}],
                                 formatter: '.idToName'
                             }"/>
-                            <ObjectNumber number="{ path: 'coverageLimit' }"/>
+                            <ObjectNumber number="{ path: 'coverageLimit', formatter: '.formatCurrency' }" unit="USD"/>
                             <Text text="{ path: 'startDate', formatter: '.formatShortDate' }"/>
                             <Text text="{ path: 'endDate', formatter: '.formatShortDate' }"/>
                             <ObjectStatus text="{status}" state="{ path: 'status', formatter: '.formatStatusState' }"/>
