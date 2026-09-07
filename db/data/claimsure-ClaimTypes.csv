@@ -1,35 +1,31 @@
 ID,code,name,description,category,active
-a1000001-0001-0001-0001-000000000001,VEH001,Vehicle Accident,Vehicle accident claim,Vehicle,True
-a1000002-0002-0002-0002-000000000002,VEH002,Vehicle Theft,Vehicle theft claim,Vehicle,True
-a1000003-0003-0003-0003-000000000003,VEH003,Vehicle Damage,Vehicle damage claim,Vehicle,True
-a1000004-0004-0004-0004-000000000004,HLT001,Medical Expense,Medical expense claim,Health,True
-a1000005-0005-0005-0005-000000000005,HLT002,Hospitalization,Hospitalization claim,Health,True
-a1000006-0006-0006-0006-000000000006,HLT003,Emergency Treatment,Emergency treatment claim,Health,True
-a1000007-0007-0007-0007-000000000007,PRO001,Property Damage,Property damage claim,Property,True
-a1000008-0008-0008-0008-000000000008,PRO002,Fire Damage,Fire damage claim,Property,True
-a1000009-0009-0009-0009-000000000009,PRO003,Theft Damage,Property theft claim,Property,True
-386a4935-193c-4278-ba5a-a38bcc60e2db,VEH010,Vehicle Collision,Vehicle collision claim,Vehicle,True
-826eb7d6-474f-4804-9b4d-54227024337b,VEH011,Vehicle Theft,Vehicle theft claim,Vehicle,True
-afcb7a6b-1f38-4c30-b88b-bec54a8d5870,PROP012,Property Damage,Property damage claim,Property,True
-9e401211-3bd1-4c9c-ae23-2d97f97b3e26,HEAL013,Medical Expense,Medical expense claim,Health,True
-bb511a14-c44d-4253-8d24-c4e084db78b0,TRVL014,Travel Delay,Travel delay claim,Travel,True
-e5b187f0-4a7e-4d27-af47-8f7061a839a4,FIRE015,Fire Damage,Fire damage claim,Property,True
-639586aa-0cd3-41de-9bc1-20671c74f082,HOME016,Home Contents,Home contents claim,Property,True
-61573260-f610-468e-9247-c458fd3012cb,LIFE017,Accidental Death,Accidental death claim,Life,True
-27c445d8-3cc5-4a05-8ed5-f33819d4cda1,VEH018,Vehicle Collision,Vehicle collision claim,Vehicle,True
-0d28e1a6-dd3f-44d3-a56c-edd7b2d71702,VEH019,Vehicle Theft,Vehicle theft claim,Vehicle,True
-9b774b0a-8018-486b-a8a8-2105c1afaa1d,PROP020,Property Damage,Property damage claim,Property,True
-798ad306-d5b4-4b29-83bf-7d6c850ffb73,HEAL021,Medical Expense,Medical expense claim,Health,True
-0426935c-aaf1-445c-9c9c-fea031878a36,TRVL022,Travel Delay,Travel delay claim,Travel,True
-621fb376-2787-4a2f-a6c9-ad469470506c,FIRE023,Fire Damage,Fire damage claim,Property,True
-d11c9c2a-bd5a-481a-9ea8-06f7d6c8a4fb,HOME024,Home Contents,Home contents claim,Property,True
-6ea2e786-09b5-474b-b1ce-7e29ae6d10e3,LIFE025,Accidental Death,Accidental death claim,Life,True
-dc85f818-39bf-4749-b607-cc1e3d75fd04,VEH026,Vehicle Collision,Vehicle collision claim,Vehicle,True
-8b107ea8-2265-4dde-aec5-b5f46d80dd02,VEH027,Vehicle Theft,Vehicle theft claim,Vehicle,True
-b6a8db1e-2a41-4670-8198-b9da66c5865e,PROP028,Property Damage,Property damage claim,Property,True
-a131311a-e2c3-4403-b66f-2acf7be6d4a9,HEAL029,Medical Expense,Medical expense claim,Health,True
-66a22790-ff69-4984-b13d-a41fc8539604,TRVL030,Travel Delay,Travel delay claim,Travel,True
-1b1a54ee-138b-4b68-82c8-dae132eb2761,FIRE031,Fire Damage,Fire damage claim,Property,True
-7d66bbea-e52b-4125-9f70-b6e772edac25,HOME032,Home Contents,Home contents claim,Property,True
-a610a318-585d-4b8d-9347-454d399bbac8,LIFE033,Accidental Death,Accidental death claim,Life,True
-5cbf98ed-fb6d-4652-bc20-8d388a8ee052,VEH034,Vehicle Collision,Vehicle collision claim,Vehicle,True
+a0000001-0001-0001-0001-000000000001,VEH001,Vehicle Accident,Vehicle Accident claim,Vehicle,False
+a0000002-0002-0002-0002-000000000002,VEH002,Vehicle Theft,Vehicle Theft claim,Vehicle,True
+a0000003-0003-0003-0003-000000000003,VEH003,Vehicle Fire,Vehicle Fire claim,Vehicle,True
+a0000004-0004-0004-0004-000000000004,VEH004,Vehicle Flood,Vehicle Flood claim,Vehicle,True
+a0000005-0005-0005-0005-000000000005,VEH005,Vehicle Collision,Vehicle Collision claim,Vehicle,True
+a0000006-0006-0006-0006-000000000006,VEH006,Windshield Damage,Windshield Damage claim,Vehicle,True
+a0000007-0007-0007-0007-000000000007,VEH007,Vehicle Vandalism,Vehicle Vandalism claim,Vehicle,True
+a0000008-0008-0008-0008-000000000008,VEH008,Third Party Damage,Third Party Damage claim,Vehicle,True
+a0000009-0009-0009-0009-000000000009,VEH009,Personal Injury Vehicle,Personal Injury Vehicle claim,Vehicle,False
+a0000010-0010-0010-0010-000000000010,VEH010,Roadside Incident,Roadside Incident claim,Vehicle,True
+a0000011-0011-0011-0011-000000000011,HEA011,Hospitalization,Hospitalization claim,Health,True
+a0000012-0012-0012-0012-000000000012,HEA012,Medical Treatment,Medical Treatment claim,Health,True
+a0000013-0013-0013-0013-000000000013,HEA013,Surgery,Surgery claim,Health,True
+a0000014-0014-0014-0014-000000000014,HEA014,Accidental Injury,Accidental Injury claim,Health,True
+a0000015-0015-0015-0015-000000000015,HEA015,Critical Illness,Critical Illness claim,Health,True
+a0000016-0016-0016-0016-000000000016,HEA016,Maternity,Maternity claim,Health,True
+a0000017-0017-0017-0017-000000000017,HEA017,Day Care Treatment,Day Care Treatment claim,Health,False
+a0000018-0018-0018-0018-000000000018,HEA018,Emergency Treatment,Emergency Treatment claim,Health,True
+a0000019-0019-0019-0019-000000000019,HEA019,Outpatient Treatment,Outpatient Treatment claim,Health,True
+a0000020-0020-0020-0020-000000000020,HEA020,Prescription Reimbursement,Prescription Reimbursement claim,Health,True
+a0000021-0021-0021-0021-000000000021,PRO021,Fire Damage,Fire Damage claim,Property,True
+a0000022-0022-0022-0022-000000000022,PRO022,Water Damage,Water Damage claim,Property,True
+a0000023-0023-0023-0023-000000000023,PRO023,Theft Damage,Theft Damage claim,Property,True
+a0000024-0024-0024-0024-000000000024,PRO024,Storm Damage,Storm Damage claim,Property,True
+a0000025-0025-0025-0025-000000000025,PRO025,Earthquake Damage,Earthquake Damage claim,Property,False
+a0000026-0026-0026-0026-000000000026,PRO026,Burglary Damage,Burglary Damage claim,Property,True
+a0000027-0027-0027-0027-000000000027,PRO027,Property Vandalism,Property Vandalism claim,Property,True
+a0000028-0028-0028-0028-000000000028,PRO028,Electrical Damage,Electrical Damage claim,Property,True
+a0000029-0029-0029-0029-000000000029,PRO029,Structural Damage,Structural Damage claim,Property,True
+a0000030-0030-0030-0030-000000000030,PRO030,Natural Disaster,Natural Disaster claim,Property,True
