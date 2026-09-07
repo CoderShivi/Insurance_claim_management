@@ -103,96 +103,35 @@ _onRouteMatched: function (oEvent) {
     oBinding.filter(aFilters);
 },
        
-_loadLookups: function () {
-    var oAdminModel = this.getOwnerComponent().getModel("admin");
 
-    if (!oAdminModel) {
-        console.error("[Policies] admin model not found");
-        MessageBox.error("MainService model 'admin' not found.");
-        return;
-    }
+        _loadLookups: function () {
+            var oLookupModel = new JSONModel({
+                customers: [
+                    { ID: "11111111-1111-1111-1111-111111111111", name: "Ravi Kumar" },
+                    { ID: "22222222-2222-2222-2222-222222222222", name: "Anita Sharma" },
+                    { ID: "33333333-3333-3333-3333-333333333333", name: "Arjun Reddy" },
+                    { ID: "44444444-4444-4444-4444-444444444444", name: "Priya Patel" },
+                    { ID: "55555555-5555-5555-5555-555555555555", name: "Vikram Singh" },
+                    { ID: "66666666-6666-6666-6666-666666666666", name: "Neha Verma" },
+                    { ID: "77777777-7777-7777-7777-777777777777", name: "Karan Mehta" },
+                    { ID: "88888888-8888-8888-8888-888888888888", name: "Sneha Iyer" },
+                    { ID: "99999999-9999-9999-9999-999999999999", name: "Test Customer" }
+                ],
+                claimTypes: [
+                    { ID: "a1000001-0001-0001-0001-000000000001", name: "Vehicle Accident" },
+                    { ID: "a1000002-0002-0002-0002-000000000002", name: "Vehicle Theft" },
+                    { ID: "a1000003-0003-0003-0003-000000000003", name: "Vehicle Damage" },
+                    { ID: "a1000004-0004-0004-0004-000000000004", name: "Medical Expense" },
+                    { ID: "a1000005-0005-0005-0005-000000000005", name: "Hospitalization" },
+                    { ID: "a1000006-0006-0006-0006-000000000006", name: "Emergency Treatment" },
+                    { ID: "a1000007-0007-0007-0007-000000000007", name: "Property Damage" },
+                    { ID: "a1000008-0008-0008-0008-000000000008", name: "Fire Damage" },
+                    { ID: "a1000009-0009-0009-0009-000000000009", name: "Theft Damage" }
+                ]
+            });
+            this.getView().setModel(oLookupModel, "lookups");
+        },
 
-    var oLookupModel = new JSONModel({
-        customers: [],
-        claimTypes: []
-    });
-
-    this.getView().setModel(oLookupModel, "lookups");
-
-    // Customers
-    var oCustomerBinding = oAdminModel.bindList(
-        "/Customers",
-        undefined,
-        undefined,
-        undefined,
-        {
-            $select: "ID,firstName,lastName"
-        }
-    );
-
-    // Claim Types
-    var oClaimTypeBinding = oAdminModel.bindList(
-        "/ClaimTypes",
-        undefined,
-        undefined,
-        undefined,
-        {
-            $select: "ID,name"
-        }
-    );
-
-    Promise.all([
-        oCustomerBinding.requestContexts(0, 1000),
-        oClaimTypeBinding.requestContexts(0, 1000)
-    ]).then(function (aResults) {
-
-        // ============================================================
-        // CUSTOMERS
-        // ============================================================
-
-        var aCustomers = aResults[0].map(function (oContext) {
-            var oData = oContext.getObject();
-
-            return {
-                ID: oData.ID,
-                name: [
-                    oData.firstName,
-                    oData.lastName
-                ].filter(Boolean).join(" ")
-            };
-        });
-
-        // ============================================================
-        // CLAIM TYPES
-        // ============================================================
-
-        var aClaimTypes = aResults[1].map(function (oContext) {
-            var oData = oContext.getObject();
-
-            return {
-                ID: oData.ID,
-                name: oData.name
-            };
-        });
-
-        console.log("[Policies] Customers loaded:", aCustomers);
-        console.log("[Policies] Claim Types loaded:", aClaimTypes);
-
-        oLookupModel.setData({
-            customers: aCustomers,
-            claimTypes: aClaimTypes
-        });
-
-    }).catch(function (oError) {
-
-        console.error("[Policies] Lookup loading failed:", oError);
-
-        MessageBox.error(
-            "Could not load customers and claim types.\n\n" +
-            (oError.message || "Unknown error")
-        );
-    });
-},
         // =================================================================
         // Formatters (plain controller methods, referenced in the view as
         // formatter: '.methodName' — no separate formatter.js file)
