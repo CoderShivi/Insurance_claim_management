@@ -5,6 +5,7 @@
     xmlns:core="sap.ui.core"
 >
     <Page
+        id="administrationPage"
         title="{i18n>navAdmin}"
         showNavButton="false"
         class="csPage"
@@ -13,10 +14,13 @@
             <IconTabBar
                 id="adminTabBar"
                 expandable="false"
-                class="sapUiResponsiveMargin"
+                class="adminTabBar"
             >
-                <!-- ================= EMPLOYEES ================= -->
                 <items>
+                    <!-- ================================================= -->
+                    <!-- EMPLOYEES -->
+                    <!-- ================================================= -->
+
                     <IconTabFilter
                         text="{i18n>tabEmployees}"
                         key="employees"
@@ -26,6 +30,11 @@
                             id="employeesTable"
                             items="{admin>/Employees}"
                             noDataText="No employees found"
+                            width="100%"
+                            fixedLayout="true"
+                            growing="true"
+                            growingThreshold="20"
+                            class="adminTable"
                         >
                             <headerToolbar>
                                 <OverflowToolbar>
@@ -33,7 +42,9 @@
                                         text="{i18n>tabEmployees}"
                                         level="H3"
                                     />
+
                                     <ToolbarSpacer />
+
                                     <Button
                                         id="newEmployeeButton"
                                         icon="sap-icon://add"
@@ -45,25 +56,37 @@
                             </headerToolbar>
 
                             <columns>
-                                <Column>
+                                <Column width="10rem">
                                     <Text text="{i18n>colEmployeeNo}" />
                                 </Column>
-                                <Column>
+
+                                <Column width="13rem">
                                     <Text text="{i18n>colName}" />
                                 </Column>
-                                <Column>
+
+                                <Column width="17rem">
                                     <Text text="{i18n>colEmail}" />
                                 </Column>
-                                <Column>
+
+                                <Column width="14rem">
                                     <Text text="{i18n>colDepartment}" />
                                 </Column>
-                                <Column>
+
+                                <Column width="11rem">
                                     <Text text="{i18n>colRole}" />
                                 </Column>
-                                <Column>
+
+                                <Column
+                                    width="6rem"
+                                    hAlign="Center"
+                                >
                                     <Text text="{i18n>colActive}" />
                                 </Column>
-                                <Column>
+
+                                <Column
+                                    width="7rem"
+                                    hAlign="Center"
+                                >
                                     <Text text="Actions" />
                                 </Column>
                             </columns>
@@ -71,24 +94,41 @@
                             <items>
                                 <ColumnListItem>
                                     <cells>
-                                        <Text text="{admin>employeeNumber}" />
+                                        <Text
+                                            text="{admin>employeeNumber}"
+                                            wrapping="false"
+                                        />
 
                                         <Text
                                             text="{admin>firstName} {admin>lastName}"
+                                            wrapping="true"
                                         />
 
-                                        <Text text="{admin>email}" />
+                                        <Text
+                                            text="{admin>email}"
+                                            wrapping="true"
+                                        />
 
-                                        <Text text="{admin>department}" />
+                                        <Text
+                                            text="{admin>department}"
+                                            wrapping="true"
+                                        />
 
-                                        <Text text="{admin>role}" />
+                                        <Text
+                                            text="{admin>role}"
+                                            wrapping="true"
+                                        />
 
                                         <Switch
                                             state="{admin>active}"
                                             change="onEmployeeActiveChange"
                                         />
 
-                                        <HBox>
+                                        <HBox
+                                            width="100%"
+                                            justifyContent="Center"
+                                            alignItems="Center"
+                                        >
                                             <Button
                                                 icon="sap-icon://edit"
                                                 type="Transparent"
@@ -109,7 +149,10 @@
                         </Table>
                     </IconTabFilter>
 
-                    <!-- ================= CUSTOMERS ================= -->
+                    <!-- ================================================= -->
+                    <!-- CUSTOMERS -->
+                    <!-- ================================================= -->
+
                     <IconTabFilter
                         text="{i18n>tabCustomers}"
                         key="customers"
@@ -119,6 +162,11 @@
                             id="customersTable"
                             items="{admin>/Customers}"
                             noDataText="No customers found"
+                            width="100%"
+                            fixedLayout="true"
+                            growing="true"
+                            growingThreshold="20"
+                            class="adminTable"
                         >
                             <headerToolbar>
                                 <OverflowToolbar>
@@ -140,22 +188,30 @@
                             </headerToolbar>
 
                             <columns>
-                                <Column>
+                                <Column width="11rem">
                                     <Text text="{i18n>colCustomerNo}" />
                                 </Column>
-                                <Column>
+
+                                <Column width="14rem">
                                     <Text text="{i18n>colName}" />
                                 </Column>
-                                <Column>
+
+                                <Column width="18rem">
                                     <Text text="{i18n>colEmail}" />
                                 </Column>
-                                <Column>
+
+                                <Column width="12rem">
                                     <Text text="{i18n>colPhone}" />
                                 </Column>
-                                <Column>
+
+                                <Column width="9rem">
                                     <Text text="{i18n>colStatus}" />
                                 </Column>
-                                <Column>
+
+                                <Column
+                                    width="7rem"
+                                    hAlign="Center"
+                                >
                                     <Text text="Actions" />
                                 </Column>
                             </columns>
@@ -163,15 +219,25 @@
                             <items>
                                 <ColumnListItem>
                                     <cells>
-                                        <Text text="{admin>customerNumber}" />
+                                        <Text
+                                            text="{admin>customerNumber}"
+                                            wrapping="false"
+                                        />
 
                                         <Text
                                             text="{admin>firstName} {admin>lastName}"
+                                            wrapping="true"
                                         />
 
-                                        <Text text="{admin>email}" />
+                                        <Text
+                                            text="{admin>email}"
+                                            wrapping="true"
+                                        />
 
-                                        <Text text="{admin>phone}" />
+                                        <Text
+                                            text="{admin>phone}"
+                                            wrapping="false"
+                                        />
 
                                         <ObjectStatus
                                             text="{admin>status}"
@@ -181,7 +247,11 @@
                                             }"
                                         />
 
-                                        <HBox>
+                                        <HBox
+                                            width="100%"
+                                            justifyContent="Center"
+                                            alignItems="Center"
+                                        >
                                             <Button
                                                 icon="sap-icon://edit"
                                                 type="Transparent"
@@ -202,7 +272,10 @@
                         </Table>
                     </IconTabFilter>
 
-                    <!-- ================= CLAIM TYPES ================= -->
+                    <!-- ================================================= -->
+                    <!-- CLAIM TYPES -->
+                    <!-- ================================================= -->
+
                     <IconTabFilter
                         text="{i18n>tabClaimTypes}"
                         key="claimTypes"
@@ -212,6 +285,11 @@
                             id="claimTypesTable"
                             items="{admin>/ClaimTypes}"
                             noDataText="No claim types found"
+                            width="100%"
+                            fixedLayout="true"
+                            growing="true"
+                            growingThreshold="20"
+                            class="adminTable"
                         >
                             <headerToolbar>
                                 <OverflowToolbar>
@@ -233,19 +311,29 @@
                             </headerToolbar>
 
                             <columns>
-                                <Column>
+                                <Column width="11rem">
                                     <Text text="{i18n>colCode}" />
                                 </Column>
-                                <Column>
+
+                                <Column width="18rem">
                                     <Text text="{i18n>colName}" />
                                 </Column>
-                                <Column>
+
+                                <Column width="11rem">
                                     <Text text="{i18n>colCategory}" />
                                 </Column>
-                                <Column>
+
+                                <Column
+                                    width="6rem"
+                                    hAlign="Center"
+                                >
                                     <Text text="{i18n>colActive}" />
                                 </Column>
-                                <Column>
+
+                                <Column
+                                    width="7rem"
+                                    hAlign="Center"
+                                >
                                     <Text text="Actions" />
                                 </Column>
                             </columns>
@@ -253,18 +341,31 @@
                             <items>
                                 <ColumnListItem>
                                     <cells>
-                                        <Text text="{admin>code}" />
+                                        <Text
+                                            text="{admin>code}"
+                                            wrapping="false"
+                                        />
 
-                                        <Text text="{admin>name}" />
+                                        <Text
+                                            text="{admin>name}"
+                                            wrapping="true"
+                                        />
 
-                                        <Text text="{admin>category}" />
+                                        <Text
+                                            text="{admin>category}"
+                                            wrapping="false"
+                                        />
 
                                         <Switch
                                             state="{admin>active}"
                                             change="onClaimTypeActiveChange"
                                         />
 
-                                        <HBox>
+                                        <HBox
+                                            width="100%"
+                                            justifyContent="Center"
+                                            alignItems="Center"
+                                        >
                                             <Button
                                                 icon="sap-icon://edit"
                                                 type="Transparent"
@@ -288,10 +389,14 @@
             </IconTabBar>
         </content>
 
+        <!-- ============================================================= -->
+        <!-- DIALOGS -->
+        <!-- ============================================================= -->
+
         <dependents>
-            <!-- ===================================================== -->
+            <!-- ========================================================= -->
             <!-- EMPLOYEE DIALOG -->
-            <!-- ===================================================== -->
+            <!-- ========================================================= -->
 
             <Dialog
                 id="employeeDialog"
@@ -344,7 +449,7 @@
                             value="{draft>/email}"
                         />
 
-                        <!-- DEPARTMENT DROPDOWN -->
+                        <!-- DEPARTMENT -->
 
                         <Label
                             text="Department"
@@ -353,6 +458,7 @@
 
                         <Select
                             id="empDepartmentSelect"
+                            width="100%"
                             selectedKey="{draft>/department}"
                             items="{adminOptions>/employeeDepartments}"
                         >
@@ -362,14 +468,16 @@
                             />
                         </Select>
 
-                        <!-- ROLE DROPDOWN -->
+                        <!-- ROLE -->
 
                         <Label
                             text="Role"
                             class="sapUiTinyMarginTop"
                         />
+
                         <Select
                             id="empRoleSelect"
+                            width="100%"
                             selectedKey="{draft>/role}"
                             items="{adminOptions>/employeeRoles}"
                         >
@@ -378,6 +486,8 @@
                                 text="{adminOptions>}"
                             />
                         </Select>
+
+                        <!-- ACTIVE -->
 
                         <Label
                             text="Active"
@@ -407,9 +517,9 @@
                 </endButton>
             </Dialog>
 
-            <!-- ===================================================== -->
+            <!-- ========================================================= -->
             <!-- CUSTOMER DIALOG -->
-            <!-- ===================================================== -->
+            <!-- ========================================================= -->
 
             <Dialog
                 id="customerDialog"
@@ -516,9 +626,9 @@
                 </endButton>
             </Dialog>
 
-            <!-- ===================================================== -->
+            <!-- ========================================================= -->
             <!-- CLAIM TYPE DIALOG -->
-            <!-- ===================================================== -->
+            <!-- ========================================================= -->
 
             <Dialog
                 id="claimTypeDialog"
@@ -548,7 +658,7 @@
                             value="{draft>/name}"
                         />
 
-                        <!-- CATEGORY DROPDOWN -->
+                        <!-- CATEGORY -->
 
                         <Label
                             text="Category"
@@ -557,6 +667,7 @@
 
                         <Select
                             id="ctCategorySelect"
+                            width="100%"
                             selectedKey="{draft>/category}"
                             items="{adminOptions>/claimTypeCategories}"
                         >
@@ -565,6 +676,8 @@
                                 text="{adminOptions>}"
                             />
                         </Select>
+
+                        <!-- ACTIVE -->
 
                         <Label
                             text="Active"
