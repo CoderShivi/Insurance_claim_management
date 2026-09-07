@@ -1,177 +1,258 @@
+
 <mvc:View
     controllerName="claimsure.app.controller.ClaimDetail"
     xmlns:mvc="sap.ui.core.mvc"
     xmlns="sap.m"
     xmlns:uxap="sap.uxap"
-    xmlns:form="sap.ui.layout.form"
->
+    xmlns:form="sap.ui.layout.form">
+
     <Page
         title="Claim Details"
         showNavButton="true"
         navButtonPress="onNavBack"
-        class="csPage"
-    >
+        class="csPage">
+
         <content>
+
             <uxap:ObjectPageLayout
                 id="claimObjectPage"
                 showTitleInHeaderContent="true"
+                showHeaderContent="true"
                 useIconTabBar="false"
                 upperCaseAnchorBar="false"
                 enableLazyLoading="false"
                 busy="{claimDetail>/busy}"
-                busyIndicatorDelay="0"
-            >
+                busyIndicatorDelay="0">
+
+                <!-- ================================================= -->
                 <!-- OBJECT PAGE HEADER -->
+                <!-- ================================================= -->
+
                 <uxap:headerTitle>
+
                     <uxap:ObjectPageDynamicHeaderTitle>
+
                         <uxap:expandedHeading>
+
                             <VBox>
+
                                 <Title
                                     text="{claimDetail>/claimNumber}"
-                                    level="H2"
-                                />
+                                    level="H1"
+                                    class="sapUiTinyMarginBottom"/>
 
                                 <Text
                                     text="{claimDetail>/description}"
-                                    class="sapUiTinyMarginTop"
-                                />
+                                    class="sapUiTinyMarginTop"/>
+
                             </VBox>
+
                         </uxap:expandedHeading>
 
                         <uxap:snappedHeading>
-                            <Title
-                                text="{claimDetail>/claimNumber}"
-                                level="H3"
-                            />
+
+                            <VBox>
+
+                                <Title
+                                    text="{claimDetail>/claimNumber}"
+                                    level="H3"/>
+
+                                <Text
+                                    text="{claimDetail>/description}"/>
+
+                            </VBox>
+
                         </uxap:snappedHeading>
+
                     </uxap:ObjectPageDynamicHeaderTitle>
+
                 </uxap:headerTitle>
 
+
+                <!-- ================================================= -->
                 <!-- HEADER CONTENT -->
+                <!-- ================================================= -->
+
                 <uxap:headerContent>
+
                     <HBox
                         width="100%"
                         justifyContent="SpaceBetween"
                         alignItems="Center"
-                    >
-                        <ObjectStatus
-                            text="{claimDetail>/status}"
-                            state="{
-                                path: 'claimDetail>/status',
-                                formatter: '.formatter.statusState'
-                            }"
-                            icon="{
-                                path: 'claimDetail>/status',
-                                formatter: '.formatter.statusIcon'
-                            }"
-                            class="sapMObjectStatusLarge"
-                        />
+                        class="sapUiSmallMarginBottom">
 
-                        <ObjectNumber
-                            number="{
-                                path: 'claimDetail>/claimedAmount',
-                                formatter: '.formatter.currency'
-                            }"
-                            unit="USD"
-                            emphasized="true"
-                        />
+                        <!-- STATUS -->
+
+                        <VBox>
+
+                            <Label
+                                text="Claim Status"
+                                class="sapUiTinyMarginBottom"/>
+
+                            <ObjectStatus
+                                text="{claimDetail>/status}"
+                                state="{
+                                    path: 'claimDetail>/status',
+                                    formatter: '.formatter.statusState'
+                                }"
+                                icon="{
+                                    path: 'claimDetail>/status',
+                                    formatter: '.formatter.statusIcon'
+                                }"
+                                class="sapMObjectStatusLarge"/>
+
+                        </VBox>
+
+
+                        <!-- AMOUNT -->
+
+                        <VBox
+                            alignItems="End">
+
+                            <Label
+                                text="Claimed Amount"
+                                class="sapUiTinyMarginBottom"/>
+
+                            <ObjectNumber
+                                number="{
+                                    path: 'claimDetail>/claimedAmount',
+                                    formatter: '.formatter.currency'
+                                }"
+                                unit="USD"
+                                emphasized="true"/>
+
+                        </VBox>
+
                     </HBox>
+
                 </uxap:headerContent>
 
-                <!-- SECTIONS -->
+
+                <!-- ================================================= -->
+                <!-- OBJECT PAGE SECTIONS -->
+                <!-- ================================================= -->
+
                 <uxap:sections>
-                    <!-- CLAIM INFORMATION -->
+
+
+                    <!-- ================================================= -->
+                    <!-- CLAIM OVERVIEW -->
+                    <!-- ================================================= -->
+
                     <uxap:ObjectPageSection
-                        title="Claim Information"
-                        titleUppercase="false"
-                    >
+                        title="Claim Overview"
+                        titleUppercase="false">
+
                         <uxap:subSections>
-                            <uxap:ObjectPageSubSection title="Claim Details">
+
+                            <uxap:ObjectPageSubSection
+                                title="Claim Information">
+
                                 <uxap:blocks>
+
                                     <form:SimpleForm
                                         editable="false"
                                         layout="ResponsiveGridLayout"
-                                        labelSpanL="4"
+                                        labelSpanXL="3"
+                                        labelSpanL="3"
                                         labelSpanM="4"
                                         labelSpanS="12"
-                                        emptySpanL="0"
+                                        emptySpanXL="1"
+                                        emptySpanL="1"
                                         emptySpanM="0"
                                         emptySpanS="0"
+                                        columnsXL="2"
                                         columnsL="2"
                                         columnsM="2"
-                                    >
-                                        <Label text="Customer" />
+                                        singleContainerFullSize="false">
+
+                                        <!-- CLAIM NUMBER -->
+
+                                        <Label text="Claim Number"/>
+
+                                        <Text
+                                            text="{claimDetail>/claimNumber}"
+                                            class="sapMTextBold"/>
+
+
+                                        <!-- CUSTOMER -->
+
+                                        <Label text="Customer"/>
 
                                         <Text
                                             text="{
-                                            parts: [
-                                                {
-                                                    path: 'claimDetail>/customer_ID'
-                                                },
-                                                {
-                                                    path: 'lookups>/customers'
-                                                }
-                                            ],
-                                            formatter: '.formatter.idToName'
-                                        }"
-                                        />
+                                                parts: [
+                                                    {
+                                                        path: 'claimDetail>/customer_ID'
+                                                    },
+                                                    {
+                                                        path: 'lookups>/customers'
+                                                    }
+                                                ],
+                                                formatter: '.formatter.idToName'
+                                            }"/>
 
-                                        <Label text="Claim Type" />
+
+                                        <!-- CLAIM TYPE -->
+
+                                        <Label text="Claim Type"/>
 
                                         <Text
                                             text="{
-                                            parts: [
-                                                {
-                                                    path: 'claimDetail>/claimType_ID'
-                                                },
-                                                {
-                                                    path: 'lookups>/claimTypes'
-                                                }
-                                            ],
-                                            formatter: '.formatter.idToName'
-                                        }"
-                                        />
+                                                parts: [
+                                                    {
+                                                        path: 'claimDetail>/claimType_ID'
+                                                    },
+                                                    {
+                                                        path: 'lookups>/claimTypes'
+                                                    }
+                                                ],
+                                                formatter: '.formatter.idToName'
+                                            }"/>
 
-                                        <Label text="Policy" />
+
+                                        <!-- POLICY -->
+
+                                        <Label text="Policy"/>
 
                                         <Text
-                                            text="{claimDetail>/policy/policyNumber}"
-                                        />
+                                            text="{claimDetail>/policy/policyNumber}"/>
 
-                                        <Label text="Incident Date" />
+
+                                        <!-- INCIDENT DATE -->
+
+                                        <Label text="Incident Date"/>
 
                                         <Text
                                             text="{
                                                 path: 'claimDetail>/incidentDate',
                                                 formatter: '.formatter.shortDate'
-                                            }"
-                                        />
+                                            }"/>
 
-                                        <Label text="Assigned Agent" />
+
+                                        <!-- ASSIGNED AGENT -->
+
+                                        <Label text="Assigned Agent"/>
 
                                         <Text
-                                            text="{
-                                            parts: [
-                                                {
-                                                    path: 'claimDetail>/assignedAgent_ID'
-                                                },
-                                                {
-                                                    path: 'lookups>/employees'
-                                                }
-                                            ]                                        }"
-                                        />
+                                            text="{claimDetail>/assignedAgentName}"/>
 
-                                        <Label text="Claimed Amount" />
+
+                                        <!-- AMOUNT -->
+
+                                        <Label text="Claimed Amount"/>
 
                                         <ObjectNumber
                                             number="{
                                                 path: 'claimDetail>/claimedAmount',
                                                 formatter: '.formatter.currency'
                                             }"
-                                            unit="USD"
-                                        />
+                                            unit="USD"/>
 
-                                        <Label text="Current Status" />
+
+                                        <!-- STATUS -->
+
+                                        <Label text="Current Status"/>
 
                                         <ObjectStatus
                                             text="{claimDetail>/status}"
@@ -182,103 +263,193 @@
                                             icon="{
                                                 path: 'claimDetail>/status',
                                                 formatter: '.formatter.statusIcon'
-                                            }"
-                                        />
+                                            }"/>
+
                                     </form:SimpleForm>
+
                                 </uxap:blocks>
+
                             </uxap:ObjectPageSubSection>
+
+
+                            <!-- DESCRIPTION -->
+
+                            <uxap:ObjectPageSubSection
+                                title="Description">
+
+                                <uxap:blocks>
+
+                                    <VBox
+                                        class="sapUiSmallMargin">
+
+                                        <Text
+                                            text="{claimDetail>/description}"
+                                            wrapping="true"/>
+
+                                    </VBox>
+
+                                </uxap:blocks>
+
+                            </uxap:ObjectPageSubSection>
+
                         </uxap:subSections>
+
                     </uxap:ObjectPageSection>
 
-                    <!-- FRAUD RISK SCORES -->
+
+                    <!-- ================================================= -->
+                    <!-- FRAUD RISK -->
+                    <!-- ================================================= -->
+
                     <uxap:ObjectPageSection
-                        title="Fraud Risk Scores"
-                        titleUppercase="false"
-                    >
+                        title="Risk Assessment"
+                        titleUppercase="false">
+
                         <uxap:subSections>
-                            <uxap:ObjectPageSubSection title="Risk Assessment">
+
+                            <uxap:ObjectPageSubSection
+                                title="Fraud Risk Scores">
+
                                 <uxap:blocks>
+
                                     <Table
                                         items="{claimDetail>/fraudRiskScores}"
-                                        noDataText="No risk scores recorded"
+                                        noDataText="No fraud risk assessment available"
                                         growing="true"
-                                    >
+                                        class="sapUiSmallMarginTop">
+
                                         <columns>
-                                            <Column>
-                                                <Text text="Risk Score" />
+
+                                            <Column
+                                                width="50%">
+
+                                                <Text
+                                                    text="Risk Score"/>
+
                                             </Column>
 
-                                            <Column>
-                                                <Text text="Risk Level" />
+                                            <Column
+                                                width="50%">
+
+                                                <Text
+                                                    text="Risk Level"/>
+
                                             </Column>
+
                                         </columns>
 
+
                                         <items>
+
                                             <ColumnListItem>
+
                                                 <cells>
+
                                                     <ObjectNumber
                                                         number="{claimDetail>riskScore}"
-                                                    />
+                                                        emphasized="true"/>
 
                                                     <ObjectStatus
                                                         text="{claimDetail>riskLevel}"
                                                         state="{
                                                             path: 'claimDetail>riskLevel',
                                                             formatter: '.formatter.riskState'
-                                                        }"
-                                                    />
+                                                        }"/>
+
                                                 </cells>
+
                                             </ColumnListItem>
+
                                         </items>
+
                                     </Table>
+
                                 </uxap:blocks>
+
                             </uxap:ObjectPageSubSection>
+
                         </uxap:subSections>
+
                     </uxap:ObjectPageSection>
 
+
+                    <!-- ================================================= -->
                     <!-- DOCUMENTS -->
+                    <!-- ================================================= -->
+
                     <uxap:ObjectPageSection
                         title="Documents"
-                        titleUppercase="false"
-                    >
+                        titleUppercase="false">
+
                         <uxap:subSections>
-                            <uxap:ObjectPageSubSection title="Claim Documents">
+
+                            <uxap:ObjectPageSubSection
+                                title="Claim Documents">
+
                                 <uxap:blocks>
+
                                     <Table
                                         items="{claimDetail>/documents}"
                                         noDataText="No documents uploaded"
                                         growing="true"
-                                    >
+                                        class="sapUiSmallMarginTop">
+
                                         <columns>
-                                            <Column>
-                                                <Text text="File Name" />
+
+                                            <Column
+                                                width="60%">
+
+                                                <Text
+                                                    text="File Name"/>
+
                                             </Column>
 
-                                            <Column>
-                                                <Text text="Type" />
+                                            <Column
+                                                width="40%">
+
+                                                <Text
+                                                    text="Document Type"/>
+
                                             </Column>
+
                                         </columns>
 
+
                                         <items>
+
                                             <ColumnListItem>
+
                                                 <cells>
-                                                    <Text
-                                                        text="{claimDetail>fileName}"
-                                                    />
 
                                                     <Text
-                                                        text="{claimDetail>documentType}"
-                                                    />
+                                                        text="{claimDetail>fileName}"/>
+
+                                                    <ObjectStatus
+                                                        text="{claimDetail>documentType}"/>
+
                                                 </cells>
+
                                             </ColumnListItem>
+
                                         </items>
+
                                     </Table>
+
                                 </uxap:blocks>
+
                             </uxap:ObjectPageSubSection>
+
                         </uxap:subSections>
+
                     </uxap:ObjectPageSection>
+
                 </uxap:sections>
+
             </uxap:ObjectPageLayout>
+
         </content>
+
     </Page>
+
 </mvc:View>
+

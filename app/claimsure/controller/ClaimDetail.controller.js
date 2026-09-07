@@ -1,7 +1,7 @@
-
 sap.ui.define([
     "sap/ui/core/mvc/Controller",
     "sap/ui/model/json/JSONModel",
+    "sap/ui/model/odata/v4/ODataModel",
     "sap/ui/model/Filter",
     "sap/ui/model/FilterOperator",
     "sap/m/MessageBox",
@@ -9,6 +9,7 @@ sap.ui.define([
 ], function (
     Controller,
     JSONModel,
+    ODataModel,
     Filter,
     FilterOperator,
     MessageBox,
@@ -16,220 +17,446 @@ sap.ui.define([
 ) {
     "use strict";
 
-    return Controller.extend(
-        "claimsure.app.controller.ClaimDetail",
-        {
+    return Controller.extend("claimsure.app.controller.ClaimDetail", {
 
-            formatter: formatter,
+        formatter: formatter,
 
-            onInit: function () {
+        onInit: function () {
 
-                this.getView().setModel(
-                    new JSONModel({
-                        busy: false,
-                        fraudRiskScores: [],
-                        documents: []
-                    }),
-                    "claimDetail"
+            this._sClaimId = null;
+
+            var oDetailModel = new JSONModel({
+                busy: false,
+
+                ID: "",
+                claimNumber: "",
+                customer_ID: "",
+                claimType_ID: "",
+                policy_ID: "",
+                incidentDate: "",
+                description: "",
+                claimedAmount: "",
+                status: "",
+
+                assignedAgent_ID: "",
+                assignedAgentDisplay: "Not Assigned",
+
+                employeeNumber: "",
+                department: "",
+                role: "",
+                email: "",
+
+                policy: null,
+                documents: [],
+                fraudRiskScores: []
+            });
+
+            this.getView().setModel(
+                oDetailModel,
+                "claimDetail"
+            );
+
+            /*
+             * MainService
+             * Used to read Employees.
+             */
+            this._oMainModel = new ODataModel({
+                serviceUrl: "/odata/v4/main/",
+                synchronizationMode: "None",
+                autoExpandSelect: true
+            });
+
+            this.getOwnerComponent()
+                .getRouter()
+                .getRoute("claimDetail")
+                .attachPatternMatched(
+                    this._onRouteMatched,
+                    this
+                );
+        },
+
+        _onRouteMatched: function (oEvent) {
+
+            var oArguments = oEvent.getParameter("arguments");
+
+            this._sClaimId = oArguments.claimId;
+
+            console.log(
+                "[ClaimDetail] Claim ID:",
+                this._sClaimId
+            );
+
+            if (!this._sClaimId) {
+                MessageBox.error(
+                    "Claim ID is missing from the route."
+                );
+                return;
+            }
+
+            this._loadClaim(this._sClaimId);
+        },
+
+        _loadClaim: async function (sClaimId) {
+
+            var oInsuranceModel = this.getView().getModel();
+            var oDetailModel = this.getView().getModel("claimDetail");
+
+            if (!oInsuranceModel) {
+                MessageBox.error(
+                    "InsuranceService OData model is not available."
+                );
+                return;
+            }
+
+            oDetailModel.setProperty("/busy", true);
+
+            try {
+
+                /*
+                 * Load Claim.
+                 *
+                 * assignedAgent is NOT expanded because
+                 * Employees belongs to MainService.
+                 */
+                var oClaimBinding = oInsuranceModel.bindContext(
+                    "/Claims(" + sClaimId + ")",
+                    undefined,
+                    {
+                        $expand: "policy,documents"
+                    }
                 );
 
-                var oRouter =
-                    this.getOwnerComponent().getRouter();
+                var oClaim =
+                    await oClaimBinding.requestObject();
 
-                oRouter
-                    .getRoute("claimDetail")
-                    .attachPatternMatched(
-                        this._onRouteMatched,
-                        this
-                    );
-            },
-
-
-            _onRouteMatched: function (oEvent) {
-
-                this._sClaimId =
-                    oEvent.getParameter(
-                        "arguments"
-                    ).claimId;
-
-                if (!this._sClaimId) {
-                    MessageBox.error(
-                        "Claim ID is missing."
-                    );
+                if (!oClaim) {
+                    MessageBox.error("Claim not found.");
                     return;
                 }
 
-                this._loadClaim();
-            },
-
-
-            _loadClaim: function () {
-
-                var oModel =
-                    this.getOwnerComponent()
-                        .getModel();
-
-                var oDetailModel =
-                    this.getView()
-                        .getModel("claimDetail");
-
-                if (!oModel) {
-
-                    MessageBox.error(
-                        "Insurance service model is not available."
-                    );
-
-                    return;
-                }
-
-                oDetailModel.setProperty(
-                    "/busy",
-                    true
+                console.log(
+                    "[ClaimDetail] Claim:",
+                    oClaim
                 );
 
-                var oBinding =
-                    oModel.bindContext(
-                        "/Claims(ID=" +
-                        this._sClaimId +
-                        ")",
-                        undefined,
-                        {
-                            $expand:
-                                "policy,documents"
-                        }
+                console.log(
+                    "[ClaimDetail] assignedAgent_ID:",
+                    oClaim.assignedAgent_ID
+                );
+
+                /*
+                 * Store claim data.
+                 */
+                oDetailModel.setData({
+                    busy: false,
+
+                    ID: oClaim.ID || "",
+
+                    claimNumber:
+                        oClaim.claimNumber || "",
+
+                    customer_ID:
+                        oClaim.customer_ID || "",
+
+                    claimType_ID:
+                        oClaim.claimType_ID || "",
+
+                    policy_ID:
+                        oClaim.policy_ID || "",
+
+                    incidentDate:
+                        oClaim.incidentDate || "",
+
+                    description:
+                        oClaim.description || "",
+
+                    claimedAmount:
+                        oClaim.claimedAmount || "",
+
+                    status:
+                        oClaim.status || "",
+
+                    assignedAgent_ID:
+                        oClaim.assignedAgent_ID || "",
+
+                    assignedAgentDisplay:
+                        "Not Assigned",
+
+                    employeeNumber: "",
+                    department: "",
+                    role: "",
+                    email: "",
+
+                    policy:
+                        oClaim.policy || null,
+
+                    documents:
+                        oClaim.documents || [],
+
+                    fraudRiskScores: []
+                });
+
+                /*
+                 * Load assigned employee.
+                 */
+                if (oClaim.assignedAgent_ID) {
+
+                    await this._loadAssignedAgent(
+                        oClaim.assignedAgent_ID
                     );
 
-                oBinding
-                    .requestObject()
-
-                    .then(function (oData) {
-
-                        oDetailModel.setData(
-                            Object.assign(
-                                {
-                                    fraudRiskScores: [],
-                                    documents: []
-                                },
-                                oData
-                            )
-                        );
-
-                        oDetailModel.setProperty(
-                            "/busy",
-                            false
-                        );
-
-                        this._loadFraudRiskScores();
-
-                    }.bind(this))
-
-                    .catch(function (oError) {
-
-                        console.error(
-                            "[ClaimDetail] Failed to load claim:",
-                            oError
-                        );
-
-                        oDetailModel.setProperty(
-                            "/busy",
-                            false
-                        );
-
-                        MessageBox.error(
-                            "Could not load claim details."
-                        );
-
-                    }.bind(this));
-            },
-
-
-            _loadFraudRiskScores: function () {
-
-                var oInvestigationModel =
-                    this.getOwnerComponent()
-                        .getModel("investigation");
-
-                var oDetailModel =
-                    this.getView()
-                        .getModel("claimDetail");
-
-                if (!oInvestigationModel) {
+                } else {
 
                     console.warn(
-                        "[ClaimDetail] Investigation model not found."
+                        "[ClaimDetail] No assigned agent ID."
                     );
 
                     oDetailModel.setProperty(
-                        "/fraudRiskScores",
-                        []
+                        "/assignedAgentDisplay",
+                        "Not Assigned"
+                    );
+                }
+
+                /*
+                 * Load fraud risk scores.
+                 */
+                await this._loadFraudRiskScores(
+                    sClaimId
+                );
+
+            } catch (oError) {
+
+                console.error(
+                    "[ClaimDetail] Error loading claim:",
+                    oError
+                );
+
+                MessageBox.error(
+                    "Could not load claim details.\n\n" +
+                    (
+                        oError && oError.message
+                            ? oError.message
+                            : "Unknown error"
+                    )
+                );
+
+            } finally {
+
+                oDetailModel.setProperty(
+                    "/busy",
+                    false
+                );
+            }
+        },
+
+        /*
+         * ============================================================
+         * LOAD ASSIGNED EMPLOYEE
+         * ============================================================
+         */
+        _loadAssignedAgent: async function (sEmployeeId) {
+
+            var oDetailModel =
+                this.getView().getModel("claimDetail");
+
+            if (!sEmployeeId) {
+
+                oDetailModel.setProperty(
+                    "/assignedAgentDisplay",
+                    "Not Assigned"
+                );
+
+                return;
+            }
+
+            console.log(
+                "[ClaimDetail] Fetching employee:",
+                sEmployeeId
+            );
+
+            try {
+
+                /*
+                 * MainService:
+                 *
+                 * /odata/v4/main/Employees(<UUID>)
+                 */
+                var oEmployeeBinding =
+                    this._oMainModel.bindContext(
+                        "/Employees(" + sEmployeeId + ")",
+                        undefined,
+                        {
+                            $select:
+                                "ID,employeeNumber,firstName,lastName,department,role,email,active"
+                        }
+                    );
+
+                var oEmployee =
+                    await oEmployeeBinding.requestObject();
+
+                console.log(
+                    "[ClaimDetail] Employee response:",
+                    oEmployee
+                );
+
+                if (!oEmployee) {
+
+                    console.warn(
+                        "[ClaimDetail] Employee not found."
+                    );
+
+                    oDetailModel.setProperty(
+                        "/assignedAgentDisplay",
+                        "Not Assigned"
                     );
 
                     return;
                 }
 
+                /*
+                 * Create employee full name.
+                 */
+                var sFullName = [
+                    oEmployee.firstName,
+                    oEmployee.lastName
+                ]
+                    .filter(Boolean)
+                    .join(" ")
+                    .trim();
+
+                if (!sFullName) {
+                    sFullName = "Not Assigned";
+                }
+
+                /*
+                 * Display employee NAME instead of ID.
+                 */
+                oDetailModel.setProperty(
+                    "/assignedAgentDisplay",
+                    sFullName
+                );
+
+                /*
+                 * Store employee details.
+                 */
+                oDetailModel.setProperty(
+                    "/employeeNumber",
+                    oEmployee.employeeNumber || ""
+                );
+
+                oDetailModel.setProperty(
+                    "/department",
+                    oEmployee.department || ""
+                );
+
+                oDetailModel.setProperty(
+                    "/role",
+                    oEmployee.role || ""
+                );
+
+                oDetailModel.setProperty(
+                    "/email",
+                    oEmployee.email || ""
+                );
+
+                console.log(
+                    "[ClaimDetail] Assigned Agent Name:",
+                    sFullName
+                );
+
+            } catch (oError) {
+
+                console.error(
+                    "[ClaimDetail] Employee loading failed:",
+                    oError
+                );
+
+                oDetailModel.setProperty(
+                    "/assignedAgentDisplay",
+                    "Not Assigned"
+                );
+            }
+        },
+
+        /*
+         * ============================================================
+         * LOAD FRAUD RISK SCORES
+         * ============================================================
+         */
+        _loadFraudRiskScores: async function (sClaimId) {
+
+            var oModel =
+                this.getView().getModel("investigation");
+
+            if (!oModel) {
+
+                console.warn(
+                    "[ClaimDetail] Investigation model not available."
+                );
+
+                return;
+            }
+
+            try {
+
                 var oBinding =
-                    oInvestigationModel.bindList(
+                    oModel.bindList(
                         "/FraudRiskScores",
                         undefined,
                         undefined,
-
-                        new Filter(
-                            "claim_ID",
-                            FilterOperator.EQ,
-                            this._sClaimId
-                        ),
-
+                        [
+                            new Filter(
+                                "claim_ID",
+                                FilterOperator.EQ,
+                                sClaimId
+                            )
+                        ],
                         {
                             $select:
-                                "ID,riskScore,riskLevel",
-
-                            $$operationMode:
-                                "Server"
+                                "ID,claim_ID,riskScore,riskLevel"
                         }
                     );
 
-                oBinding
-                    .requestContexts(0, 100)
+                var aContexts =
+                    await oBinding.requestContexts(
+                        0,
+                        100
+                    );
 
-                    .then(function (aContexts) {
+                var aScores =
+                    aContexts.map(
+                        function (oContext) {
+                            return oContext.getObject();
+                        }
+                    );
 
-                        var aScores =
-                            aContexts.map(
-                                function (oContext) {
-                                    return oContext.getObject();
-                                }
-                            );
+                console.log(
+                    "[ClaimDetail] Fraud scores:",
+                    aScores
+                );
 
-                        oDetailModel.setProperty(
-                            "/fraudRiskScores",
-                            aScores
-                        );
+                this.getView()
+                    .getModel("claimDetail")
+                    .setProperty(
+                        "/fraudRiskScores",
+                        aScores
+                    );
 
-                    })
+            } catch (oError) {
 
-                    .catch(function (oError) {
-
-                        console.warn(
-                            "[ClaimDetail] Failed to load fraud risk scores:",
-                            oError
-                        );
-
-                        oDetailModel.setProperty(
-                            "/fraudRiskScores",
-                            []
-                        );
-                    });
-            },
-
-
-            onNavBack: function () {
-
-                this.getOwnerComponent()
-                    .getRouter()
-                    .navTo("claims");
+                console.error(
+                    "[ClaimDetail] Fraud score error:",
+                    oError
+                );
             }
+        },
 
+        onNavBack: function () {
+
+            this.getOwnerComponent()
+                .getRouter()
+                .navTo("claims");
         }
-    );
-});
 
+    });
+});

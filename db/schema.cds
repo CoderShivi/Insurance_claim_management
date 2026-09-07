@@ -1,28 +1,29 @@
 namespace claimsure;
 
 
-using { cuid } from '@sap/cds/common';
+using {cuid} from '@sap/cds/common';
 
 entity Customers : cuid {
 
-    customerNumber : String(30) @mandatory;
+    customerNumber : String(30)  @mandatory;
 
-    firstName : String(100) @mandatory;
+    firstName      : String(100) @mandatory;
 
-    lastName : String(100) @mandatory;
+    lastName       : String(100) @mandatory;
 
-    email : String(150)
-        @assert.format: '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+[.][A-Za-z]{2,}$';
+    email          : String(150)
+                                 @assert.format: '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+[.][A-Za-z]{2,}$';
 
-    phone : String(30)
-        @assert.format: '^[0-9+() -]{7,15}$';
+    phone          : String(30)
+                                 @assert.format: '^[0-9+() -]{7,15}$';
 
-    address : String(500);
+    address        : String(500);
 
-    status : String(20) enum {
+    status         : String(20) enum {
         Active;
         Inactive;
         Suspended;
+        policy
     } default 'Active';
 
     // Relationships
@@ -34,17 +35,15 @@ entity Customers : cuid {
 }
 
 
-
-
 entity ClaimTypes : cuid {
 
-    code : String(30) @mandatory;
+    code        : String(30)  @mandatory;
 
-    name : String(100) @mandatory;
+    name        : String(100) @mandatory;
 
     description : String(500);
 
-    category : String(30) enum {
+    category    : String(30) enum {
         Vehicle;
         Health;
         Property;
@@ -64,24 +63,20 @@ entity ClaimTypes : cuid {
 }
 
 
-
-
-
-
 entity Employees : cuid {
 
-    employeeNumber : String(30) @mandatory;
+    employeeNumber : String(30)  @mandatory;
 
-    firstName : String(100) @mandatory;
+    firstName      : String(100) @mandatory;
 
-    lastName : String(100) @mandatory;
+    lastName       : String(100) @mandatory;
 
-    email : String(150) @mandatory
-        @assert.format: '^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$';
+    email          : String(150) @mandatory
+                                 @assert.format: '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+[.][A-Za-z]{2,}$';
 
-    department : String(100);
+    department     : String(100);
 
-    role : String(30) enum {
+    role           : String(30) enum {
         ClaimsAgent;
         Investigator;
         ClaimsManager;
@@ -190,7 +185,6 @@ entity Claims : cuid {
 }
 
 
-
 entity ClaimDocuments : cuid {
 
     claim        : Association to Claims @mandatory;
@@ -204,7 +198,6 @@ entity ClaimDocuments : cuid {
     content      : LargeBinary
                                          @Core.MediaType: mediaType;
 }
-
 
 
 entity FraudRiskScores : cuid {
