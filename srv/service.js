@@ -2,20 +2,33 @@ const cds = require('@sap/cds')
 const { executeHttpRequest } = require('@sap-cloud-sdk/http-client');
 
 
-module.exports = cds.service.impl(function () {
+module.exports = cds.service.impl(async function () {
 
 
- 
-    const { Policies, Claims, ClaimDocuments } = this.entities;
+
+    const {
+        Policies,
+        Claims,
+        ClaimDocuments
+    } = this.entities;
+
+    const db = await cds.connect.to('db');
+
+    const {
+        FraudRiskScores
+    } = db.entities;
+
     this.before('CREATE', 'FraudRiskScores', async (req) => {
 
         const score = req.data.riskScore;
 
         if (score < 0 || score > 100) {
-            req.error(400, 'Risk score must be between 0 and 100');
+            return req.error(
+                400,
+                'Risk score must be between 0 and 100'
+            );
         }
 
-        // Automatically calculate risk level
         if (score <= 25) {
             req.data.riskLevel = 'Low';
         }
@@ -231,20 +244,25 @@ module.exports = cds.service.impl(function () {
         return Number(result.count);
     });
 
+    //BPA STARTS
+
     this.on("submitClaim", async (req) => {
 
         const { claimID } = req.data;
 
+        // ------------------------------------------------------------
+        // Validate Claim ID
         // ------------------------------------------------------------
 
         if (!claimID) {
             return req.reject(400, "Claim ID is required");
         }
 
+        // ------------------------------------------------------------
+        // Get Claim
+        // ------------------------------------------------------------
 
-
-        const claim = await SELECT
-            .one
+        const claim = await SELECT.one
             .from(Claims)
             .where({
                 ID: claimID
@@ -253,27 +271,49 @@ module.exports = cds.service.impl(function () {
         if (!claim) {
             return req.reject(404, "Claim not found");
         }
+        const riskScore = await SELECT.one
+            .from(FraudRiskScores)
+            .where({
+                claim_ID: claimID
+            });
+        console.log("Risk Score:", riskScore?.riskScore);
+        console.log("Risk Level:", riskScore?.riskLevel);
+        // ------------------------------------------------------------
+        // Claim must be Submitted
+        // ----------------
+        // --------------------------------------------
 
-
-
-        if (claim.status !== "Draft") {
+        if (claim.status !== "Submitted") {
             return req.reject(
                 400,
-                "Only Draft claims can be submitted for approval"
+                `Only Submitted claims can start the review process. Current status: ${claim.status}`
             );
         }
 
-
         try {
 
+            // --------------------------------------------------------
+            // First move claim to UnderReview
+            // --------------------------------------------------------
 
+            await UPDATE(Claims)
+                .set({
+                    status: "UnderReview"
+                })
+                .where({
+                    ID: claimID
+                });
+
+            // --------------------------------------------------------
+            // Start BPA workflow
+            // --------------------------------------------------------
 
             const response = await executeHttpRequest(
                 {
                     destinationName: "ClaimProcess"
                 },
                 {
-                    method: "GET",
+                    method: "POST",
 
                     url: "/workflow/rest/v1/workflow-instances",
 
@@ -285,7 +325,13 @@ module.exports = cds.service.impl(function () {
                             claimid: claim.ID,
                             claimnumber: claim.claimNumber,
                             claimedamount: Number(claim.claimedAmount),
-                            description: claim.description || ""
+                            description: claim.description || "",
+                            riskScore: riskScore
+                                ? Number(riskScore.riskScore)
+                                : 0,
+                            riskLevel: riskScore
+                                ? riskScore.riskLevel
+                                : "Low"
                         }
                     }
                 },
@@ -294,40 +340,22 @@ module.exports = cds.service.impl(function () {
                 }
             );
 
-            console.log(response);
-            
-
-
-            await UPDATE(Claims)
-                .set({
-                    status: "PendingApproval"
-                })
-                .where({
-                    ID: claimID
-                });
-
             console.log(
-                "SBPA STATUS:",
+                "BPA workflow started:",
                 response.status
             );
 
-            console.log(
-                "SBPA RESPONSE DATA:",
-                JSON.stringify(response.data, null, 2)
-            );
+            // --------------------------------------------------------
+            // Get updated claim
+            // --------------------------------------------------------
 
-
-
-            const updatedClaim = await SELECT
-                .one
+            const updatedClaim = await SELECT.one
                 .from(Claims)
                 .where({
                     ID: claimID
                 });
 
-
             return updatedClaim;
-
 
         } catch (error) {
 
@@ -337,8 +365,8 @@ module.exports = cds.service.impl(function () {
             );
 
             console.error(
-                "SBPA ERROR CAUSE:",
-                error.cause
+                "SBPA ERROR STATUS:",
+                error.response?.status
             );
 
             console.error(
@@ -350,31 +378,79 @@ module.exports = cds.service.impl(function () {
                 )
             );
 
+            // --------------------------------------------------------
+            // If workflow could not start,
+            // move claim back to Submitted
+            // --------------------------------------------------------
+
+            await UPDATE(Claims)
+                .set({
+                    status: "Submitted"
+                })
+                .where({
+                    ID: claimID
+                });
+
             return req.reject(
                 502,
-                `Failed to start approval process: ${error.message}`
+                `Failed to start claim review process: ${error.message}`
             );
         }
     });
-
-    this.on('approveClaim', async (req) => {
+    this.on('moveToPendingApproval', async (req) => {
 
         const { claimID } = req.data;
 
-        const claim = await SELECT.one.from(Claims)
+        const claim = await SELECT.one
+            .from(Claims)
             .where({ ID: claimID });
 
         if (!claim) {
             return req.error(404, 'Claim not found');
         }
 
-        if (
-            claim.status !== 'PendingApproval' &&
-            claim.status !== 'UnderReview'
-        ) {
+        if (claim.status !== 'UnderReview') {
             return req.error(
                 400,
-                'Claim cannot be approved in its current status'
+                `Claim cannot move to PendingApproval. Current status: ${claim.status}`
+            );
+        }
+
+        await UPDATE(Claims)
+            .set({
+                status: 'PendingApproval'
+            })
+            .where({ ID: claimID });
+
+        return await SELECT.one
+            .from(Claims)
+            .where({ ID: claimID });
+    });
+    this.on('approveClaim', async (req) => {
+
+        const { claimID } = req.data;
+
+        const claim = await SELECT.one
+            .from(Claims)
+            .where({
+                ID: claimID
+            });
+
+        if (!claim) {
+            return req.error(
+                404,
+                'Claim not found'
+            );
+        }
+
+        // ------------------------------------------------------------
+        // Only PendingApproval can be approved
+        // ------------------------------------------------------------
+
+        if (claim.status !== 'PendingApproval') {
+            return req.error(
+                400,
+                `Claim cannot be approved. Current status: ${claim.status}`
             );
         }
 
@@ -382,10 +458,15 @@ module.exports = cds.service.impl(function () {
             .set({
                 status: 'Approved'
             })
-            .where({ ID: claimID });
+            .where({
+                ID: claimID
+            });
 
-        return await SELECT.one.from(Claims)
-            .where({ ID: claimID });
+        return await SELECT.one
+            .from(Claims)
+            .where({
+                ID: claimID
+            });
     });
 
 
@@ -393,20 +474,27 @@ module.exports = cds.service.impl(function () {
 
         const { claimID } = req.data;
 
-        const claim = await SELECT.one.from(Claims)
-            .where({ ID: claimID });
+        const claim = await SELECT.one
+            .from(Claims)
+            .where({
+                ID: claimID
+            });
 
         if (!claim) {
-            return req.error(404, 'Claim not found');
+            return req.error(
+                404,
+                'Claim not found'
+            );
         }
 
-        if (
-            claim.status !== 'PendingApproval' &&
-            claim.status !== 'UnderReview'
-        ) {
+        // ------------------------------------------------------------
+        // Only PendingApproval can be rejected
+        // ------------------------------------------------------------
+
+        if (claim.status !== 'PendingApproval') {
             return req.error(
                 400,
-                'Claim cannot be rejected in its current status'
+                `Claim cannot be rejected. Current status: ${claim.status}`
             );
         }
 
@@ -414,11 +502,49 @@ module.exports = cds.service.impl(function () {
             .set({
                 status: 'Rejected'
             })
-            .where({ ID: claimID });
+            .where({
+                ID: claimID
+            });
 
-        return await SELECT.one.from(Claims)
-            .where({ ID: claimID });
+        return await SELECT.one
+            .from(Claims)
+            .where({
+                ID: claimID
+            });
     });
+
+this.on('rejectFraudClaim', async (req) => {
+
+    const { claimID } = req.data;
+
+    console.log("========== rejectFraudClaim ==========");
+    console.log("Received claimID:", claimID);
+
+    const claim = await SELECT.one
+        .from(Claims)
+        .where({ ID: claimID });
+
+    console.log("Claim found:", claim);
+
+    if (!claim) {
+        return req.error(404, 'Claim not found');
+    }
+
+    if (claim.status !== 'UnderReview') {
+        return req.error(
+            400,
+            `Fraud claim cannot be rejected. Current status: ${claim.status}`
+        );
+    }
+
+    await UPDATE(Claims)
+        .set({ status: 'Rejected' })
+        .where({ ID: claimID });
+
+    return await SELECT.one
+        .from(Claims)
+        .where({ ID: claimID });
+});
 
     this.on('getClaimStatus', async (req) => {
 
