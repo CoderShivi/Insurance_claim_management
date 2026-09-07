@@ -1,9 +1,31 @@
 ID,customerNumber,firstName,lastName,email,phone,address,status
-11111111-1111-1111-1111-111111111111,CUST001,Ravi,Kumar,ravi.kumar@email.com,9876543210,Bangalore,Active
-22222222-2222-2222-2222-222222222222,CUST002,Anita,Sharma,anita.sharma@email.com,9876543211,Mumbai,Active
-33333333-3333-3333-3333-333333333333,CUST003,Arjun,Reddy,arjun.reddy@email.com,9876543212,Hyderabad,Active
-44444444-4444-4444-4444-444444444444,CUST004,Priya,Patel,priya.patel@email.com,9876543213,Ahmedabad,Active
-55555555-5555-5555-5555-555555555555,CUST005,Vikram,Singh,vikram.singh@email.com,9876543214,Delhi,Active
-66666666-6666-6666-6666-666666666666,CUST006,Neha,Verma,neha.verma@email.com,9876543215,Pune,Active
-77777777-7777-7777-7777-777777777777,CUST007,Karan,Mehta,karan.mehta@email.com,9876543216,Chennai,Active
-88888888-8888-8888-8888-888888888888,CUST008,Sneha,Iyer,sneha.iyer@email.com,9876543217,Kochi,Active
+10000001-0001-0001-0001-000000000001,CUST001,Ravi,Kumar,ravi.kumar@email.com,+91 9876500000,Bangalore,Inactive
+10000002-0002-0002-0002-000000000002,CUST002,Anita,Sharma,anita.sharma@email.com,+91 9876500001,Mumbai,Active
+10000003-0003-0003-0003-000000000003,CUST003,Arjun,Patel,arjun.patel@email.com,+91 9876500002,Hyderabad,Active
+10000004-0004-0004-0004-000000000004,CUST004,Priya,Reddy,priya.reddy@email.com,+91 9876500003,Chennai,Active
+10000005-0005-0005-0005-000000000005,CUST005,Kiran,Rao,kiran.rao@email.com,+91 9876500004,Delhi,Active
+10000006-0006-0006-0006-000000000006,CUST006,Sneha,Iyer,sneha.iyer@email.com,+91 9876500005,Pune,Active
+10000007-0007-0007-0007-000000000007,CUST007,Vikram,Nair,vikram.nair@email.com,+91 9876500006,Kolkata,Active
+10000008-0008-0008-0008-000000000008,CUST008,Meera,Joshi,meera.joshi@email.com,+91 9876500007,Ahmedabad,Inactive
+10000009-0009-0009-0009-000000000009,CUST009,Rahul,Mehta,rahul.mehta@email.com,+91 9876500008,Jaipur,Active
+10000010-0010-0010-0010-000000000010,CUST010,Divya,Singh,divya.singh@email.com,+91 9876500009,Kochi,Active
+10000011-0011-0011-0011-000000000011,CUST011,Suresh,Gupta,suresh.gupta@email.com,+91 9876500010,Bangalore,Active
+10000012-0012-0012-0012-000000000012,CUST012,Nisha,Das,nisha.das@email.com,+91 9876500011,Mumbai,Active
+10000013-0013-0013-0013-000000000013,CUST013,Amit,Verma,amit.verma@email.com,+91 9876500012,Hyderabad,Active
+10000014-0014-0014-0014-000000000014,CUST014,Kavya,Kapoor,kavya.kapoor@email.com,+91 9876500013,Chennai,Active
+10000015-0015-0015-0015-000000000015,CUST015,Rohan,Bhat,rohan.bhat@email.com,+91 9876500014,Delhi,Inactive
+10000016-0016-0016-0016-000000000016,CUST016,Pooja,Mishra,pooja.mishra@email.com,+91 9876500015,Pune,Active
+10000017-0017-0017-0017-000000000017,CUST017,Manoj,Pillai,manoj.pillai@email.com,+91 9876500016,Kolkata,Active
+10000018-0018-0018-0018-000000000018,CUST018,Isha,Chopra,isha.chopra@email.com,+91 9876500017,Ahmedabad,Active
+10000019-0019-0019-0019-000000000019,CUST019,Varun,Malhotra,varun.malhotra@email.com,+91 9876500018,Jaipur,Active
+10000020-0020-0020-0020-000000000020,CUST020,Neha,Desai,neha.desai@email.com,+91 9876500019,Kochi,Active
+10000021-0021-0021-0021-000000000021,CUST021,Akash,Jain,akash.jain@email.com,+91 9876500020,Bangalore,Active
+10000022-0022-0022-0022-000000000022,CUST022,Shreya,Menon,shreya.menon@email.com,+91 9876500021,Mumbai,Inactive
+10000023-0023-0023-0023-000000000023,CUST023,Naveen,Shetty,naveen.shetty@email.com,+91 9876500022,Hyderabad,Active
+10000024-0024-0024-0024-000000000024,CUST024,Asha,Kulkarni,asha.kulkarni@email.com,+91 9876500023,Chennai,Active
+10000025-0025-0025-0025-000000000025,CUST025,Vivek,Agarwal,vivek.agarwal@email.com,+91 9876500024,Delhi,Active
+10000026-0026-0026-0026-000000000026,CUST026,Maya,Bose,maya.bose@email.com,+91 9876500025,Pune,Active
+10000027-0027-0027-0027-000000000027,CUST027,Aditya,Saxena,aditya.saxena@email.com,+91 9876500026,Kolkata,Active
+10000028-0028-0028-0028-000000000028,CUST028,Sonia,Dutta,sonia.dutta@email.com,+91 9876500027,Ahmedabad,Active
+10000029-0029-0029-0029-000000000029,CUST029,Harish,Choudhary,harish.choudhary@email.com,+91 9876500028,Jaipur,Inactive
+10000030-0030-0030-0030-000000000030,CUST030,Tanya,Naidu,tanya.naidu@email.com,+91 9876500029,Kochi,Active

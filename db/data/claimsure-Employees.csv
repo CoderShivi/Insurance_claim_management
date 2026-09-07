@@ -1,9 +1,31 @@
 ID,employeeNumber,firstName,lastName,email,department,role,active
-e1111111-1111-1111-1111-111111111111,EMP-1001,Sam,Agent,sam.agent@claimsure.com,Claims Operations,ClaimsAgent,true
-e2222222-2222-2222-2222-222222222222,EMP-1002,Ivy,Investigator,ivy.investigator@claimsure.com,Fraud Investigation,Investigator,true
-e3333333-3333-3333-3333-333333333333,EMP-1003,Mona,Manager,mona.manager@claimsure.com,Claims Operations,ClaimsManager,true
-e4444444-4444-4444-4444-444444444444,EMP-1004,Fred,Finance,fred.finance@claimsure.com,Finance,FinanceOfficer,true
-e5555555-5555-5555-5555-555555555555,EMP-1005,Nora,Nelson,nora.nelson@claimsure.com,Claims Operations,ClaimsAgent,true
-e6666666-6666-6666-6666-666666666666,EMP-1006,Ian,Roy,ian.roy@claimsure.com,Fraud Investigation,Investigator,true
-e7777777-7777-7777-7777-777777777777,EMP-1007,Priya,Shah,priya.shah@claimsure.com,Claims Operations,ClaimsManager,true
-e8888888-8888-8888-8888-888888888888,EMP-1008,Carlos,Diaz,carlos.diaz@claimsure.com,Finance,FinanceOfficer,false
+e0000001-0001-0001-0001-000000000001,EMP-1001,Ravi,Kumar,ravi.kumar@claimsure.com,Claims Operations,ClaimsAgent,True
+e0000002-0002-0002-0002-000000000002,EMP-1002,Anita,Sharma,anita.sharma@claimsure.com,Fraud Investigation,Investigator,True
+e0000003-0003-0003-0003-000000000003,EMP-1003,Arjun,Patel,arjun.patel@claimsure.com,Claims Management,ClaimsManager,True
+e0000004-0004-0004-0004-000000000004,EMP-1004,Priya,Reddy,priya.reddy@claimsure.com,Finance,FinanceOfficer,True
+e0000005-0005-0005-0005-000000000005,EMP-1005,Kiran,Rao,kiran.rao@claimsure.com,Administration,Admin,True
+e0000006-0006-0006-0006-000000000006,EMP-1006,Sneha,Iyer,sneha.iyer@claimsure.com,Claims Operations,ClaimsAgent,True
+e0000007-0007-0007-0007-000000000007,EMP-1007,Vikram,Nair,vikram.nair@claimsure.com,Fraud Investigation,Investigator,True
+e0000008-0008-0008-0008-000000000008,EMP-1008,Meera,Joshi,meera.joshi@claimsure.com,Claims Management,ClaimsManager,True
+e0000009-0009-0009-0009-000000000009,EMP-1009,Rahul,Mehta,rahul.mehta@claimsure.com,Finance,FinanceOfficer,True
+e0000010-0010-0010-0010-000000000010,EMP-1010,Divya,Singh,divya.singh@claimsure.com,Administration,Admin,False
+e0000011-0011-0011-0011-000000000011,EMP-1011,Suresh,Gupta,suresh.gupta@claimsure.com,Claims Operations,ClaimsAgent,True
+e0000012-0012-0012-0012-000000000012,EMP-1012,Nisha,Das,nisha.das@claimsure.com,Fraud Investigation,Investigator,True
+e0000013-0013-0013-0013-000000000013,EMP-1013,Amit,Verma,amit.verma@claimsure.com,Claims Management,ClaimsManager,True
+e0000014-0014-0014-0014-000000000014,EMP-1014,Kavya,Kapoor,kavya.kapoor@claimsure.com,Finance,FinanceOfficer,True
+e0000015-0015-0015-0015-000000000015,EMP-1015,Rohan,Bhat,rohan.bhat@claimsure.com,Administration,Admin,True
+e0000016-0016-0016-0016-000000000016,EMP-1016,Pooja,Mishra,pooja.mishra@claimsure.com,Claims Operations,ClaimsAgent,True
+e0000017-0017-0017-0017-000000000017,EMP-1017,Manoj,Pillai,manoj.pillai@claimsure.com,Fraud Investigation,Investigator,True
+e0000018-0018-0018-0018-000000000018,EMP-1018,Isha,Chopra,isha.chopra@claimsure.com,Claims Management,ClaimsManager,True
+e0000019-0019-0019-0019-000000000019,EMP-1019,Varun,Malhotra,varun.malhotra@claimsure.com,Finance,FinanceOfficer,True
+e0000020-0020-0020-0020-000000000020,EMP-1020,Neha,Desai,neha.desai@claimsure.com,Administration,Admin,False
+e0000021-0021-0021-0021-000000000021,EMP-1021,Akash,Jain,akash.jain@claimsure.com,Claims Operations,ClaimsAgent,True
+e0000022-0022-0022-0022-000000000022,EMP-1022,Shreya,Menon,shreya.menon@claimsure.com,Fraud Investigation,Investigator,True
+e0000023-0023-0023-0023-000000000023,EMP-1023,Naveen,Shetty,naveen.shetty@claimsure.com,Claims Management,ClaimsManager,True
+e0000024-0024-0024-0024-000000000024,EMP-1024,Asha,Kulkarni,asha.kulkarni@claimsure.com,Finance,FinanceOfficer,True
+e0000025-0025-0025-0025-000000000025,EMP-1025,Vivek,Agarwal,vivek.agarwal@claimsure.com,Administration,Admin,True
+e0000026-0026-0026-0026-000000000026,EMP-1026,Maya,Bose,maya.bose@claimsure.com,Claims Operations,ClaimsAgent,True
+e0000027-0027-0027-0027-000000000027,EMP-1027,Aditya,Saxena,aditya.saxena@claimsure.com,Fraud Investigation,Investigator,True
+e0000028-0028-0028-0028-000000000028,EMP-1028,Sonia,Dutta,sonia.dutta@claimsure.com,Claims Management,ClaimsManager,True
+e0000029-0029-0029-0029-000000000029,EMP-1029,Harish,Choudhary,harish.choudhary@claimsure.com,Finance,FinanceOfficer,True
+e0000030-0030-0030-0030-000000000030,EMP-1030,Tanya,Naidu,tanya.naidu@claimsure.com,Administration,Admin,False

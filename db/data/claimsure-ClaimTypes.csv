@@ -1,10 +1,31 @@
 ID,code,name,description,category,active
-a1000001-0001-0001-0001-000000000001,VEH001,Vehicle Accident,Vehicle accident claim,Vehicle,true
-a1000002-0002-0002-0002-000000000002,VEH002,Vehicle Theft,Vehicle theft claim,Vehicle,true
-a1000003-0003-0003-0003-000000000003,VEH003,Vehicle Damage,Vehicle damage claim,Vehicle,true
-a1000004-0004-0004-0004-000000000004,HLT001,Medical Expense,Medical expense claim,Health,true
-a1000005-0005-0005-0005-000000000005,HLT002,Hospitalization,Hospitalization claim,Health,true
-a1000006-0006-0006-0006-000000000006,HLT003,Emergency Treatment,Emergency treatment claim,Health,true
-a1000007-0007-0007-0007-000000000007,PRO001,Property Damage,Property damage claim,Property,true
-a1000008-0008-0008-0008-000000000008,PRO002,Fire Damage,Fire damage claim,Property,true
-a1000009-0009-0009-0009-000000000009,PRO003,Theft Damage,Property theft claim,Property,true
+a0000001-0001-0001-0001-000000000001,VEH001,Vehicle Accident,Vehicle Accident claim,Vehicle,False
+a0000002-0002-0002-0002-000000000002,VEH002,Vehicle Theft,Vehicle Theft claim,Vehicle,True
+a0000003-0003-0003-0003-000000000003,VEH003,Vehicle Fire,Vehicle Fire claim,Vehicle,True
+a0000004-0004-0004-0004-000000000004,VEH004,Vehicle Flood,Vehicle Flood claim,Vehicle,True
+a0000005-0005-0005-0005-000000000005,VEH005,Vehicle Collision,Vehicle Collision claim,Vehicle,True
+a0000006-0006-0006-0006-000000000006,VEH006,Windshield Damage,Windshield Damage claim,Vehicle,True
+a0000007-0007-0007-0007-000000000007,VEH007,Vehicle Vandalism,Vehicle Vandalism claim,Vehicle,True
+a0000008-0008-0008-0008-000000000008,VEH008,Third Party Damage,Third Party Damage claim,Vehicle,True
+a0000009-0009-0009-0009-000000000009,VEH009,Personal Injury Vehicle,Personal Injury Vehicle claim,Vehicle,False
+a0000010-0010-0010-0010-000000000010,VEH010,Roadside Incident,Roadside Incident claim,Vehicle,True
+a0000011-0011-0011-0011-000000000011,HEA011,Hospitalization,Hospitalization claim,Health,True
+a0000012-0012-0012-0012-000000000012,HEA012,Medical Treatment,Medical Treatment claim,Health,True
+a0000013-0013-0013-0013-000000000013,HEA013,Surgery,Surgery claim,Health,True
+a0000014-0014-0014-0014-000000000014,HEA014,Accidental Injury,Accidental Injury claim,Health,True
+a0000015-0015-0015-0015-000000000015,HEA015,Critical Illness,Critical Illness claim,Health,True
+a0000016-0016-0016-0016-000000000016,HEA016,Maternity,Maternity claim,Health,True
+a0000017-0017-0017-0017-000000000017,HEA017,Day Care Treatment,Day Care Treatment claim,Health,False
+a0000018-0018-0018-0018-000000000018,HEA018,Emergency Treatment,Emergency Treatment claim,Health,True
+a0000019-0019-0019-0019-000000000019,HEA019,Outpatient Treatment,Outpatient Treatment claim,Health,True
+a0000020-0020-0020-0020-000000000020,HEA020,Prescription Reimbursement,Prescription Reimbursement claim,Health,True
+a0000021-0021-0021-0021-000000000021,PRO021,Fire Damage,Fire Damage claim,Property,True
+a0000022-0022-0022-0022-000000000022,PRO022,Water Damage,Water Damage claim,Property,True
+a0000023-0023-0023-0023-000000000023,PRO023,Theft Damage,Theft Damage claim,Property,True
+a0000024-0024-0024-0024-000000000024,PRO024,Storm Damage,Storm Damage claim,Property,True
+a0000025-0025-0025-0025-000000000025,PRO025,Earthquake Damage,Earthquake Damage claim,Property,False
+a0000026-0026-0026-0026-000000000026,PRO026,Burglary Damage,Burglary Damage claim,Property,True
+a0000027-0027-0027-0027-000000000027,PRO027,Property Vandalism,Property Vandalism claim,Property,True
+a0000028-0028-0028-0028-000000000028,PRO028,Electrical Damage,Electrical Damage claim,Property,True
+a0000029-0029-0029-0029-000000000029,PRO029,Structural Damage,Structural Damage claim,Property,True
+a0000030-0030-0030-0030-000000000030,PRO030,Natural Disaster,Natural Disaster claim,Property,True
