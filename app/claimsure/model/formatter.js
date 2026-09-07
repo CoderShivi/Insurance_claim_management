@@ -178,6 +178,11 @@ sap.ui.define([], function () {
 
         canCancel: function (status) {
             return status === "Active";
+        },
+
+        approvalButtonVisible: function (sStatus) {
+            return sStatus === "Submitted";
         }
+
     };
 });
