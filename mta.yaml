@@ -9,6 +9,9 @@ build-parameters:
     - builder: custom
       commands:
         - npx cds build --production
+        - rm -rf app/router/webapp/claimsure
+        - mkdir -p app/router/webapp
+        - cp -r app/claimsure app/router/webapp/claimsure
 modules:
   - name: Insurance_claim_management-srv
     type: nodejs
