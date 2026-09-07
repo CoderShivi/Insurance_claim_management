@@ -4,14 +4,6 @@
     font-weight: 600;
 }
 
-.dashboardPage .sapMPageBgStandard {
-    background: #F7F9FB;
-    overflow-x: hidden;
-    max-width: 100%;
-}
-
-.dashboardContent {
-    box-sizing: border-box;
 .sapMObjectStatusLarge .sapMObjStatusText {
     font-size: 1.1rem;
 }
@@ -20,102 +12,33 @@
     font-weight: 500;
 }
 
-/* Prevent wide tables/toolbars from forcing a page-level horizontal scrollbar;
-   the affected control (e.g. sap.m.Table) scrolls internally instead. */
 html,
 body {
     overflow-x: auto;
     max-width: 100%;
 }
 
-.kpiRow {
-    gap: 1rem;
+
+/* ==========================================================================
+   ClaimSure Dashboard — SAPUI5 / Fiori visual styling
+   ========================================================================== */
+
+.dashboardPage .sapMPageBgStandard {
+    background: #F7F9FB;
+    overflow-x: hidden;
+    max-width: 100%;
 }
 
-.kpiCard {
-    flex: 1 1 200px;
-    min-width: 180px;
-    padding: 1.25rem 1.5rem;
-    border-radius: 12px;
-    background: #F5F5F0;
-}
-
-.kpiNeutral {
-    background: #F5F5F0;
-}
-
-.kpiWarning {
-    background: #FBE7C6;
-}
-
-.kpiDanger {
-    background: #F9D3D3;
-}
-
-.kpiSuccess {
-    background: #D9EAD3;
-}
-
-.kpiLabel {
-    font-size: 0.9rem;
-    color: #6E6E6E;
-    margin-bottom: 0.5rem;
-    display: block;
-}
-
-.kpiLabelWarning {
-    color: #8A5A00;
-}
-
-.kpiLabelDanger {
-    color: #A61C1C;
-}
-
-.kpiLabelSuccess {
-    color: #1E7A34;
-}
-
-.kpiValue {
-    font-size: 2rem;
-    font-weight: 600;
-    color: #1A1A1A;
-    display: block;
-}
-
-.kpiValueWarning {
-    color: #B36B00;
-}
-
-.kpiValueDanger {
-    color: #C0271F;
-}
-
-.kpiValueSuccess {
-    color: #1E7A34;
-}
-
-.statusPanel .statusList {
-    background: transparent;
-}
-
-.statusRow {
-    gap: 1rem;
-    padding: 0.5rem 0;
+.dashboardContent {
+    box-sizing: border-box;
     width: 100%;
     max-width: 100%;
     padding: 1.35rem 1.5rem 1rem;
 }
 
 
-
-.sapMObjectStatusLarge .sapMObjStatusText {
-    font-size: 1.1rem;
-
-
-}
-
 /* ==========================================================================
-   Welcome banner
+   Welcome Banner
    ========================================================================== */
 
 .welcomeBanner {
@@ -125,8 +48,16 @@ body {
     border: 1px solid #E5EDF7;
     border-radius: 14px;
     background:
-        radial-gradient(circle at 80% 20%, rgba(112, 166, 230, 0.14), transparent 28%),
-        linear-gradient(135deg, #EAF2FB 0%, #F5F8FC 100%);
+        radial-gradient(
+            circle at 80% 20%,
+            rgba(112, 166, 230, 0.14),
+            transparent 28%
+        ),
+        linear-gradient(
+            135deg,
+            #EAF2FB 0%,
+            #F5F8FC 100%
+        );
     overflow: hidden;
 }
 
@@ -147,7 +78,11 @@ body {
     font-size: 0.9rem;
 }
 
-/* CSS illustration in the banner */
+
+/* ==========================================================================
+   CSS Illustration in Welcome Banner
+   ========================================================================== */
+
 .welcomeIllustration {
     position: relative;
     width: 245px;
@@ -164,7 +99,7 @@ body {
     height: 88px;
     border: 1px solid #CFE0F3;
     border-radius: 9px;
-    background: rgba(255,255,255,0.88);
+    background: rgba(255, 255, 255, 0.88);
     box-shadow: 0 7px 22px rgba(60, 103, 145, 0.12);
 }
 
@@ -195,7 +130,12 @@ body {
     width: 35px;
     height: 35px;
     border-radius: 50%;
-    background: conic-gradient(#3E7CB1 0 40%, #79AEE0 40% 68%, #DCEAF8 68% 100%);
+    background:
+        conic-gradient(
+            #3E7CB1 0 40%,
+            #79AEE0 40% 68%,
+            #DCEAF8 68% 100%
+        );
     position: relative;
 }
 
@@ -215,22 +155,27 @@ body {
 }
 
 .miniBars i {
-/* sap.ui.core.HTML does not stretch to fill a flex parent by default,
-   so the percentage-width fill div inside it was computing against zero
-   width and never showing. Force the wrapper to fill .statusTrack.
-   Still used by the "Claims by status" / "Policies by status" panels
-   if you re-enable them — not used by Policies by type anymore. */
-.statusTrack>.statusTrackHtml {
     display: block;
     width: 9px;
     border-radius: 3px 3px 0 0;
     background: #5B96D0;
 }
 
-.miniBars i:nth-child(1) { height: 17px; }
-.miniBars i:nth-child(2) { height: 27px; }
-.miniBars i:nth-child(3) { height: 21px; }
-.miniBars i:nth-child(4) { height: 34px; }
+.miniBars i:nth-child(1) {
+    height: 17px;
+}
+
+.miniBars i:nth-child(2) {
+    height: 27px;
+}
+
+.miniBars i:nth-child(3) {
+    height: 21px;
+}
+
+.miniBars i:nth-child(4) {
+    height: 34px;
+}
 
 .illustrationShield {
     position: absolute;
@@ -249,8 +194,9 @@ body {
     box-shadow: 0 7px 18px rgba(62, 124, 177, 0.16);
 }
 
+
 /* ==========================================================================
-   Navigation cards
+   Navigation Cards
    ========================================================================== */
 
 .navCardRow,
@@ -272,7 +218,10 @@ body {
     cursor: pointer;
     justify-content: space-between;
     box-shadow: 0 2px 9px rgba(31, 56, 78, 0.04);
-    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+    transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease,
+        border-color 0.15s ease;
 }
 
 .navCard:hover {
@@ -309,6 +258,7 @@ body {
 .navCardIconWrapClaims {
     background: #E9F1FB;
 }
+
 .navCardIconWrapClaims .navCardIcon {
     color: #3E7CB1;
 }
@@ -316,6 +266,7 @@ body {
 .navCardIconWrapPolicies {
     background: #E6F5EF;
 }
+
 .navCardIconWrapPolicies .navCardIcon {
     color: #1D9E75;
 }
@@ -323,6 +274,7 @@ body {
 .navCardIconWrapCustomers {
     background: #F1EEFB;
 }
+
 .navCardIconWrapCustomers .navCardIcon {
     color: #7F77DD;
 }
@@ -330,6 +282,7 @@ body {
 .navCardIconWrapClaimTypes {
     background: #FDF2E3;
 }
+
 .navCardIconWrapClaimTypes .navCardIcon {
     color: #EF9F27;
 }
@@ -373,8 +326,9 @@ body {
     color: #C0781A;
 }
 
+
 /* ==========================================================================
-   KPI cards
+   KPI Cards
    ========================================================================== */
 
 .kpiRowSpaced {
@@ -392,7 +346,9 @@ body {
     background: #FFFFFF;
     box-shadow: 0 2px 9px rgba(31, 56, 78, 0.04);
     cursor: pointer;
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease;
 }
 
 .kpiCard:hover {
@@ -416,17 +372,45 @@ body {
     font-size: 1rem;
 }
 
-.kpiIconWarning { color: #7F77DD; }
-.kpiIconDanger { color: #D85A30; }
-.kpiIconNeutral { color: #3E7CB1; }
-.kpiIconApproved { color: #1D9E75; }
-.kpiIconSuccess { color: #1D9E75; }
+.kpiIconWarning {
+    color: #7F77DD;
+}
 
-.kpiWarning { border-left-color: #7F77DD; }
-.kpiDanger { border-left-color: #D85A30; }
-.kpiNeutral { border-left-color: #3E7CB1; }
-.kpiApprovedColor { border-left-color: #1D9E75; }
-.kpiSuccess { border-left-color: #1D9E75; }
+.kpiIconDanger {
+    color: #D85A30;
+}
+
+.kpiIconNeutral {
+    color: #3E7CB1;
+}
+
+.kpiIconApproved {
+    color: #1D9E75;
+}
+
+.kpiIconSuccess {
+    color: #1D9E75;
+}
+
+.kpiWarning {
+    border-left-color: #7F77DD;
+}
+
+.kpiDanger {
+    border-left-color: #D85A30;
+}
+
+.kpiNeutral {
+    border-left-color: #3E7CB1;
+}
+
+.kpiApprovedColor {
+    border-left-color: #1D9E75;
+}
+
+.kpiSuccess {
+    border-left-color: #1D9E75;
+}
 
 .kpiLabel {
     color: #566575;
@@ -434,11 +418,22 @@ body {
     font-weight: 500;
 }
 
-.kpiLabelWarning { color: #514A9D; }
-.kpiLabelDanger { color: #B33F1E; }
-.kpiLabelNeutral { color: #2C567F; }
+.kpiLabelWarning {
+    color: #514A9D;
+}
+
+.kpiLabelDanger {
+    color: #B33F1E;
+}
+
+.kpiLabelNeutral {
+    color: #2C567F;
+}
+
 .kpiLabelSuccess,
-.kpiLabelApproved { color: #0F6E56; }
+.kpiLabelApproved {
+    color: #0F6E56;
+}
 
 .kpiValue {
     display: block;
@@ -448,11 +443,23 @@ body {
     font-weight: 700;
 }
 
-.kpiValueWarning { color: #514A9D; }
-.kpiValueDanger { color: #B33F1E; }
-.kpiValueNeutral { color: #2C567F; }
+.kpiValueWarning {
+    color: #514A9D;
+}
+
+.kpiValueDanger {
+    color: #B33F1E;
+}
+
+.kpiValueNeutral {
+    color: #2C567F;
+}
+
 .kpiValueSuccess,
-.kpiValueApproved { color: #0F6E56; }
+.kpiValueApproved {
+    color: #0F6E56;
+}
+
 
 /* ==========================================================================
    Analytics
@@ -496,6 +503,8 @@ body {
 
 .policyTypeCol {
     border-left: 1px solid #E8EBEF;
+    overflow-x: auto;
+    overflow-y: hidden;
 }
 
 .chartSectionTitle {
@@ -517,85 +526,16 @@ body {
     margin-left: 3rem;
 }
 
-.pieChart {
-    width: 180px;
-    height: 180px;
-    border-radius: 50%;
-    position: relative;
-    /* needed so slice labels position relative to the pie, not the page */
-}
-
-/* don't let the legend column stretch across the whole panel,
-   otherwise the label eats all the leftover space and pushes percent/count
-   off to the far right edge */
-.pieLegend {
-    flex: 0 1 auto;
-    min-width: 220px;
-    max-width: 320px;
-}
-
-/* tight row (not full width) so percent/count sit right after the label */
-.legendRow {
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-    padding: 0.4rem 0;
-    width: auto;
-}
-
-.legendDot {
-    display: inline-block;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    flex-shrink: 0;
-}
-
-/* fixed width instead of flex:1, so it doesn't consume all remaining space.
-   Widened from 140px so "InvestigationRequired" no longer overlaps its percentage. */
-.legendLabel {
-    width: 170px;
-    flex-shrink: 0;
-    color: #4A4A4A;
-}
-
-/* left-aligned so it sits immediately next to the label */
-.legendPercent {
-    width: 36px;
-    text-align: left;
-    color: #6E6E6E;
-    flex-shrink: 0;
-}
-
-/* Third column inside the Claims analytics panel, holds the
-   Policies by type SVG bar chart */
-.policyTypeCol {
-    flex: 1;
-    min-width: 220px;
-    border-left: 0.5px solid #EDEDE8;
-    padding-left: 1.5rem;
-    /* NEW — the SVG bar chart widens with the number of policy types;
-       scroll horizontally instead of squeezing or overflowing the panel */
-    overflow-x: auto;
-}
-
-.policyTypeTitle {
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: #4A4A4A;
-    margin-bottom: 0.75rem;
-    display: block;
-}
-
 .pieClickArea {
     cursor: pointer;
 }
+
 .pieChart {
     position: relative;
     width: 220px;
     height: 220px;
     border-radius: 50%;
-    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.65);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.65);
 }
 
 .pieChart::after {
@@ -630,7 +570,7 @@ body {
     font-size: 0.72rem;
     font-weight: 700;
     text-align: center;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
     transform: translate(-50%, -50%);
     pointer-events: none;
     white-space: nowrap;
@@ -658,6 +598,7 @@ body {
 .legendRowClickable:hover {
     background: #F3F6F9;
 }
+
 .legendDot {
     display: inline-block;
     flex-shrink: 0;
@@ -700,11 +641,6 @@ body {
     font-weight: 600;
 }
 
-.policyTypeCol {
-    overflow-x: auto;
-    overflow-y: hidden;
-}
-
 .policyChartSvg {
     display: block;
     width: 100%;
@@ -716,11 +652,13 @@ body {
     stroke: #EDF0F3;
     stroke-width: 1;
 }
+
 .chartGridLabel {
     fill: #8A969F;
     font-size: 10px;
     font-weight: 500;
 }
+
 .chartBarValue {
     fill: #334554;
     font-size: 12px;
@@ -732,8 +670,9 @@ body {
     font-size: 11px;
 }
 
+
 /* ==========================================================================
-   Recent claims
+   Recent Claims
    ========================================================================== */
 
 .recentClaimsPanel .sapMToolbar {
@@ -781,6 +720,11 @@ body {
     font-size: 0.8rem;
 }
 
+.recentClaimsTable .sapMListTblCell:last-child,
+.recentClaimsTable .sapMListTblHeaderCell:last-child {
+    padding-right: 1.25rem;
+}
+
 .statusPill {
     display: inline-block;
     padding: 0.24rem 0.65rem;
@@ -791,8 +735,9 @@ body {
     white-space: nowrap;
 }
 
+
 /* ==========================================================================
-   Footer
+   Dashboard Footer
    ========================================================================== */
 
 .dashboardFooter {
@@ -803,77 +748,9 @@ body {
     text-align: center;
 }
 
-/* ==========================================================================
-   Responsive adjustments
-   ========================================================================== */
-
-@media (max-width: 1050px) {
-    .navCard {
-        flex-basis: 46%;
-    }
-
-    .kpiCard {
-        flex-basis: 29%;
-    }
-
-    .claimsStatusColumn,
-    .policyTypeCol {
-        min-width: 100%;
-    }
-
-    .policyTypeCol {
-        border-top: 1px solid #E8EBEF;
-        border-left: 0;
-    }
-}
-
-@media (max-width: 700px) {
-    .dashboardContent {
-        padding: 0.8rem;
-    }
-
-    .welcomeBanner {
-        padding: 1rem;
-    }
-
-    .welcomeIllustration {
-        display: none;
-    }
-
-    .navCard,
-    .kpiCard {
-        flex-basis: 100%;
-        min-width: 100%;
-    }
-
-    .claimsStatusColumn,
-    .policyTypeCol {
-        min-width: 0;
-        padding: 0.85rem;
-    }
-
-    .pieRow {
-        gap: 1.4rem;
-        align-items: center;
-        margin-top: 1.5rem;
-    }
-
-    .pieLegend {
-        width: 100%;
-        min-width: 0;
-    }
-
-    .recentClaimsTable {
-        min-width: 680px;
-    }
-
-    .recentClaimsPanel .sapMPanelContent {
-        overflow-x: auto;
-    }
-}
 
 /* ==========================================================================
-   Policies - Toolbar
+   Policies — Toolbar
    ========================================================================== */
 
 .policyToolbar {
@@ -903,51 +780,17 @@ body {
     margin-left: 0.4rem;
 }
 
-
-/* Search field */
 .policySearch .sapMSFF {
     border-radius: 6px;
 }
 
-
-/* Keep table full width */
 .policyTable {
     width: 100%;
 }
 
 
-/* =========================================================
-   Responsive toolbar
-   ========================================================= */
-
-@media (max-width: 1100px) {
-
-    .policySearch {
-        width: 9rem !important;
-    }
-
-}
-
-
-@media (max-width: 900px) {
-
-    .policySearch {
-        width: 8rem !important;
-    }
-
-}
-
-
-@media (max-width: 700px) {
-
-    .policyToolbar {
-        padding: 0 0.4rem;
-    }
-
-}
-
 /* ==========================================================================
-   INVESTIGATION PAGE
+   Investigation Page
    ========================================================================== */
 
 .investigationPage {
@@ -961,7 +804,7 @@ body {
 
 
 /* ==========================================================================
-   HEADER
+   Investigation Header
    ========================================================================== */
 
 .investigationHeader {
@@ -990,7 +833,7 @@ body {
 
 
 /* ==========================================================================
-   KPI CARDS
+   Investigation KPI Cards
    ========================================================================== */
 
 .investigationKpiRow {
@@ -1067,7 +910,7 @@ body {
 
 
 /* ==========================================================================
-   PANELS
+   Investigation Panels
    ========================================================================== */
 
 .investigationPanel {
@@ -1086,7 +929,7 @@ body {
 
 
 /* ==========================================================================
-   INVESTIGATION TABLE
+   Investigation Tables
    ========================================================================== */
 
 .investigationTable {
@@ -1111,11 +954,6 @@ body {
     color: #1d2939;
 }
 
-
-/* ==========================================================================
-   FRAUD RISK
-   ========================================================================== */
-
 .fraudRiskTable {
     background: #ffffff;
 }
@@ -1129,11 +967,6 @@ body {
     color: #344054;
 }
 
-
-/* ==========================================================================
-   APPROVALS
-   ========================================================================== */
-
 .approvalTable .sapMListTblHeaderCell {
     background: #f9fafb;
 }
@@ -1145,51 +978,8 @@ body {
 
 
 /* ==========================================================================
-   RESPONSIVE
+   Administration Page
    ========================================================================== */
-
-@media (max-width: 900px) {
-
-    .investigationContent {
-        padding: 1rem;
-    }
-
-    .investigationSearch {
-        margin-left: 0;
-        margin-top: 1rem;
-        width: 100% !important;
-    }
-
-    .investigationKpiCard {
-        flex: 1 1 45%;
-    }
-
-}
-
-
-@media (max-width: 600px) {
-
-    .investigationKpiCard {
-        flex: 1 1 100%;
-    }
-
-    .investigationTitle {
-        font-size: 1.25rem;
-    }
-
-}
-
-.recentClaimsTable .sapMListTblCell:last-child,
-.recentClaimsTable .sapMListTblHeaderCell:last-child {
-    padding-right: 1.25rem;
-    font-weight: 600;
-    color: #fff;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
-    pointer-events: none;
-    /* clicks pass through to the pie for onPieChartPress */
-    white-space: nowrap;
-    text-align: center;
-}
 
 .adminPage {
     width: 100%;
@@ -1247,4 +1037,980 @@ body {
 
 .adminTable .sapMSwt {
     margin: auto;
+}
+
+
+/* ==========================================================================
+   Responsive Adjustments
+   ========================================================================== */
+
+@media (max-width: 1100px) {
+    .policySearch {
+        width: 9rem !important;
+    }
+}
+
+@media (max-width: 1050px) {
+    .navCard {
+        flex-basis: 46%;
+    }
+
+    .kpiCard {
+        flex-basis: 29%;
+    }
+
+    .claimsStatusColumn,
+    .policyTypeCol {
+        min-width: 100%;
+    }
+
+    .policyTypeCol {
+        border-top: 1px solid #E8EBEF;
+        border-left: 0;
+    }
+}
+
+@media (max-width: 900px) {
+    .policySearch {
+        width: 8rem !important;
+    }
+
+    .investigationContent {
+        padding: 1rem;
+    }
+
+    .investigationSearch {
+        margin-left: 0;
+        margin-top: 1rem;
+        width: 100% !important;
+    }
+
+    .investigationKpiCard {
+        flex: 1 1 45%;
+    }
+}
+
+@media (max-width: 700px) {
+    .dashboardContent {
+        padding: 0.8rem;
+    }
+
+    .welcomeBanner {
+        padding: 1rem;
+    }
+
+    .welcomeIllustration {
+        display: none;
+    }
+
+    .navCard,
+    .kpiCard {
+        flex-basis: 100%;
+        min-width: 100%;
+    }
+
+    .claimsStatusColumn,
+    .policyTypeCol {
+        min-width: 0;
+        padding: 0.85rem;
+    }
+
+    .pieRow {
+        gap: 1.4rem;
+        align-items: center;
+        margin-top: 1.5rem;
+    }
+
+    .pieLegend {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .recentClaimsTable {
+        min-width: 680px;
+    }
+
+    .recentClaimsPanel .sapMPanelContent {
+        overflow-x: auto;
+    }
+
+    .policyToolbar {
+        padding: 0 0.4rem;
+    }
+}
+
+@media (max-width: 600px) {
+    .investigationKpiCard {
+        flex: 1 1 100%;
+    }
+
+    .investigationTitle {
+        font-size: 1.25rem;
+    }
+}
+
+
+/* =========================================================
+   CLAIMSURE - SETTLEMENT LEDGER
+   Layout matched to Payout.view.xml
+   ========================================================= */
+
+/* ---------- PAGE ---------- */
+
+.csPage.ledgerPage {
+    background: #f5f7fa !important;
+}
+
+.ledgerPage .sapMPageScroll {
+    background: #f5f7fa !important;
+    overflow-x: hidden !important;
+}
+
+.ledgerPage .sapMPageContent {
+    padding: 0 !important;
+    background: #f5f7fa !important;
+}
+
+
+/* ---------- MAIN CONTAINER ---------- */
+
+.ledgerRoot {
+    width: 100% !important;
+    max-width: 1400px;
+    margin: 0 auto !important;
+    padding: 28px 32px 40px 32px !important;
+    box-sizing: border-box !important;
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.ledgerHeader {
+    width: 100% !important;
+    min-height: 72px;
+    box-sizing: border-box;
+    margin-bottom: 4px;
+}
+
+.ledgerEyebrow {
+    display: block;
+    font-size: 11px !important;
+    line-height: 16px !important;
+    font-weight: 700 !important;
+    letter-spacing: 1.5px;
+    color: #7a8696 !important;
+}
+
+.ledgerTitle {
+    display: block;
+    margin-top: 3px !important;
+    font-size: 28px !important;
+    line-height: 34px !important;
+    font-weight: 700 !important;
+    color: #182230 !important;
+}
+
+.ledgerSubtitle {
+    display: block;
+    margin-top: 5px !important;
+    font-size: 13px !important;
+    line-height: 20px !important;
+    color: #718096 !important;
+}
+
+.ledgerRefreshBtn {
+    height: 38px !important;
+    min-width: 145px !important;
+    border: 1px solid #d7dee7 !important;
+    border-radius: 7px !important;
+    background: #ffffff !important;
+}
+
+.ledgerRefreshBtn .sapMBtnInner {
+    height: 36px !important;
+    border: none !important;
+    background: transparent !important;
+}
+
+
+/* =========================================================
+   KPI STRIP
+   ========================================================= */
+
+.kpiStrip {
+    width: 100% !important;
+    min-height: 118px;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: stretch !important;
+
+    background: #ffffff !important;
+    border: 1px solid #e1e6ed !important;
+    border-radius: 10px !important;
+
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+
+    box-shadow: 0 2px 8px rgba(30, 45, 65, 0.04);
+}
+
+.kpiCell {
+    flex: 1 1 0 !important;
+    width: auto !important;
+    min-width: 0 !important;
+
+    padding: 22px 24px !important;
+    box-sizing: border-box !important;
+
+    justify-content: center !important;
+}
+
+.kpiCellPrimary {
+    flex: 1.35 1 0 !important;
+}
+
+.kpiDivider {
+    flex: 0 0 1px !important;
+    width: 1px !important;
+    min-width: 1px !important;
+    padding: 0 !important;
+    background: #e8ecf1 !important;
+}
+
+.kpiTag {
+    font-size: 10px !important;
+    line-height: 14px !important;
+    font-weight: 700 !important;
+    letter-spacing: 1px;
+    color: #7a8696 !important;
+}
+
+.kpiFigure {
+    margin-top: 5px !important;
+    font-size: 23px !important;
+    line-height: 28px !important;
+    font-weight: 700 !important;
+    color: #273444 !important;
+}
+
+.kpiFigurePrimary {
+    color: #1f3b57 !important;
+}
+
+.kpiFigureAmber {
+    color: #b7791f !important;
+}
+
+.kpiFigureBlue {
+    color: #28659f !important;
+}
+
+.kpiFigureRed {
+    color: #c0392b !important;
+}
+
+.kpiFoot {
+    margin-top: 4px !important;
+    font-size: 11px !important;
+    line-height: 16px !important;
+    color: #8a95a3 !important;
+}
+
+
+/* =========================================================
+   ANALYTICS ROW
+   ========================================================= */
+
+.ledgerAnalyticsRow {
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: stretch !important;
+
+    gap: 16px !important;
+    box-sizing: border-box !important;
+}
+
+.healthPanel {
+    flex: 1 1 50% !important;
+    width: auto !important;
+    min-width: 0 !important;
+}
+
+.lifecyclePanel {
+    flex: 1 1 50% !important;
+    width: auto !important;
+    min-width: 0 !important;
+}
+
+.panel {
+    background: #ffffff !important;
+    border: 1px solid #e1e6ed !important;
+    border-radius: 10px !important;
+    box-sizing: border-box !important;
+
+    box-shadow: 0 2px 8px rgba(30, 45, 65, 0.04);
+}
+
+.healthPanel,
+.lifecyclePanel {
+    min-height: 190px;
+    padding: 22px 24px !important;
+}
+
+.panelTitle {
+    font-size: 16px !important;
+    line-height: 21px !important;
+    font-weight: 700 !important;
+    color: #202936 !important;
+}
+
+.panelSubtitle {
+    margin-top: 3px !important;
+    font-size: 11px !important;
+    line-height: 17px !important;
+    color: #7a8696 !important;
+}
+
+
+/* =========================================================
+   HEALTH
+   ========================================================= */
+
+.healthBigNumber {
+    font-size: 25px !important;
+    line-height: 30px !important;
+    font-weight: 700 !important;
+    color: #25384a !important;
+}
+
+.ledgerHealthBar {
+    width: 100% !important;
+    height: 10px !important;
+    margin-top: 25px !important;
+}
+
+.ledgerHealthBar .sapMPI {
+    height: 10px !important;
+    border-radius: 10px !important;
+}
+
+.ledgerHealthBar .sapMPIBar {
+    border-radius: 10px !important;
+}
+
+.healthStatusTag {
+    font-size: 11px !important;
+    line-height: 17px !important;
+    font-weight: 700 !important;
+    color: #3f4d5c !important;
+}
+
+
+/* =========================================================
+   LIFECYCLE
+   ========================================================= */
+
+.timelineTrack {
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: flex-start !important;
+
+    box-sizing: border-box !important;
+}
+
+.timelineNode {
+    flex: 0 0 76px !important;
+    width: 76px !important;
+
+    align-items: center !important;
+}
+
+.timelineLine {
+    flex: 1 1 auto !important;
+    height: 1px !important;
+    min-width: 20px !important;
+
+    margin-top: 22px !important;
+
+    background: #d8dee6 !important;
+}
+
+.lifecycleButton {
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+
+    padding: 0 !important;
+    border-radius: 50% !important;
+}
+
+.lifecycleButton .sapMBtnInner {
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+
+    padding: 0 !important;
+    border: none !important;
+    border-radius: 50% !important;
+}
+
+.lifecycleButton .sapUiIcon {
+    font-size: 17px !important;
+}
+
+.timelineDotAmber .sapMBtnInner {
+    background: #fff4d6 !important;
+    color: #b7791f !important;
+}
+
+.timelineDotBlue .sapMBtnInner {
+    background: #e6f0fa !important;
+    color: #28659f !important;
+}
+
+.timelineDotGreen .sapMBtnInner {
+    background: #e3f4eb !important;
+    color: #25845a !important;
+}
+
+.timelineFigure {
+    margin-top: 7px !important;
+    font-size: 16px !important;
+    line-height: 20px !important;
+    font-weight: 700 !important;
+    color: #283442 !important;
+}
+
+.timelineLabel {
+    margin-top: 2px !important;
+    font-size: 10px !important;
+    line-height: 14px !important;
+    color: #7a8696 !important;
+}
+
+
+/* =========================================================
+   METRIC STRIP
+   ========================================================= */
+
+.metricStrip {
+    width: 100% !important;
+
+    display: flex !important;
+    flex-direction: row !important;
+
+    background: #ffffff !important;
+    border: 1px solid #e1e6ed !important;
+    border-radius: 10px !important;
+
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+
+    box-shadow: 0 2px 8px rgba(30, 45, 65, 0.04);
+}
+
+.metricCell {
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+
+    padding: 17px 22px !important;
+    box-sizing: border-box !important;
+
+    border-right: 1px solid #e8ecf1 !important;
+}
+
+.metricCell:last-child {
+    border-right: none !important;
+}
+
+.metricTag {
+    font-size: 10px !important;
+    line-height: 14px !important;
+    font-weight: 600 !important;
+    color: #7a8696 !important;
+}
+
+.metricFigure {
+    margin-top: 5px !important;
+    font-size: 16px !important;
+    line-height: 21px !important;
+    font-weight: 700 !important;
+    color: #263442 !important;
+}
+
+.metricFigureGreen {
+    color: #25845a !important;
+}
+
+.metricFigureRed {
+    color: #c0392b !important;
+}
+
+
+/* =========================================================
+   RECENT SETTLEMENTS PANEL
+   ========================================================= */
+
+.statementPanel {
+    width: 100% !important;
+    box-sizing: border-box !important;
+    padding: 22px 24px 18px 24px !important;
+
+    overflow: hidden !important;
+}
+
+.statementPanel > .sapMFlexBox:first-child {
+    width: 100% !important;
+}
+
+
+/* =========================================================
+   FILTER BAR
+   ========================================================= */
+
+.filterBar {
+    width: 100% !important;
+
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+
+    gap: 8px !important;
+    box-sizing: border-box !important;
+}
+
+.filterBar .sapMSF {
+    width: 280px !important;
+    max-width: 280px !important;
+}
+
+.filterBar .sapMSlt {
+    width: 155px !important;
+}
+
+.filterBar .sapMBtn {
+    margin-left: 0 !important;
+}
+
+
+/* =========================================================
+   TABLE
+   ========================================================= */
+
+.statementTable {
+    width: 100% !important;
+    max-width: 100% !important;
+
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+}
+
+.statementTable .sapMListTbl {
+    width: 100% !important;
+    table-layout: fixed !important;
+}
+
+.statementTable .sapMListTblHeader {
+    height: 42px !important;
+}
+
+.statementTable .sapMListTblHeaderCell {
+    background: #f8fafc !important;
+    border-bottom: 1px solid #dfe5ec !important;
+
+    padding: 10px 12px !important;
+    box-sizing: border-box !important;
+}
+
+.statementTable .sapMListTblCell {
+    padding: 13px 12px !important;
+    vertical-align: middle !important;
+
+    border-bottom: 1px solid #edf0f4 !important;
+
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+.statementTable .sapMListTblRow {
+    height: 55px !important;
+}
+
+.stmtHead {
+    font-size: 10px !important;
+    line-height: 14px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.7px;
+    text-transform: uppercase;
+    color: #6e7a89 !important;
+}
+
+.stmtPayoutNumber {
+    font-size: 12px !important;
+    line-height: 18px !important;
+    font-weight: 700 !important;
+    color: #263442 !important;
+}
+
+.stmtAmount {
+    font-size: 12px !important;
+    font-weight: 600 !important;
+}
+
+.stmtMuted {
+    display: block !important;
+
+    font-size: 11px !important;
+    line-height: 17px !important;
+
+    color: #657285 !important;
+
+    overflow: hidden !important;
+    white-space: nowrap !important;
+    text-overflow: ellipsis !important;
+}
+
+
+/* =========================================================
+   TABLE STATUS
+   ========================================================= */
+
+.statementTable .sapMObjStatus {
+    white-space: nowrap !important;
+}
+
+
+/* =========================================================
+   DIALOG
+   ========================================================= */
+
+.ledgerDialog .sapMDialogTitle {
+    font-size: 17px !important;
+    font-weight: 700 !important;
+    color: #202936 !important;
+}
+
+.ledgerDialog .sapMDialogScrollCont {
+    padding: 0 !important;
+}
+
+.dialogContent {
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+.dialogLabel {
+    font-size: 10px !important;
+    line-height: 14px !important;
+    font-weight: 700 !important;
+
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+
+    color: #7a8696 !important;
+}
+
+.dialogPayoutNumber {
+    margin-top: 3px !important;
+
+    font-size: 21px !important;
+    line-height: 27px !important;
+    font-weight: 700 !important;
+
+    color: #202936 !important;
+}
+
+.dialogAmount {
+    margin-top: 4px !important;
+
+    font-size: 18px !important;
+    line-height: 24px !important;
+    font-weight: 700 !important;
+
+    color: #263b50 !important;
+}
+
+.dialogValue {
+    margin-top: 4px !important;
+
+    font-size: 12px !important;
+    line-height: 18px !important;
+
+    color: #354253 !important;
+}
+
+.detailRow {
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+.detailSection {
+    width: 100% !important;
+
+    border-top: 1px solid #e6ebf0 !important;
+    padding-top: 15px !important;
+}
+
+.timeline {
+    width: 100% !important;
+}
+
+.timelineRow {
+    min-height: 34px !important;
+}
+
+.timelineIcon {
+    width: 25px !important;
+    font-size: 13px !important;
+    color: #5f7081 !important;
+}
+
+.timelineText {
+    font-size: 12px !important;
+    color: #455363 !important;
+}
+
+
+/* =========================================================
+   SPACING OVERRIDES
+   ========================================================= */
+
+.ledgerRoot .sapUiMediumMarginTop {
+    margin-top: 16px !important;
+}
+
+.ledgerRoot .sapUiLargeMarginTop {
+    margin-top: 22px !important;
+}
+
+.ledgerRoot .sapUiSmallMarginTop {
+    margin-top: 10px !important;
+}
+
+.ledgerRoot .sapUiTinyMarginTop {
+    margin-top: 4px !important;
+}
+
+
+/* =========================================================
+   1200px - TABLET / SMALL LAPTOP
+   ========================================================= */
+
+@media (max-width: 1200px) {
+
+    .ledgerRoot {
+        padding-left: 22px !important;
+        padding-right: 22px !important;
+    }
+
+    .kpiCell {
+        padding-left: 18px !important;
+        padding-right: 18px !important;
+    }
+
+    .healthPanel,
+    .lifecyclePanel {
+        padding: 19px !important;
+    }
+
+    .statementPanel {
+        padding-left: 19px !important;
+        padding-right: 19px !important;
+    }
+
+    .stmtMuted {
+        font-size: 10px !important;
+    }
+}
+
+
+/* =========================================================
+   900px - STACK ANALYTICS
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+    .ledgerRoot {
+        padding: 20px !important;
+    }
+
+    .ledgerAnalyticsRow {
+        flex-direction: column !important;
+    }
+
+    .healthPanel,
+    .lifecyclePanel {
+        width: 100% !important;
+        flex: none !important;
+    }
+
+    .kpiStrip {
+        flex-wrap: wrap !important;
+    }
+
+    .kpiCell {
+        flex: 1 1 50% !important;
+        width: 50% !important;
+    }
+
+    .kpiDivider {
+        display: none !important;
+    }
+
+    .metricStrip {
+        flex-wrap: wrap !important;
+    }
+
+    .metricCell {
+        flex: 1 1 50% !important;
+        width: 50% !important;
+    }
+
+    .metricCell:nth-child(2) {
+        border-right: none !important;
+    }
+
+    .metricCell:nth-child(3) {
+        border-top: 1px solid #e8ecf1 !important;
+    }
+
+    .metricCell:nth-child(4) {
+        border-top: 1px solid #e8ecf1 !important;
+        border-right: none !important;
+    }
+}
+
+
+/* =========================================================
+   600px - MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+    .ledgerRoot {
+        padding: 16px !important;
+    }
+
+    .ledgerHeader {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 12px !important;
+    }
+
+    .ledgerTitle {
+        font-size: 23px !important;
+        line-height: 29px !important;
+    }
+
+    .ledgerSubtitle {
+        font-size: 12px !important;
+    }
+
+    .ledgerRefreshBtn {
+        min-width: 130px !important;
+    }
+
+    .kpiStrip {
+        flex-direction: column !important;
+    }
+
+    .kpiCell {
+        width: 100% !important;
+        flex: none !important;
+
+        padding: 15px 18px !important;
+
+        border-bottom: 1px solid #e8ecf1 !important;
+    }
+
+    .kpiCell:last-child {
+        border-bottom: none !important;
+    }
+
+    .metricStrip {
+        flex-direction: column !important;
+    }
+
+    .metricCell {
+        width: 100% !important;
+        flex: none !important;
+
+        border-right: none !important;
+        border-bottom: 1px solid #e8ecf1 !important;
+    }
+
+    .metricCell:last-child {
+        border-bottom: none !important;
+    }
+
+    .healthPanel,
+    .lifecyclePanel,
+    .statementPanel {
+        padding: 17px !important;
+    }
+
+    .timelineTrack {
+        overflow-x: auto !important;
+        padding-bottom: 8px !important;
+    }
+
+    .timelineNode {
+        flex: 0 0 65px !important;
+        width: 65px !important;
+    }
+
+    .timelineLine {
+        min-width: 25px !important;
+    }
+
+    .filterBar {
+        flex-direction: column !important;
+        align-items: stretch !important;
+    }
+
+    .filterBar .sapMSF,
+    .filterBar .sapMSlt {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin-left: 0 !important;
+    }
+
+    .filterBar .sapMBtn {
+        align-self: flex-start !important;
+        margin-left: 0 !important;
+    }
+
+    /*
+       Keep table inside the card.
+       SAPUI5 table handles its own content.
+    */
+    .statementTable {
+        overflow-x: auto !important;
+    }
+}
+
+
+/* =========================================================
+   IMPORTANT - PREVENT PAGE HORIZONTAL SCROLL
+   ========================================================= */
+
+.ledgerPage,
+.ledgerPage .sapMPageScroll,
+.ledgerPage .sapMPageContent,
+.ledgerRoot,
+.ledgerHeader,
+.kpiStrip,
+.ledgerAnalyticsRow,
+.metricStrip,
+.statementPanel {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+.ledgerPage .sapMPageScroll {
+    overflow-x: hidden !important;
 }

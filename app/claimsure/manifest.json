@@ -133,6 +133,11 @@
         "target": "investigation"
         },
         {
+        "name": "payout",
+        "pattern": "payout",
+        "target": "payout"
+    },
+        {
           "pattern": "admin",
           "name": "admin",
           "target": "admin"
@@ -159,6 +164,10 @@
           "viewName": "Investigation",
           "viewId": "investigation"
         },
+        "payout": {
+        "viewName": "Payout",
+        "viewId": "payout"
+    },
         "admin": {
           "viewName": "Administration",
           "viewId": "admin"
