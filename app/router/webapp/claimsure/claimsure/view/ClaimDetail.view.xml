@@ -1,0 +1,243 @@
+<mvc:View
+    controllerName="claimsure.app.controller.ClaimDetail"
+    xmlns="sap.m"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:core="sap.ui.core"
+    xmlns:form="sap.ui.layout.form"
+    xmlns:uxap="sap.uxap"
+>
+    <Page
+        showNavButton="true"
+        navButtonPress="onNavBack"
+        showHeader="true"
+        class="csPage"
+    >
+        <content>
+            <uxap:ObjectPageLayout
+                 id="claimObjectPage"
+                busy="{claimDetail>/busy}"
+                busyIndicatorDelay="0"
+                showFooter="false"
+                useIconTabBar="true"
+            >
+
+                <!-- ========================= -->
+                <!-- HEADER TITLE               -->
+                <!-- ========================= -->
+
+                <uxap:headerTitle>
+                    <uxap:ObjectPageDynamicHeaderTitle>
+                        <uxap:expandedHeading>
+                            <VBox>
+                                <Title text="{claimDetail>/claimNumber}" level="H2"/>
+                                <Text text="{claimDetail>/description}" class="sapUiTinyMarginTop"/>
+                            </VBox>
+                        </uxap:expandedHeading>
+
+                        <uxap:snappedHeading>
+                            <Title text="{claimDetail>/claimNumber}" level="H4"/>
+                        </uxap:snappedHeading>
+
+                        <!-- <uxap:actions>
+                            <Button
+                                text="Edit"
+                                type="Transparent"
+                                press="onEditClaim"
+                            />
+
+                            <MenuButton
+                                text="Process Actions"
+                                type="Emphasized"
+                                buttonMode="Split"
+                                useDefaultActionOnly="false"
+                            >
+                                <menu>
+                                    <Menu>
+                                        <MenuItem
+                                            text="{i18n>btnSubmit}"
+                                            icon="sap-icon://paper-plane"
+                                            press="onSubmitClaim"
+                                            visible="{= ${claimDetail>/status} === 'Draft' }"
+                                        />
+                                        <MenuItem
+                                            text="{i18n>btnApprove}"
+                                            icon="sap-icon://accept"
+                                            press="onApproveClaim"
+                                            visible="{= ${claimDetail>/status} === 'PendingApproval' || ${claimDetail>/status} === 'UnderReview' }"
+                                        />
+                                        <MenuItem
+                                            text="{i18n>btnReject}"
+                                            icon="sap-icon://decline"
+                                            press="onRejectClaim"
+                                            visible="{= ${claimDetail>/status} === 'PendingApproval' || ${claimDetail>/status} === 'UnderReview' }"
+                                        />
+                                    </Menu>
+                                </menu>
+                            </MenuButton>
+                        </uxap:actions> -->
+
+                        <uxap:navigationActions>
+                            <Button
+                                icon="sap-icon://action"
+                                type="Transparent"
+                                tooltip="Share"
+                            />
+                        </uxap:navigationActions>
+                    </uxap:ObjectPageDynamicHeaderTitle>
+                </uxap:headerTitle>
+
+                <!-- ========================= -->
+                <!-- HEADER CONTENT             -->
+                <!-- (key facts row, like the   -->
+                <!-- SAP reference's "Details") -->
+                <!-- ========================= -->
+
+                <uxap:headerContent>
+                    <HBox wrap="Wrap">
+
+                        <VBox class="sapUiMediumMarginEnd">
+                            <Label text="Processing Status" design="Bold"/>
+                            <ObjectStatus
+                                text="{claimDetail>/status}"
+                                state="{ path: 'claimDetail>/status', formatter: '.formatter.statusState' }"
+                                icon="{ path: 'claimDetail>/status', formatter: '.formatter.statusIcon' }"
+                            />
+                        </VBox>
+
+                        <VBox class="sapUiMediumMarginEnd">
+                            <Label text="Incident Date" design="Bold"/>
+                            <Text text="{ path: 'claimDetail>/incidentDate', formatter: '.formatter.shortDate' }"/>
+                        </VBox>
+
+                        <VBox class="sapUiMediumMarginEnd">
+                            <Label text="Requested Amount" design="Bold"/>
+                            <ObjectNumber
+                                number="{ path: 'claimDetail>/claimedAmount', formatter: '.formatter.currency' }"
+                                unit="USD"
+                            />
+                        </VBox>
+
+                        <VBox class="sapUiMediumMarginEnd">
+                            <Label text="Policy" design="Bold"/>
+                            <Text text="{claimDetail>/policy/policyNumber}"/>
+                        </VBox>
+
+                    </HBox>
+                </uxap:headerContent>
+
+                <!-- ========================= -->
+                <!-- SECTIONS (ANCHOR TABS)     -->
+                <!-- ========================= -->
+
+                <uxap:sections>
+
+                    <!-- General Information -->
+                    <uxap:ObjectPageSection title="General Information">
+                        <uxap:subSections>
+                            <uxap:ObjectPageSubSection>
+                                <uxap:blocks>
+                                    <form:SimpleForm
+                                        editable="false"
+                                        layout="ResponsiveGridLayout"
+                                        labelSpanL="4"
+                                        labelSpanM="4"
+                                        emptySpanL="0"
+                                        emptySpanM="0"
+                                        columnsL="2"
+                                        columnsM="2"
+                                    >
+                                        <Label text="Customer"/>
+                                        <Text text="{
+                                            parts: [{path: 'claimDetail>/customer_ID'}, {path: 'lookups>/customers'}],
+                                            formatter: '.formatter.idToName'
+                                        }"/>
+
+                                        <Label text="Claim Type"/>
+                                        <Text text="{
+                                            parts: [{path: 'claimDetail>/claimType_ID'}, {path: 'lookups>/claimTypes'}],
+                                            formatter: '.formatter.idToName'
+                                        }"/>
+
+                                        <Label text="Policy"/>
+                                        <Text text="{claimDetail>/policy/policyNumber}"/>
+
+                                        <Label text="Incident Date"/>
+                                        <Text text="{ path: 'claimDetail>/incidentDate', formatter: '.formatter.shortDate' }"/>
+
+                                        <Label text="Assigned Agent"/>
+                                        <Text text="{
+                                            parts: [{path: 'claimDetail>/assignedAgent_ID'}, {path: 'lookups>/employees'}],
+                                            formatter: '.formatter.idToName'
+                                        }"/>
+
+                                        <Label text="Description"/>
+                                        <Text text="{claimDetail>/description}"/>
+                                    </form:SimpleForm>
+                                </uxap:blocks>
+                            </uxap:ObjectPageSubSection>
+                        </uxap:subSections>
+                    </uxap:ObjectPageSection>
+
+                    <!-- Fraud Risk Scores -->
+                    <uxap:ObjectPageSection title="Fraud Risk Scores">
+                        <uxap:subSections>
+                            <uxap:ObjectPageSubSection>
+                                <uxap:blocks>
+                                    <Table
+                                        items="{claimDetail>/fraudRiskScores}"
+                                        noDataText="No risk scores recorded"
+                                    >
+                                        <columns>
+                                            <Column><Text text="Risk Score"/></Column>
+                                            <Column><Text text="Risk Level"/></Column>
+                                        </columns>
+                                        <items>
+                                            <ColumnListItem>
+                                                <cells>
+                                                    <Text text="{claimDetail>riskScore}"/>
+                                                    <ObjectStatus
+                                                        text="{claimDetail>riskLevel}"
+                                                        state="{ path: 'claimDetail>riskLevel', formatter: '.formatter.riskState' }"
+                                                    />
+                                                </cells>
+                                            </ColumnListItem>
+                                        </items>
+                                    </Table>
+                                </uxap:blocks>
+                            </uxap:ObjectPageSubSection>
+                        </uxap:subSections>
+                    </uxap:ObjectPageSection>
+
+                    <!-- Documents -->
+                    <uxap:ObjectPageSection title="Documents">
+                        <uxap:subSections>
+                            <uxap:ObjectPageSubSection>
+                                <uxap:blocks>
+                                    <Table
+                                        items="{claimDetail>/documents}"
+                                        noDataText="No documents uploaded"
+                                    >
+                                        <columns>
+                                            <Column><Text text="File Name"/></Column>
+                                            <Column><Text text="Type"/></Column>
+                                        </columns>
+                                        <items>
+                                            <ColumnListItem>
+                                                <cells>
+                                                    <Text text="{claimDetail>fileName}"/>
+                                                    <Text text="{claimDetail>documentType}"/>
+                                                </cells>
+                                            </ColumnListItem>
+                                        </items>
+                                    </Table>
+                                </uxap:blocks>
+                            </uxap:ObjectPageSubSection>
+                        </uxap:subSections>
+                    </uxap:ObjectPageSection>
+
+                </uxap:sections>
+
+            </uxap:ObjectPageLayout>
+        </content>
+    </Page>
+</mvc:View>

@@ -293,66 +293,28 @@
                         growing="false"
                         class="recentClaimsTable">
 
-               <columns>
+                        <columns>
+                            <Column><Text text="Claim ID"/></Column>
+                            <Column><Text text="Policy No."/></Column>
+                            <Column><Text text="Customer"/></Column>
+                            <Column><Text text="Status"/></Column>
+                            <Column hAlign="End"><Text text="Amount"/></Column>
+                        </columns>
 
-                  <Column>
-                        <Text text="Claim Number"/>
-                    </Column>
-
-                    <Column>
-                        <Text text="Claim"/>
-                    </Column>
-
-                 
-
-                    <Column>
-                        <Text text="Customer"/>
-                    </Column>
-
-                    <Column>
-                        <Text text="Status"/>
-                    </Column>
-
-                    <Column>
-                        <Text text="Amount"/>
-                    </Column>
-                </columns>
-
-                <items>
-                    <ColumnListItem
-                        type="Active"
-                        press="onClaimPress">
-
-                        <cells>
-                            <Text text="{recent>claimNumber}"/>
-                            <!-- Claim Type / Claim Name -->
-                          <Text text="{recent>claimTypeName}"/>
-
-                            <!-- Policy Name -->
-                       
-
-                            <!-- Customer -->
-                            <Text text="{recent>customerName}"/>
-
-                            <!-- Status -->
-                            <core:HTML
-                                content="{
-                                    path: 'recent>status',
-                                    formatter: '.formatStatusPillHtml'
-                                }"/>
-
-                            <!-- Amount -->
-                            <Text
-                                text="{
-                                    path: 'recent>claimedAmount',
-                                    formatter: '.formatCurrency'
-                                }"
-                                textAlign="End"/>
-
-                        </cells>
-
-                    </ColumnListItem>
-                </items>
+                        <items>
+                            <ColumnListItem type="Active" press="onClaimPress">
+                                <cells>
+                                    <Text text="{recent>claimNumber}"/>
+                                    <Text text="{recent>policyNumber}"/>
+                                    <Text text="{recent>customerName}"/>
+                                    <core:HTML
+                                        content="{ path: 'recent>status', formatter: '.formatStatusPillHtml' }"/>
+                                    <Text
+                                        text="{ path: 'recent>claimedAmount', formatter: '.formatCurrency' }"
+                                        textAlign="End"/>
+                                </cells>
+                            </ColumnListItem>
+                        </items>
                     </Table>
                 </Panel>
 
