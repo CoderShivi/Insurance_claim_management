@@ -8,8 +8,8 @@ build-parameters:
   before-all:
     - builder: custom
       commands:
-        - npm ci
         - npx cds build --production
+        - rm -rf app/router/webapp/claimsure
         - mkdir -p app/router/webapp
         - cp -r app/claimsure app/router/webapp/claimsure
 modules:
@@ -52,7 +52,6 @@ modules:
           url: ~{srv-url}
           forwardAuthToken: true
       - name: Insurance_claim_management-auth
-      - name: Insurance_claim_management-destination
     provides:
       - name: app-api
         properties:

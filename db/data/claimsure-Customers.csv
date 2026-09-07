@@ -1,34 +1,31 @@
 ID,customerNumber,firstName,lastName,email,phone,address,status
-11111111-1111-1111-1111-111111111111,CUST001,Ravi,Kumar,ravi.kumar@email.com,9876543210,Bangalore,Active
-22222222-2222-2222-2222-222222222222,CUST002,Anita,Sharma,anita.sharma@email.com,9876543211,Mumbai,Active
-33333333-3333-3333-3333-333333333333,CUST003,Arjun,Reddy,arjun.reddy@email.com,9876543212,Hyderabad,Active
-44444444-4444-4444-4444-444444444444,CUST004,Priya,Patel,priya.patel@email.com,9876543213,Ahmedabad,Active
-55555555-5555-5555-5555-555555555555,CUST005,Vikram,Singh,vikram.singh@email.com,9876543214,Delhi,Active
-66666666-6666-6666-6666-666666666666,CUST006,Neha,Verma,neha.verma@email.com,9876543215,Pune,Active
-77777777-7777-7777-7777-777777777777,CUST007,Karan,Mehta,karan.mehta@email.com,9876543216,Chennai,Active
-88888888-8888-8888-8888-888888888888,CUST008,Sneha,Iyer,sneha.iyer@email.com,9876543217,Kochi,Active
-cca1686f-f06c-42b4-89a3-bf17af67a90d,CUST8889,Sneha,Rao,sneha.rao8889@email.com,9876543289,Chennai,Inactive
-e3e8bea9-90e7-45eb-a8ed-f1414d0bca11,CUST8890,Vikram,Shah,vikram.shah8890@email.com,9876543290,Hyderabad,Active
-068ea98c-db2e-4154-8706-efa7fd9fc87e,CUST8891,Neha,Das,neha.das8891@email.com,9876543291,Pune,Active
-b67096cc-4a2f-40a1-ae9c-1a637e604b14,CUST8892,Amit,Kapoor,amit.kapoor8892@email.com,9876543292,Delhi,Active
-967f47f9-c05a-4b74-a620-0a19fc752af1,CUST8893,Kavya,Bhat,kavya.bhat8893@email.com,9876543293,Kolkata,Active
-970af25c-ac81-4c9e-bcf5-5968074c332e,CUST8894,Rohan,Singh,rohan.singh8894@email.com,9876543294,Ahmedabad,Active
-8af5a65f-0d9e-4ea7-b1cd-93fba6fba6b0,CUST8895,Pooja,Gupta,pooja.gupta8895@email.com,9876543295,Jaipur,Active
-8f7e872c-f5f8-462f-935c-6b53960ea27f,CUST8896,Nikhil,Pillai,nikhil.pillai8896@email.com,9876543296,Kochi,Inactive
-7230437b-1bb0-4e5b-9157-5e046c364ba7,CUST8897,Divya,Malhotra,divya.malhotra8897@email.com,9876543297,Coimbatore,Active
-cd667eb9-d24f-4959-9216-bfec727d6a17,CUST8898,Suresh,Naidu,suresh.naidu8898@email.com,9876543298,Mysore,Active
-d169ebde-2311-4b21-bfa3-fd165b186e7c,CUST8899,Ananya,Chopra,ananya.chopra8899@email.com,9876543299,Bangalore,Active
-c7e7b59a-4faa-4c3e-ac2c-c602037ad510,CUST8900,Manoj,Kulkarni,manoj.kulkarni8900@email.com,9876543200,Mumbai,Active
-599558c1-f6ba-4f48-ab02-bcc39065494b,CUST8901,Isha,Saxena,isha.saxena8901@email.com,9876543201,Chennai,Active
-9d38832c-1cc3-4c26-ae3b-5953b3dde612,CUST8902,Varun,Mishra,varun.mishra8902@email.com,9876543202,Hyderabad,Active
-ea617602-60ea-42a6-9fdc-5e55830bff70,CUST8903,Asha,Jain,asha.jain8903@email.com,9876543203,Pune,Inactive
-dd4bb083-5f14-44e2-a9cf-2d24ba30ad06,CUST8904,Harish,Thomas,harish.thomas8904@email.com,9876543204,Delhi,Active
-eccb9636-6ee6-432b-8bc6-ae1f44da643f,CUST8905,Nandini,Desai,nandini.desai8905@email.com,9876543205,Kolkata,Active
-c80b3651-ef27-4102-b8b5-f6a321fa96ed,CUST8906,Aditya,Bose,aditya.bose8906@email.com,9876543206,Ahmedabad,Active
-ec8d58cf-6130-4114-9150-162bee96623e,CUST8907,Swati,Reddy,swati.reddy8907@email.com,9876543207,Jaipur,Active
-8b75c359-1e8c-4e9b-9a70-a644f61b55e7,CUST8908,Gaurav,Nair,gaurav.nair8908@email.com,9876543208,Kochi,Active
-7f4653a6-b92e-4ec0-874c-b5456b456a26,CUST8909,Arun,Patel,arun.patel8909@email.com,9876543209,Coimbatore,Active
-d5578586-dbdd-4e04-bb33-f7c7605cce9b,CUST8910,Meera,Iyer,meera.iyer8910@email.com,9876543210,Mysore,Inactive
-fe3bfb09-ced5-4f20-8a5c-a26c63aa27e2,CUST8911,Kiran,Joshi,kiran.joshi8911@email.com,9876543211,Bangalore,Active
-f03aa303-af0e-4731-919f-5562e1973199,CUST8912,Priya,Verma,priya.verma8912@email.com,9876543212,Mumbai,Active
-ed5d96a9-d7ca-4442-845a-10483abf0478,CUST8913,Rahul,Menon,rahul.menon8913@email.com,9876543213,Chennai,Active
+10000001-0001-0001-0001-000000000001,CUST001,Ravi,Kumar,ravi.kumar@email.com,+91 9876500000,Bangalore,Inactive
+10000002-0002-0002-0002-000000000002,CUST002,Anita,Sharma,anita.sharma@email.com,+91 9876500001,Mumbai,Active
+10000003-0003-0003-0003-000000000003,CUST003,Arjun,Patel,arjun.patel@email.com,+91 9876500002,Hyderabad,Active
+10000004-0004-0004-0004-000000000004,CUST004,Priya,Reddy,priya.reddy@email.com,+91 9876500003,Chennai,Active
+10000005-0005-0005-0005-000000000005,CUST005,Kiran,Rao,kiran.rao@email.com,+91 9876500004,Delhi,Active
+10000006-0006-0006-0006-000000000006,CUST006,Sneha,Iyer,sneha.iyer@email.com,+91 9876500005,Pune,Active
+10000007-0007-0007-0007-000000000007,CUST007,Vikram,Nair,vikram.nair@email.com,+91 9876500006,Kolkata,Active
+10000008-0008-0008-0008-000000000008,CUST008,Meera,Joshi,meera.joshi@email.com,+91 9876500007,Ahmedabad,Inactive
+10000009-0009-0009-0009-000000000009,CUST009,Rahul,Mehta,rahul.mehta@email.com,+91 9876500008,Jaipur,Active
+10000010-0010-0010-0010-000000000010,CUST010,Divya,Singh,divya.singh@email.com,+91 9876500009,Kochi,Active
+10000011-0011-0011-0011-000000000011,CUST011,Suresh,Gupta,suresh.gupta@email.com,+91 9876500010,Bangalore,Active
+10000012-0012-0012-0012-000000000012,CUST012,Nisha,Das,nisha.das@email.com,+91 9876500011,Mumbai,Active
+10000013-0013-0013-0013-000000000013,CUST013,Amit,Verma,amit.verma@email.com,+91 9876500012,Hyderabad,Active
+10000014-0014-0014-0014-000000000014,CUST014,Kavya,Kapoor,kavya.kapoor@email.com,+91 9876500013,Chennai,Active
+10000015-0015-0015-0015-000000000015,CUST015,Rohan,Bhat,rohan.bhat@email.com,+91 9876500014,Delhi,Inactive
+10000016-0016-0016-0016-000000000016,CUST016,Pooja,Mishra,pooja.mishra@email.com,+91 9876500015,Pune,Active
+10000017-0017-0017-0017-000000000017,CUST017,Manoj,Pillai,manoj.pillai@email.com,+91 9876500016,Kolkata,Active
+10000018-0018-0018-0018-000000000018,CUST018,Isha,Chopra,isha.chopra@email.com,+91 9876500017,Ahmedabad,Active
+10000019-0019-0019-0019-000000000019,CUST019,Varun,Malhotra,varun.malhotra@email.com,+91 9876500018,Jaipur,Active
+10000020-0020-0020-0020-000000000020,CUST020,Neha,Desai,neha.desai@email.com,+91 9876500019,Kochi,Active
+10000021-0021-0021-0021-000000000021,CUST021,Akash,Jain,akash.jain@email.com,+91 9876500020,Bangalore,Active
+10000022-0022-0022-0022-000000000022,CUST022,Shreya,Menon,shreya.menon@email.com,+91 9876500021,Mumbai,Inactive
+10000023-0023-0023-0023-000000000023,CUST023,Naveen,Shetty,naveen.shetty@email.com,+91 9876500022,Hyderabad,Active
+10000024-0024-0024-0024-000000000024,CUST024,Asha,Kulkarni,asha.kulkarni@email.com,+91 9876500023,Chennai,Active
+10000025-0025-0025-0025-000000000025,CUST025,Vivek,Agarwal,vivek.agarwal@email.com,+91 9876500024,Delhi,Active
+10000026-0026-0026-0026-000000000026,CUST026,Maya,Bose,maya.bose@email.com,+91 9876500025,Pune,Active
+10000027-0027-0027-0027-000000000027,CUST027,Aditya,Saxena,aditya.saxena@email.com,+91 9876500026,Kolkata,Active
+10000028-0028-0028-0028-000000000028,CUST028,Sonia,Dutta,sonia.dutta@email.com,+91 9876500027,Ahmedabad,Active
+10000029-0029-0029-0029-000000000029,CUST029,Harish,Choudhary,harish.choudhary@email.com,+91 9876500028,Jaipur,Inactive
+10000030-0030-0030-0030-000000000030,CUST030,Tanya,Naidu,tanya.naidu@email.com,+91 9876500029,Kochi,Active

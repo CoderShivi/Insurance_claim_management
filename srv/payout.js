@@ -11,9 +11,7 @@ module.exports = cds.service.impl(async function () {
     } = this.entities;
 
 
-    
-    // Create Payout
-    
+
 
     this.on('createPayout', async (req) => {
 
@@ -126,13 +124,6 @@ module.exports = cds.service.impl(async function () {
 
         try {
 
-            /*
-             * In a real enterprise project,
-             * external payment/finance system
-             * can be called here using Destination Service.
-             *
-             * Currently payment is simulated.
-             */
 
             const paymentSuccessful = true;
 
