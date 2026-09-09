@@ -216,6 +216,7 @@
                         items="{
                             path: 'investigation>/Investigations',
                             parameters: {
+                                $$operationMode: 'Server',
                                 $select: 'ID,investigationNumber,claim_ID,investigator_ID,status,findings',
                                 $orderby: 'investigationNumber desc'
                             }
@@ -272,8 +273,8 @@
                             <!-- ACTION -->
 
                             <Column
-                                width="5rem"
-                                hAlign="End">
+                                width="8rem"
+                                >
 
                                 <Text
                                     text="Action"/>
