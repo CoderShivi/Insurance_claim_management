@@ -1,5 +1,3 @@
-
-
 .csPage .sapMPageHeader {
     font-weight: 600;
 }
@@ -40,42 +38,33 @@ body {
 /* ==========================================================================
    Welcome Banner
    ========================================================================== */
-
+   
 .welcomeBanner {
-    box-sizing: border-box;
-    min-height: 122px;
+    min-height: 190px;
     padding: 1.45rem 1.65rem;
-    border: 1px solid #E5EDF7;
-    border-radius: 14px;
-    background:
-        radial-gradient(
-            circle at 80% 20%,
-            rgba(112, 166, 230, 0.14),
-            transparent 28%
-        ),
-        linear-gradient(
-            135deg,
-            #EAF2FB 0%,
-            #F5F8FC 100%
-        );
-    overflow: hidden;
-}
 
+    background: url("../img/welcome-banner1.png") center center / cover no-repeat !important;
+
+    border: 2px solid red;
+}
 .welcomeCopy {
     min-width: 280px;
 }
 
 .welcomeTitle {
     margin: 0;
-    color: #16283A;
+    color:#FFFFFF;
     font-size: 1.42rem;
     font-weight: 700;
+    text-shadow: 0 2px 4px rgba(0, 35, 45, 0.65);
 }
 
 .welcomeSubtitle {
-    margin-top: 0.3rem;
-    color: #5F6F7E;
-    font-size: 0.9rem;
+    margin-top: 0;
+    color:#FFFFFF;
+    font-weight: 500;
+    font-size: 1rem;
+    text-shadow: 0 2px 4px rgba(0, 35, 45, 0.75);
 }
 
 
@@ -203,6 +192,7 @@ body {
 .kpiRow {
     width: 100%;
     gap: 0.85rem;
+    
 }
 
 .navCard {
@@ -509,71 +499,88 @@ body {
 
 .chartSectionTitle {
     display: block;
-    margin-bottom: 0.65rem;
-    color: #4D5D6B;
-    font-size: 0.85rem;
+    margin-bottom: 0.9rem;
+    color: #243544;
+    font-size: 0.95rem;
     font-weight: 700;
 }
 
+
+/* ==========================================================================
+   Status Donut + Legend
+   (rendered via core:HTML from the same statusChart>/items model
+   that used to feed the VizFrame — data/binding unchanged)
+   ========================================================================== */
+
 .pieRow {
-    gap: 1.4rem;
+    gap: 1.6rem;
     align-items: center;
 }
 
 .pieChartWrap {
     flex-shrink: 0;
     padding: 0.35rem 0.2rem;
-    margin-left: 3rem;
-}
-
-.pieClickArea {
-    cursor: pointer;
+    margin-left: 1rem;
 }
 
 .pieChart {
     position: relative;
-    width: 220px;
-    height: 220px;
+    width: 210px;
+    height: 210px;
     border-radius: 50%;
     box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.65);
 }
 
-.pieChart::after {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    background: #FFFFFF;
-    transform: translate(-50%, -50%);
-}
-
 .emptyPie {
+    width: 210px;
+    height: 210px;
+    border-radius: 50%;
     background: #EDEDE8 !important;
 }
 
-.pieSelectedLabel {
-    min-height: 1.15rem;
-    margin-top: 0.45rem;
-    color: #354655;
-    font-size: 0.78rem;
-    font-weight: 600;
-    text-align: center;
+.pieChartSvg {
+    display: block;
 }
 
-.pieSliceLabel {
+.pieSlice {
+    cursor: pointer;
+    transition: opacity 0.12s ease, filter 0.12s ease;
+}
+
+.pieSlice:hover,
+.pieSlice:focus {
+    opacity: 0.86;
+    filter: brightness(1.04);
+    outline: none;
+}
+
+.pieCenterLabel {
     position: absolute;
+    top: 50%;
+    left: 50%;
     z-index: 2;
-    color: #FFFFFF;
-    font-size: 0.72rem;
-    font-weight: 700;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     text-align: center;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
     transform: translate(-50%, -50%);
     pointer-events: none;
-    white-space: nowrap;
+}
+
+.pieCenterValue {
+    display: block;
+    color: #172534;
+    font-size: 1.9rem;
+    line-height: 1.1;
+    font-weight: 700;
+}
+
+.pieCenterCaption {
+    display: block;
+    margin-top: 0.15rem;
+    color: #7B8791;
+    font-size: 0.78rem;
+    font-weight: 500;
 }
 
 .pieLegend {
@@ -584,9 +591,9 @@ body {
 .legendRow {
     display: flex;
     align-items: center;
-    gap: 0.55rem;
-    min-height: 28px;
-    padding: 0.18rem 0.4rem;
+    gap: 0.65rem;
+    min-height: 32px;
+    padding: 0.3rem 0.2rem;
     border-radius: 6px;
     transition: background 0.12s ease;
 }
@@ -595,15 +602,61 @@ body {
     cursor: pointer;
 }
 
-.legendRowClickable:hover {
+.legendRowClickable:hover,
+.legendRowClickable:focus {
     background: #F3F6F9;
+    outline: none;
+}
+
+
+/* ==========================================================================
+   Status Popover (opened from a donut slice or a legend row)
+   ========================================================================== */
+
+.statusPopoverContent {
+    padding: 0.9rem 1rem;
+    min-width: 190px;
+}
+
+.statusPopoverHeader {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.statusPopoverDot {
+    display: inline-block;
+    flex-shrink: 0;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+}
+
+.statusPopoverTitle {
+    color: #172534;
+    font-size: 0.92rem;
+    font-weight: 700;
+}
+
+.statusPopoverCount {
+    color: #243544;
+    font-size: 1.15rem;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+.statusPopoverPercent {
+    margin-top: 0.15rem;
+    color: #7B8791;
+    font-size: 0.8rem;
 }
 
 .legendDot {
     display: inline-block;
     flex-shrink: 0;
-    width: 9px;
-    height: 9px;
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
 }
 
@@ -611,17 +664,19 @@ body {
     flex: 1;
     min-width: 0;
     overflow: hidden;
-    color: #4A5662;
-    font-size: 0.8rem;
+    color: #37454F;
+    font-size: 0.88rem;
+    font-weight: 500;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
 .legendPercent {
     flex-shrink: 0;
-    width: 32px;
-    color: #71808D;
-    font-size: 0.78rem;
+    min-width: 24px;
+    color: #172534;
+    font-size: 0.9rem;
+    font-weight: 700;
     text-align: right;
 }
 
@@ -633,8 +688,8 @@ body {
 
 .chartFooterCaption {
     display: block;
-    margin-top: 0.55rem;
-    padding-top: 0.65rem;
+    margin-top: 0.9rem;
+    padding-top: 0.75rem;
     border-top: 1px solid #E9ECEF;
     color: #4D5D6B;
     font-size: 0.8rem;
@@ -1118,7 +1173,12 @@ body {
     .pieRow {
         gap: 1.4rem;
         align-items: center;
-        margin-top: 1.5rem;
+        margin-top: 1rem;
+        justify-content: center;
+    }
+
+    .pieChartWrap {
+        margin-left: 0;
     }
 
     .pieLegend {
@@ -2014,3 +2074,108 @@ body {
 .ledgerPage .sapMPageScroll {
     overflow-x: hidden !important;
 }
+
+.chartHeaderRow {
+    margin-bottom: 0.9rem;
+}
+
+.yearSelectDropdown {
+    min-width: 90px;
+}
+
+.chartLinePath {
+    fill: none;
+    stroke: #3E7CB1;
+    stroke-width: 2.5;
+}
+
+.chartLinePoint {
+    fill: #3E7CB1;
+    stroke: #FFFFFF;
+    stroke-width: 2;
+    cursor: pointer;
+}
+
+.chartLinePoint:hover {
+    fill: #2C567F;
+}
+
+
+
+.chartLinePoint {
+    fill: #3E7CB1;
+    stroke: #FFFFFF;
+    stroke-width: 2;
+    cursor: pointer;
+}
+.welcomeBanner {
+    box-sizing: border-box;
+    min-height: 190px;
+    padding: 1.45rem 1.65rem;
+    border: 1px solid #E5EDF7;
+    border-radius: 14px;
+    position: relative;
+    overflow: hidden;
+
+    background-image:
+        linear-gradient(
+            100deg,
+            rgba(15, 30, 50, 0.72) 0%,
+            rgba(15, 30, 50, 0.45) 35%,
+            rgba(15, 30, 50, 0.15) 65%,
+            rgba(15, 30, 50, 0.05) 100%
+        ),
+        url("../img/welcome-banner.jpg");
+    background-size: cover;
+    background-position: center;
+}
+.navCardClaims {
+    background: #F3F8FE;
+}
+
+.navCardPolicies {
+    background: #F1FBF7;
+}
+
+.navCardCustomers {
+    background: #F8F6FD;
+}
+
+.navCardClaimTypes {
+    background: #FEF9F0;
+}
+
+.kpiWarning {
+    border-left-color: #7F77DD;
+    background: #F8F7FE;
+}
+
+.kpiDanger {
+    border-left-color: #D85A30;
+    background: #FDF5F3;
+}
+
+.kpiNeutral {
+    border-left-color: #3E7CB1;
+    background: #F3F8FD;
+}
+
+.kpiApprovedColor {
+    border-left-color: #1D9E75;
+    background: #F2FAF7;
+}
+
+.kpiSuccess {
+    border-left-color: #1D9E75;
+    background: #F2FAF7;
+}
+
+
+.claimsureSideNav {
+    background-color: #F4F8FB !important;
+}
+
+.claimsureSideNav .sapTntNavLIActive {
+    background-color: #DCEAF6 !important;
+} 
+ 

@@ -456,6 +456,33 @@ sap.ui.define([
             this.getOwnerComponent()
                 .getRouter()
                 .navTo("claims");
+        },
+         
+
+          onDocumentPress: function (oEvent) {
+
+            var oDocument = oEvent.getSource()
+                .getBindingContext("claimDetail")
+                .getObject();
+
+            if (!oDocument || !oDocument.ID) {
+                MessageBox.error("Unable to open document.");
+                return;
+            }
+
+            var oInsuranceModel = this.getView().getModel();
+
+            if (!oInsuranceModel) {
+                MessageBox.error("OData model is not available.");
+                return;
+            }
+
+            var sBaseUrl = oInsuranceModel.getServiceUrl().replace(/\/$/, "");
+
+            var sUrl = sBaseUrl +
+                "/Claims(" + this._sClaimId + ")/documents(" + oDocument.ID + ")/content";
+
+            window.open(sUrl, "_blank");
         }
 
     });
