@@ -9,7 +9,8 @@ sap.ui.define([
     "sap/m/Label",
     "sap/m/Text",
     "sap/m/ObjectStatus",
-    "sap/m/Button"
+    "sap/m/Button",
+    "sap/ui/layout/form/SimpleForm"
 ], function (
     Controller,
     JSONModel,
@@ -21,7 +22,8 @@ sap.ui.define([
     Label,
     Text,
     ObjectStatus,
-    Button
+    Button,
+    SimpleForm
 ) {
     "use strict";
 
@@ -946,216 +948,122 @@ onSearch: function (oEvent) {
             // DETAILS DIALOG
             // =====================================================
 
-            _showInvestigationDetails: function (oData) {
+_showInvestigationDetails: function (oData) {
+
+    var oDialog =
+        this._oInvestigationDialog;
+
+
+    if (!oDialog) {
+
+        oDialog =
+            new Dialog({
+
+                title:
+                    "Investigation Details",
+
+                contentWidth:
+                    "36rem",
 
-                var oDialog =
-                    this._oInvestigationDialog;
+                verticalScrolling: true,
 
+                content: [
 
-                if (!oDialog) {
+                    new SimpleForm({
 
-                    oDialog =
-                        new Dialog({
+                        editable: false,
+                        layout: "ResponsiveGridLayout",
+                        labelSpanL: 4,
+                        labelSpanM: 4,
+                        labelSpanS: 12,
+                        emptySpanL: 0,
+                        emptySpanM: 0,
+                        emptySpanS: 0,
+                        columnsL: 1,
+                        columnsM: 1,
 
-                            title:
-                                "Investigation Details",
+                        content: [
 
-                            contentWidth:
-                                "36rem",
+                            // CLAIM
+                            new Label({ text: "Claim" }),
+                            new Text({
+                                text: {
+                                    path: "selectedInvestigation>/claim_ID",
+                                    formatter: this.getClaimNumber.bind(this)
+                                }
+                            }),
 
-                            content: [
+                            // CLAIM TYPE
+                            new Label({ text: "Claim Type" }),
+                            new Text({
+                                text: {
+                                    path: "selectedInvestigation>/claim_ID",
+                                    formatter: this.getClaimTypeName.bind(this)
+                                }
+                            }),
 
-                                new VBox({
+                            // INVESTIGATOR
+                            new Label({ text: "Investigator" }),
+                            new Text({
+                                text: {
+                                    path: "selectedInvestigation>/investigator_ID",
+                                    formatter: this.getInvestigatorName.bind(this)
+                                }
+                            }),
 
-                                    class:
-                                        "sapUiMediumMargin",
+                            // STATUS
+                            new Label({ text: "Status" }),
+                            new ObjectStatus({
+                                text: "{selectedInvestigation>/status}",
+                                state: {
+                                    path: "selectedInvestigation>/status",
+                                    formatter: this.formatInvestigationState.bind(this)
+                                }
+                            }),
 
-                                    items: [
+                            // FINDINGS
+                            new Label({ text: "Findings" }),
+                            new Text({
+                                text: "{selectedInvestigation>/findings}",
+                                wrapping: true
+                            }).addStyleClass("sapUiTinyMarginBottom")
 
-                                        // =====================
-                                        // CLAIM
-                                        // =====================
+                        ]
 
-                                        new Label({
-                                            text: "Claim"
-                                        }),
+                    })
 
-                                        new Text({
+                ],
 
-                                            text: {
-                                                path:
-                                                    "selectedInvestigation>/claim_ID",
+                endButton:
+                    new Button({
+                        text: "Close",
+                        press: function () {
+                            oDialog.close();
+                        }
+                    })
 
-                                                formatter:
-                                                    this.getClaimNumber
-                                                        .bind(this)
-                                            }
+            }).addStyleClass("sapUiContentPadding");
 
-                                        }),
 
+        this._oInvestigationDialog =
+            oDialog;
 
-                                        // =====================
-                                        // CLAIM TYPE
-                                        // =====================
 
-                                        new Label({
+        this.getView()
+            .addDependent(
+                oDialog
+            );
+    }
 
-                                            text:
-                                                "Claim Type",
 
-                                            class:
-                                                "sapUiSmallMarginTop"
+    oDialog.setModel(
+        new JSONModel(oData),
+        "selectedInvestigation"
+    );
 
-                                        }),
 
-                                        new Text({
-
-                                            text: {
-                                                path:
-                                                    "selectedInvestigation>/claim_ID",
-
-                                                formatter:
-                                                    this.getClaimTypeName
-                                                        .bind(this)
-                                            }
-
-                                        }),
-
-
-                                        // =====================
-                                        // INVESTIGATOR
-                                        // =====================
-
-                                        new Label({
-
-                                            text:
-                                                "Investigator",
-
-                                            class:
-                                                "sapUiSmallMarginTop"
-
-                                        }),
-
-                                        new Text({
-
-                                            text: {
-
-                                                path:
-                                                    "selectedInvestigation>/investigator_ID",
-
-                                                formatter:
-                                                    this.getInvestigatorName
-                                                        .bind(this)
-
-                                            }
-
-                                        }),
-
-
-                                        // =====================
-                                        // STATUS
-                                        // =====================
-
-                                        new Label({
-
-                                            text:
-                                                "Status",
-
-                                            class:
-                                                "sapUiSmallMarginTop"
-
-                                        }),
-
-
-                                        new ObjectStatus({
-
-                                            text:
-                                                "{selectedInvestigation>/status}",
-
-                                            state: {
-
-                                                path:
-                                                    "selectedInvestigation>/status",
-
-                                                formatter:
-                                                    this.formatInvestigationState
-                                                        .bind(this)
-
-                                            }
-
-                                        }),
-
-
-                                        // =====================
-                                        // FINDINGS
-                                        // =====================
-
-                                        new Label({
-
-                                            text:
-                                                "Findings",
-
-                                            class:
-                                                "sapUiSmallMarginTop"
-
-                                        }),
-
-
-                                        new Text({
-
-                                            text:
-                                                "{selectedInvestigation>/findings}",
-
-                                            wrapping:
-                                                true
-
-                                        })
-
-                                    ]
-
-                                })
-
-                            ],
-
-
-                            endButton:
-                                new Button({
-
-                                    text:
-                                        "Close",
-
-                                    press:
-                                        function () {
-
-                                            oDialog.close();
-
-                                        }
-
-                                })
-
-                        });
-
-
-                    this._oInvestigationDialog =
-                        oDialog;
-
-
-                    this.getView()
-                        .addDependent(
-                            oDialog
-                        );
-                }
-
-
-                oDialog.setModel(
-                    new JSONModel(oData),
-                    "selectedInvestigation"
-                );
-
-
-                oDialog.open();
-            },
-
+    oDialog.open();
+},
 
             // =====================================================
             // INVESTIGATION STATUS
