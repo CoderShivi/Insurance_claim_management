@@ -296,22 +296,10 @@
                                          ================================= -->
 
                                     <VBox>
-
-                                        <ObjectIdentifier
-                                            title="{
-                                                path: 'investigation>claim_ID',
-                                                formatter: '.getClaimNumber'
-                                            }"/>
-
-                                        <Text
-                                            text="{
-                                                path: 'investigation>claim_ID',
-                                                formatter: '.getClaimTypeName'
-                                            }"
-                                            class="claimTypeSubText"/>
-
+                                         <Text
+                                            text="{path: 'investigation>claim_ID', formatter: '.getClaimTypeName'}"
+                                        />
                                     </VBox>
-
 
                                     <!-- =================================
                                          INVESTIGATOR NAME
@@ -441,7 +429,7 @@
                                     <ObjectIdentifier
                                         title="{
                                             path: 'investigation>claim_ID',
-                                            formatter: '.getClaimNumber'
+                                            formatter: '.getClaimTypeName'
                                         }"/>
 
 
@@ -485,129 +473,8 @@
                 </Panel>
 
 
-                <!-- =====================================================
-                     APPROVALS
-                     ===================================================== -->
-
-                <Panel
-                    headerText="Investigation Approvals"
-                    class="investigationPanel sapUiMediumMarginTop"
-                    expandable="false"
-                    width="100%">
-
-                    <Table
-                        id="approvalsTable"
-                        width="100%"
-                        growing="true"
-                        growingThreshold="10"
-
-                        items="{
-                            path: 'investigation>/Approvals',
-                            parameters: {
-                                $select: 'ID,approvalNumber,claim_ID,approver_ID,approvalLevel,decision,comments'
-                            }
-                        }"
-
-                        noDataText="No approvals found"
-                        class="approvalTable">
-
-                        <columns>
-
-                            <Column
-                                width="12rem">
-
-                                <Text
-                                    text="Approval"/>
-
-                            </Column>
-
-                            <Column
-                                width="10rem">
-
-                                <Text
-                                    text="Claim"/>
-
-                            </Column>
-
-                            <Column
-                                width="12rem">
-
-                                <Text
-                                    text="Approval Level"/>
-
-                            </Column>
-
-                            <Column
-                                width="10rem">
-
-                                <Text
-                                    text="Decision"/>
-
-                            </Column>
-
-                            <Column>
-
-                                <Text
-                                    text="Comments"/>
-
-                            </Column>
-
-                        </columns>
-
-
-                        <items>
-
-                            <ColumnListItem>
-
-                                <cells>
-
-                                    <!-- APPROVAL -->
-
-                                    <ObjectIdentifier
-                                        title="{investigation>approvalNumber}"/>
-
-
-                                    <!-- CLAIM -->
-
-                                    <Text
-                                        text="{
-                                            path: 'investigation>claim_ID',
-                                            formatter: '.getClaimNumber'
-                                        }"/>
-
-
-                                    <!-- APPROVAL LEVEL -->
-
-                                    <Text
-                                        text="{investigation>approvalLevel}"/>
-
-
-                                    <!-- DECISION -->
-
-                                    <ObjectStatus
-                                        text="{investigation>decision}"
-                                        state="{
-                                            path: 'investigation>decision',
-                                            formatter: '.formatDecisionState'
-                                        }"/>
-
-
-                                    <!-- COMMENTS -->
-
-                                    <Text
-                                        text="{investigation>comments}"
-                                        maxLines="2"
-                                        wrapping="true"/>
-
-                                </cells>
-
-                            </ColumnListItem>
-
-                        </items>
-
-                    </Table>
-
-                </Panel>
+   
+            
 
             </VBox>
 

@@ -647,91 +647,204 @@ sap.ui.define([
             // =====================================================
             // SEARCH
             // =====================================================
+onSearch: function (oEvent) {
 
-            onSearch: function (oEvent) {
+    var sValue = oEvent.getParameter("query");
 
-                var sValue =
-                    oEvent.getParameter(
-                        "query"
-                    );
+    if (sValue === undefined) {
+        sValue = oEvent.getParameter("newValue");
+    }
+
+    sValue = (sValue || "").trim().toLowerCase();
+
+    var oTable = this.byId("investigationsTable");
+
+    if (!oTable) {
+        console.error("Investigation table not found");
+        return;
+    }
+
+    var aItems = oTable.getItems();
+
+    console.log("Search:", sValue);
+    console.log("Items:", aItems.length);
+
+    // =====================================================
+    // SHOW ALL WHEN SEARCH IS EMPTY
+    // =====================================================
+
+    if (!sValue) {
+
+        aItems.forEach(function (oItem) {
+            oItem.setVisible(true);
+        });
+
+        return;
+    }
 
 
-                if (sValue === undefined) {
+    // =====================================================
+    // LOOKUP MODEL
+    // =====================================================
 
-                    sValue =
-                        oEvent.getParameter(
-                            "newValue"
-                        );
+    var oLookupModel = this.getView().getModel("lookups");
+
+    var aClaims =
+        oLookupModel.getProperty("/claims") || [];
+
+    var aClaimTypes =
+        oLookupModel.getProperty("/claimTypes") || [];
+
+    var aEmployees =
+        oLookupModel.getProperty("/employees") || [];
+
+
+    // =====================================================
+    // CHECK EACH ROW
+    // =====================================================
+
+    aItems.forEach(function (oItem) {
+
+        var oContext =
+            oItem.getBindingContext("investigation");
+
+        if (!oContext) {
+            oItem.setVisible(false);
+            return;
+        }
+
+        var oData = oContext.getObject();
+
+        if (!oData) {
+            oItem.setVisible(false);
+            return;
+        }
+
+
+        // =================================================
+        // CLAIM TYPE
+        // =================================================
+
+        var sClaimName = "";
+
+        var oClaim = aClaims.find(function (oClaim) {
+
+            return String(oClaim.ID || "")
+                .toLowerCase()
+                ===
+                String(oData.claim_ID || "")
+                    .toLowerCase();
+
+        });
+
+
+        if (oClaim) {
+
+            var oClaimType = aClaimTypes.find(
+                function (oType) {
+
+                    return String(oType.ID || "")
+                        .toLowerCase()
+                        ===
+                        String(oClaim.claimType_ID || "")
+                            .toLowerCase();
+
                 }
+            );
+
+            if (oClaimType) {
+
+                sClaimName =
+                    oClaimType.name ||
+                    oClaimType.code ||
+                    oClaimType.category ||
+                    "";
+            }
+        }
 
 
-                sValue =
-                    (sValue || "")
-                        .trim();
+        // =================================================
+        // INVESTIGATOR
+        // =================================================
+
+        var sInvestigatorName = "";
+
+        var oEmployee = aEmployees.find(
+            function (oEmployee) {
+
+                return String(oEmployee.ID || "")
+                    .toLowerCase()
+                    ===
+                    String(oData.investigator_ID || "")
+                        .toLowerCase();
+
+            }
+        );
 
 
-                var oTable =
-                    this.byId(
-                        "investigationsTable"
-                    );
+        if (oEmployee) {
+
+            sInvestigatorName =
+                (
+                    (oEmployee.firstName || "") +
+                    " " +
+                    (oEmployee.lastName || "")
+                ).trim();
+
+            if (!sInvestigatorName) {
+
+                sInvestigatorName =
+                    oEmployee.employeeNumber || "";
+            }
+        }
 
 
-                if (!oTable) {
-                    return;
-                }
+        // =================================================
+        // OTHER SEARCHABLE VALUES
+        // =================================================
+
+        var sInvestigationNumber =
+            String(
+                oData.investigationNumber || ""
+            );
+
+        var sStatus =
+            String(
+                oData.status || ""
+            );
+
+        var sFindings =
+            String(
+                oData.findings || ""
+            );
 
 
-                var oBinding =
-                    oTable.getBinding(
-                        "items"
-                    );
+        // =================================================
+        // COMBINE EVERYTHING
+        // =================================================
+
+        var sSearchText = (
+
+            sClaimName + " " +
+            sInvestigatorName + " " +
+            sInvestigationNumber + " " +
+            sStatus + " " +
+            sFindings
+
+        ).toLowerCase();
 
 
-                if (!oBinding) {
-                    return;
-                }
+        // =================================================
+        // SHOW / HIDE ROW
+        // =================================================
 
+        oItem.setVisible(
+            sSearchText.includes(sValue)
+        );
 
-                if (!sValue) {
+    });
 
-                    oBinding.filter([]);
-
-                    return;
-                }
-
-
-                var aFilters = [
-
-                    new Filter(
-                        "investigationNumber",
-                        FilterOperator.Contains,
-                        sValue
-                    ),
-
-                    new Filter(
-                        "status",
-                        FilterOperator.Contains,
-                        sValue
-                    ),
-
-                    new Filter(
-                        "findings",
-                        FilterOperator.Contains,
-                        sValue
-                    )
-
-                ];
-
-
-                oBinding.filter(
-                    new Filter({
-                        filters: aFilters,
-                        and: false
-                    })
-                );
-            },
-
-
+},
             // =====================================================
             // SELECT INVESTIGATION
             // =====================================================

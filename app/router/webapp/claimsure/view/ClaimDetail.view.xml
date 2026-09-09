@@ -234,8 +234,18 @@
 
                                         <Label text="Assigned Agent"/>
 
-                                        <Text
-                                            text="{claimDetail>/assignedAgentName}"/>
+                                         <Text
+                                            text="{claimDetail>/assignedAgentDisplay}"/>
+
+                                                                        <!-- <Text
+                                text="{
+                                    parts: [
+                                        {path: 'claimDetail>/assignedAgent_ID'},
+                                        {path: 'lookups>/employees'}
+                                    ],
+                                    formatter: '.formatter.assignAgent'
+                                }"
+                            /> -->
 
 
                                         <!-- AMOUNT -->
