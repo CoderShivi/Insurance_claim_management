@@ -1,3 +1,4 @@
+
 <mvc:View
     controllerName="claimsure.app.controller.Claims"
     xmlns="sap.m"
@@ -25,17 +26,12 @@
                 }"
                 noDataText="{i18n>noClaims}"
             >
-                <!-- ========================= -->
-                <!-- HEADER TOOLBAR             -->
-                <!-- ========================= -->
-
                 <headerToolbar>
                     <OverflowToolbar>
                         <Title
                             text="{i18n>navClaims}"
                             level="H2"
                         />
-
                         <ToolbarSpacer />
 
                         <SearchField
@@ -52,45 +48,14 @@
                             placeholder="{i18n>filterStatus}"
                             selectionChange="onStatusFilterChange"
                         >
-                            <core:Item
-                                text="Draft"
-                                key="Draft"
-                            />
-
-                            <core:Item
-                                text="Submitted"
-                                key="Submitted"
-                            />
-
-                            <core:Item
-                                text="UnderReview"
-                                key="UnderReview"
-                            />
-
-                            <core:Item
-                                text="InvestigationRequired"
-                                key="InvestigationRequired"
-                            />
-
-                            <core:Item
-                                text="PendingApproval"
-                                key="PendingApproval"
-                            />
-
-                            <core:Item
-                                text="Approved"
-                                key="Approved"
-                            />
-
-                            <core:Item
-                                text="Rejected"
-                                key="Rejected"
-                            />
-
-                            <core:Item
-                                text="Paid"
-                                key="Paid"
-                            />
+                            <!-- <core:Item text="Draft" key="Draft" /> -->
+                            <core:Item text="Submitted" key="Submitted" />
+                            <core:Item text="UnderReview" key="UnderReview" />
+                            <core:Item text="InvestigationRequired" key="InvestigationRequired" />
+                            <core:Item text="PendingApproval" key="PendingApproval" />
+                            <core:Item text="Approved" key="Approved" />
+                            <core:Item text="Rejected" key="Rejected" />
+                            <core:Item text="Paid" key="Paid" />
                         </ComboBox>
 
                         <Button
@@ -103,10 +68,6 @@
                         />
                     </OverflowToolbar>
                 </headerToolbar>
-
-                <!-- ========================= -->
-                <!-- TABLE COLUMNS              -->
-                <!-- ========================= -->
 
                 <columns>
                     <Column>
@@ -139,7 +100,6 @@
                         <Text text="{i18n>colStatus}" />
                     </Column>
 
-                    <!-- NEW ACTION COLUMN -->
                     <Column
                         hAlign="Center"
                         demandPopin="true"
@@ -149,20 +109,16 @@
                     </Column>
                 </columns>
 
-                <!-- ========================= -->
-                <!-- TABLE ROWS                 -->
-                <!-- ========================= -->
-
                 <items>
                     <ColumnListItem
                         type="Navigation"
                         press="onClaimPress"
                     >
                         <cells>
-                            <!-- Claim Number -->
-                            <ObjectIdentifier title="{claimNumber}" />
+                            <ObjectIdentifier
+                                title="{claimNumber}"
+                            />
 
-                            <!-- Customer -->
                             <Text
                                 text="{
                                     parts: [
@@ -173,7 +129,6 @@
                                 }"
                             />
 
-                            <!-- Claim Type -->
                             <Text
                                 text="{
                                     parts: [
@@ -184,13 +139,13 @@
                                 }"
                             />
 
-                            <!-- Amount -->
-                            <ObjectNumber
-                                number="{claimedAmount}"
-                                unit="USD"
+                          <ObjectNumber
+                                number="{
+                                    path: 'claimedAmount',
+                                    formatter: '.formatter.indianCurrency'
+                                }"
                             />
 
-                            <!-- Incident Date -->
                             <Text
                                 text="{
                                     path: 'incidentDate',
@@ -198,28 +153,27 @@
                                 }"
                             />
 
-                            <!-- Status -->
                             <ObjectStatus
                                 text="{status}"
                                 state="{
                                     path: 'status',
                                     formatter: '.formatter.statusState'
                                 }"
-                                icon="{ 
-    path: 'status', 
-    formatter: '.formatter.statusIcon'
-}"
+                                icon="{
+                                    path: 'status',
+                                    formatter: '.formatter.statusIcon'
+                                }"
                             />
-
-                            <!-- ========================= -->
-                            <!-- GO FOR APPROVAL BUTTON     -->
-                            <!-- ========================= -->
 
                             <Button
                                 text="Go for Approval"
                                 icon="sap-icon://approvals"
                                 type="Emphasized"
-                                visible="{= ${status} === 'Draft' }"
+                                visible="{
+                                    path: 'status',
+                                    targetType: 'any',
+                                    formatter: '.formatter.approvalButtonVisible'
+                                }"
                                 press="onGoForApproval"
                             />
                         </cells>

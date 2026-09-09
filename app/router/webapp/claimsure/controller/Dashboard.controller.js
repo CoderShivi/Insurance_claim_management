@@ -258,6 +258,42 @@ formatLegendListHtml: function (aItems) {
     }).join("");
 },
 
+// NEW — builds a vertical bar chart in raw SVG for Policies by type.
+// One bar per policy type, scaled to the tallest bar, with a % label
+// above each bar and a rotated type-name label below. Bound from the
+// view via formatPolicyTypeChartSvg. Uses the same oItem.color values
+// _buildPolicyTypeChart already assigns, so it stays visually consistent
+// with the rest of the dashboard's palette.
+formatPolicyTypeChartSvg: function (aItems) {
+    if (!aItems || !aItems.length) {
+        return "<div class=\"legendEmpty\">No data</div>";
+    }
+
+    var iBarWidth = 28, iGap = 14, iChartHeight = 110, iTopPad = 20, iLabelHeight = 46;
+    var iWidth = aItems.length * (iBarWidth + iGap) + iGap;
+    var iHeight = iTopPad + iChartHeight + iLabelHeight;
+    var iMaxPct = Math.max.apply(null, aItems.map(function (o) { return o.percentOfTotal; })) || 1;
+
+    var sBars = aItems.map(function (oItem, i) {
+        var iBarHeight = Math.round((oItem.percentOfTotal / iMaxPct) * iChartHeight);
+        var iX = iGap + i * (iBarWidth + iGap);
+        var iY = iTopPad + iChartHeight - iBarHeight;
+        var iLabelY = iTopPad + iChartHeight + 16;
+        var iCenterX = iX + iBarWidth / 2;
+        var sLabel = oItem.type.length > 14 ? oItem.type.substring(0, 13) + "…" : oItem.type;
+
+        return "<rect x=\"" + iX + "\" y=\"" + iY + "\" width=\"" + iBarWidth + "\" height=\"" + iBarHeight
+            + "\" fill=\"" + oItem.color + "\" rx=\"3\"></rect>"
+            + "<text x=\"" + iCenterX + "\" y=\"" + (iY - 6) + "\" text-anchor=\"middle\" font-size=\"11\" fill=\"#2C2C2A\">"
+            + oItem.percentOfTotal + "%</text>"
+            + "<text x=\"" + iCenterX + "\" y=\"" + iLabelY + "\" text-anchor=\"end\" font-size=\"10\" fill=\"#6E6E6E\" "
+            + "transform=\"rotate(-40 " + iCenterX + " " + iLabelY + ")\">" + sLabel + "</text>";
+    }).join("");
+
+    return "<svg viewBox=\"0 0 " + iWidth + " " + iHeight + "\" style=\"width:100%;height:auto;max-width:"
+        + iWidth + "px;display:block;\">" + sBars + "</svg>";
+},
+
         _loadFraudRisk: function (oModel) {
             if (!oModel) {
                 console.warn("[Dashboard] No model available for FraudRiskScores");
