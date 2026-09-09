@@ -44,6 +44,7 @@
       "minUI5Version": "1.120.0",
       "libs": {
         "sap.m": {},
+        "sap.viz": {},
         "sap.ui.core": {},
         "sap.ui.layout": {},
         "sap.f": {},
@@ -112,7 +113,7 @@
           "target": "dashboard"
         },
         {
-          "pattern": "claims",
+          "pattern": "claims:?query:",
           "name": "claims",
           "target": "claims"
         },
@@ -122,10 +123,20 @@
           "target": "claimDetail"
         },
         {
-          "pattern": "policies",
+          "pattern": "policies:?query:",
           "name": "policies",
           "target": "policies"
         },
+         {
+        "pattern": "investigation",
+        "name": "investigation",
+        "target": "investigation"
+        },
+        {
+        "name": "payout",
+        "pattern": "payout",
+        "target": "payout"
+    },
         {
           "pattern": "admin",
           "name": "admin",
@@ -149,6 +160,14 @@
           "viewName": "Policies",
           "viewId": "policies"
         },
+        "investigation": {
+          "viewName": "Investigation",
+          "viewId": "investigation"
+        },
+        "payout": {
+        "viewName": "Payout",
+        "viewId": "payout"
+    },
         "admin": {
           "viewName": "Administration",
           "viewId": "admin"
