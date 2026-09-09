@@ -43,7 +43,7 @@ body {
     min-height: 190px;
     padding: 1.45rem 1.65rem;
 
-    background: url("../img/welcome-banner1.png") center center / cover no-repeat !important;
+    background: url("../img/welcome.png") center center / cover no-repeat !important;
 
     border: 2px solid red;
 }
@@ -2125,7 +2125,7 @@ body {
             rgba(15, 30, 50, 0.15) 65%,
             rgba(15, 30, 50, 0.05) 100%
         ),
-        url("../img/welcome-banner.jpg");
+        url("../img/welcome.png");
     background-size: cover;
     background-position: center;
 }
