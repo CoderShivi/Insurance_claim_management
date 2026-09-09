@@ -48,7 +48,7 @@
                             placeholder="{i18n>filterStatus}"
                             selectionChange="onStatusFilterChange"
                         >
-                            <!-- <core:Item text="Draft" key="Draft" /> -->
+                          
                             <core:Item text="Submitted" key="Submitted" />
                             <core:Item text="UnderReview" key="UnderReview" />
                             <core:Item text="InvestigationRequired" key="InvestigationRequired" />

@@ -2,454 +2,1763 @@ sap.ui.define([
     "sap/ui/core/mvc/Controller",
     "sap/ui/model/json/JSONModel",
     "sap/ui/model/Filter",
-    "sap/ui/model/FilterOperator"
-], function (Controller, JSONModel, Filter, FilterOperator) {
+    "sap/ui/model/FilterOperator",
+    "sap/viz/ui5/controls/Popover",
+    "sap/m/List",
+    "sap/m/StandardListItem",
+    "sap/m/VBox",
+    "sap/m/HBox",
+    "sap/m/Text",
+    "sap/ui/core/Icon"
+], function (
+    Controller,
+    JSONModel,
+    Filter,
+    FilterOperator,
+    VizPopover,
+    List,
+    StandardListItem,
+    VBox,
+    HBox,
+    Text,
+    Icon
+) {
     "use strict";
 
-    // Central color map so bars, pie chart and legend all use the same hex values
-    var STATE_COLORS = {
-        Success: "#1D9E75",
-        Warning: "#EF9F27",
-        Error:   "#D85A30",
-        None:    "#7F77DD"
-    };
     var STATUS_COLORS = {
-    "Rejected":               "#D85A30", // red-orange
-    "Approved":                "#1D9E75", // green
-    "Paid":                     "#2FA8A0", // teal
-    "Pending / review":         "#EF9F27", // amber
-    "InvestigationRequired":    "#7F77DD", // purple
-    "Submitted":                "#3E7CB1"  // blue
+        "Rejected": "#D85A30",
+        "Approved": "#1D9E75",
+        "Paid": "#2FA8A0",
+        "Pending / review": "#EF9F27",
+        "InvestigationRequired": "#7F77DD",
+        "Submitted": "#3E7CB1",
+        "Draft": "#3E7CB1"
     };
-    var FALLBACK_PALETTE = ["#D85A30", "#1D9E75", "#2FA8A0", "#EF9F27", "#7F77DD", "#3E7CB1", "#C2571F", "#4C6EF5"];
-    return Controller.extend("claimsure.app.controller.Dashboard", {
 
-        onInit: function () {
-            this.getView().setModel(new JSONModel({
-                totalClaims: 0,
-                pendingApproval: 0,
-                highFraudRisk: 0,
-                activePolicies: 0
-            }), "dash");
+    var FALLBACK_PALETTE = [
+        "#3E7CB1",
+        "#1D9E75",
+        "#EF9F27",
+        "#7F77DD",
+        "#D85A30",
+        "#2FA8A0",
+        "#C2571F",
+        "#4C6EF5"
+    ];
 
-            this.getView().setModel(new JSONModel([]), "recent");
-
-            // statusChart model now holds { items: [...], pieBackground: "conic-gradient(...)" }
-            this.getView().setModel(new JSONModel({ items: [], pieBackground: "" }), "statusChart");
-            this.getView().setModel(new JSONModel({ items: [] }), "policyChart");
-            this.getView().setModel(new JSONModel({ items: [] }), "policyTypeChart");
-            this._loadDashboardData();
+    var STATUS_PILL_COLORS = {
+        "PendingApproval": {
+            bg: "#E9F1FB",
+            text: "#2563A6",
+            label: "Pending Approval"
         },
-
-        _loadDashboardData: function () {
-            var oModel = this.getOwnerComponent().getModel();          // insuranceService (Claims, Policies)
-            var oAdminModel = this.getOwnerComponent().getModel("admin"); // mainService (Customers, ClaimTypes, Employees)
-
-            Promise.all([
-                this._loadLookupMap(oAdminModel, "/ClaimTypes", "name"),
-                this._loadLookupMap(oAdminModel, "/Customers", null)
-            ]).then(function (aMaps) {
-                return this._loadClaims(oModel, aMaps[0], aMaps[1]);
-            }.bind(this)).catch(function (oErr) {
-                console.error("[Dashboard] Failed to load claims", oErr);
-            });
-
-            this._loadFraudRisk(oModel);
-            this._loadActivePolicies(oModel);
-            // FIX — this was defined but never invoked, which is why
-            // "Policies by status" always rendered "No data".
-            this._loadPolicyStatusChart(oModel);
-            this._loadPolicyTypeChart(oModel, oAdminModel);
+        "UnderReview": {
+            bg: "#FDF2E3",
+            text: "#A66A0A",
+            label: "Under Review"
         },
+        "Rejected": {
+            bg: "#FBEAE5",
+            text: "#B33F1E",
+            label: "Rejected"
+        },
+        "Submitted": {
+            bg: "#E9F1FB",
+            text: "#2563A6",
+            label: "Submitted"
+        },
+        "Approved": {
+            bg: "#E6F5EF",
+            text: "#0F6E56",
+            label: "Approved"
+        },
+        "Paid": {
+            bg: "#E6F5EF",
+            text: "#0F6E56",
+            label: "Paid"
+        },
+        "Draft": {
+            bg: "#F0F3F7",
+            text: "#4A6175",
+            label: "Draft"
+        },
+        "InvestigationRequired": {
+            bg: "#F1EEFB",
+            text: "#5B55A5",
+            label: "Investigation Required"
+        }
+    };
+
+    return Controller.extend(
+        "claimsure.app.controller.Dashboard",
+        {
+
+            /* =========================================================
+             * INIT
+             * ========================================================= */
+
+            onInit: function () {
+
+                this.getView().setModel(
+                    new JSONModel({
+                        totalClaims: 0,
+                        pendingApproval: 0,
+                        rejectedClaims: 0,
+                        submittedClaims: 0,
+                        approvedClaims: 0,
+                        totalPolicies: 0,
+                        activePolicies: 0,
+                        totalCustomers: 0,
+                        newCustomersThisMonth: 0,
+                        totalClaimTypes: 0
+                    }),
+                    "dash"
+                );
+
+                this.getView().setModel(
+                    new JSONModel([]),
+                    "recent"
+                );
+
+                this.getView().setModel(
+                    new JSONModel({
+                        items: []
+                    }),
+                    "statusChart"
+                );
+
+                this.getView().setModel(
+                    new JSONModel({
+                        items: []
+                    }),
+                    "policyTypeChart"
+                );
+
+                this._loadDashboardData();
+            },
 
 
-        _loadLookupMap: function (oModel, sPath, sNameField) {
-            return new Promise(function (resolve) {
+            /* =========================================================
+             * AFTER RENDERING
+             * ========================================================= */
+
+            onAfterRendering: function () {
+
+                var oView = this.getView();
+
+                var mHandlers = {
+                    "navCardClaims": this.onNavClaims,
+                    "navCardPolicies": this.onNavPolicies,
+                    "navCardCustomers": this.onNavCustomers,
+                    "navCardClaimTypes": this.onNavClaimTypes,
+
+                    "kpiPendingApproval":
+                        this.onKpiPendingApproval,
+
+                    "kpiRejected":
+                        this.onKpiRejected,
+
+                    "kpiSubmitted":
+                        this.onKpiSubmitted,
+
+                    "kpiApproved":
+                        this.onKpiApproved,
+
+                    "kpiActivePolicies":
+                        this.onKpiActivePolicies
+                };
+
+                Object.keys(mHandlers).forEach(
+                    function (sId) {
+
+                        var oControl =
+                            oView.byId(sId);
+
+                        if (
+                            oControl &&
+                            oControl.getDomRef()
+                        ) {
+
+                            oControl.$()
+                                .off("click.dashboardCard")
+                                .on(
+                                    "click.dashboardCard",
+                                    mHandlers[sId].bind(this)
+                                )
+
+                                .off("keydown.dashboardCard")
+                                .on(
+                                    "keydown.dashboardCard",
+                                    function (oEvent) {
+
+                                        if (
+                                            oEvent.key === "Enter" ||
+                                            oEvent.key === " "
+                                        ) {
+
+                                            oEvent.preventDefault();
+
+                                            mHandlers[sId].call(
+                                                this
+                                            );
+                                        }
+
+                                    }.bind(this)
+                                );
+                        }
+
+                    }.bind(this)
+                );
+
+                this._attachVizPopover();
+            },
+
+
+            /* =========================================================
+             * VIZ POPOVER
+             * ========================================================= */
+
+            _attachVizPopover: function () {
+
+                var oStatusVizFrame =
+                    this.getView().byId(
+                        "statusVizFrame"
+                    );
+
+                if (
+                    oStatusVizFrame &&
+                    !this._oStatusVizPopover
+                ) {
+
+                    oStatusVizFrame.setVizProperties({
+
+                        title: {
+                            visible: false
+                        },
+
+                        legend: {
+                            visible: true,
+                            alignment: "center",
+                            layout: {
+                                position: "right"
+                            }
+                        },
+
+                        plotArea: {
+
+                            dataLabel: {
+                                visible: true,
+                                showTotal: false,
+                                distance: 15
+                            }
+                        }
+                    });
+
+                    this._oStatusVizPopover =
+                        new VizPopover();
+
+                    this._oStatusVizPopover.connect(
+                        oStatusVizFrame.getVizUid()
+                    );
+                }
+
+
+                var oPolicyVizFrame =
+                    this.getView().byId(
+                        "policyTypeVizFrame"
+                    );
+
+                if (
+                    oPolicyVizFrame &&
+                    !this._oPolicyVizPopover
+                ) {
+
+                    oPolicyVizFrame.setVizProperties({
+
+                        title: {
+                            visible: false
+                        },
+
+                        legend: {
+                            visible: false
+                        },
+
+                        plotArea: {
+
+                            dataLabel: {
+                                visible: true
+                            },
+
+                            colorPalette: [
+                                "#3E7CB1",
+                                "#1D9E75",
+                                "#EF9F27",
+                                "#7F77DD",
+                                "#D85A30",
+                                "#2FA8A0",
+                                "#C2571F",
+                                "#4C6EF5"
+                            ]
+                        }
+                    });
+
+                    this._oPolicyVizPopover =
+                        new VizPopover();
+
+                    this._oPolicyVizPopover.connect(
+                        oPolicyVizFrame.getVizUid()
+                    );
+                }
+            },
+
+
+            /* =========================================================
+             * DASHBOARD DATA
+             * ========================================================= */
+
+            _loadDashboardData: function () {
+
+                var oModel =
+                    this.getOwnerComponent().getModel();
+
+                var oAdminModel =
+                    this.getOwnerComponent()
+                        .getModel("admin");
+
                 if (!oModel) {
-                    console.warn("[Dashboard] No model available for " + sPath);
-                    resolve({});
+
+                    console.error(
+                        "[Dashboard] Default insurance model is not available."
+                    );
+
                     return;
                 }
 
-                var oBinding = oModel.bindList(sPath, undefined, undefined, undefined, {
-                    $select: sNameField ? "ID," + sNameField : "ID,firstName,lastName"
+
+                Promise.all([
+
+                    // Claim Types
+                    this._loadLookupMap(
+                        oAdminModel,
+                        "/ClaimTypes",
+                        "name"
+                    ),
+
+                    // Customers
+                    this._loadLookupMap(
+                        oAdminModel,
+                        "/Customers",
+                        null
+                    ),
+
+                    // Policies
+                    this._loadPolicyLookupMap(
+                        oModel
+                    )
+
+                ])
+                .then(function (aMaps) {
+
+                    return this._loadClaims(
+                        oModel,
+                        aMaps[0],
+                        aMaps[1],
+                        aMaps[2]
+                    );
+
+                }.bind(this))
+                .catch(function (oErr) {
+
+                    console.error(
+                        "[Dashboard] Failed to load claims",
+                        oErr
+                    );
                 });
 
-                oBinding.requestContexts(0, 1000).then(function (aContexts) {
-                    var mMap = {};
-                    aContexts.forEach(function (oCtx) {
-                        var oData = oCtx.getObject();
-                        mMap[oData.ID] = sNameField
-                            ? oData[sNameField]
-                            : [oData.firstName, oData.lastName].filter(Boolean).join(" ");
+
+                this._loadPolicyCounts(oModel);
+
+                this._loadPolicyTypeChart(
+                    oModel,
+                    oAdminModel
+                );
+
+                this._loadCustomerCount(
+                    oAdminModel
+                );
+
+                this._loadClaimTypeCount(
+                    oAdminModel
+                );
+            },
+
+
+            /* =========================================================
+             * GENERIC LOOKUP
+             *
+             * ClaimTypes:
+             *   ID -> name
+             *
+             * Customers:
+             *   ID -> firstName + lastName
+             * ========================================================= */
+
+            _loadLookupMap: function (
+                oModel,
+                sPath,
+                sNameField
+            ) {
+
+                return new Promise(
+                    function (resolve) {
+
+                        if (!oModel) {
+                            resolve({});
+                            return;
+                        }
+
+                        var oBinding =
+                            oModel.bindList(
+                                sPath,
+                                undefined,
+                                undefined,
+                                undefined,
+                                {
+                                    $select:
+                                        sNameField
+                                            ? "ID," +
+                                              sNameField
+                                            : "ID,firstName,lastName"
+                                }
+                            );
+
+                        oBinding
+                            .requestContexts(
+                                0,
+                                1000
+                            )
+                            .then(
+                                function (aContexts) {
+
+                                    var mMap = {};
+
+                                    aContexts.forEach(
+                                        function (oCtx) {
+
+                                            var oData =
+                                                oCtx.getObject();
+
+                                            if (sNameField) {
+
+                                                mMap[oData.ID] =
+                                                    oData[
+                                                        sNameField
+                                                    ];
+
+                                            } else {
+
+                                                mMap[oData.ID] =
+                                                    [
+                                                        oData.firstName,
+                                                        oData.lastName
+                                                    ]
+                                                    .filter(Boolean)
+                                                    .join(" ");
+                                            }
+                                        }
+                                    );
+
+                                    resolve(mMap);
+                                }
+                            )
+                            .catch(
+                                function (oErr) {
+
+                                    console.warn(
+                                        "[Dashboard] Lookup failed for " +
+                                        sPath,
+                                        oErr
+                                    );
+
+                                    resolve({});
+                                }
+                            );
+                    }
+                );
+            },
+
+
+            /* =========================================================
+             * POLICY LOOKUP
+             *
+             * Policy ID ->
+             * {
+             *     policyNumber,
+             *     claimType_ID
+             * }
+             * ========================================================= */
+
+            _loadPolicyLookupMap: function (
+                oModel
+            ) {
+
+                return new Promise(
+                    function (resolve) {
+
+                        if (!oModel) {
+                            resolve({});
+                            return;
+                        }
+
+                        var oBinding =
+                            oModel.bindList(
+                                "/Policies",
+                                undefined,
+                                undefined,
+                                undefined,
+                                {
+                                    $select:
+                                        "ID,policyNumber,claimType_ID"
+                                }
+                            );
+
+                        oBinding
+                            .requestContexts(
+                                0,
+                                1000
+                            )
+                            .then(
+                                function (aContexts) {
+
+                                    var mMap = {};
+
+                                    aContexts.forEach(
+                                        function (oCtx) {
+
+                                            var oData =
+                                                oCtx.getObject();
+
+                                            mMap[oData.ID] = {
+
+                                                policyNumber:
+                                                    oData.policyNumber,
+
+                                                claimType_ID:
+                                                    oData.claimType_ID
+                                            };
+                                        }
+                                    );
+
+                                    resolve(mMap);
+                                }
+                            )
+                            .catch(
+                                function (oErr) {
+
+                                    console.warn(
+                                        "[Dashboard] Policy lookup failed",
+                                        oErr
+                                    );
+
+                                    resolve({});
+                                }
+                            );
+                    }
+                );
+            },
+
+
+            /* =========================================================
+             * CLAIMS
+             * ========================================================= */
+
+            _loadClaims: function (
+                oModel,
+                mClaimTypes,
+                mCustomers,
+                mPolicies
+            ) {
+
+                var oClaimsBinding =
+                    oModel.bindList(
+                        "/Claims",
+                        undefined,
+                        undefined,
+                        undefined,
+                        {
+                            $select:
+                                "ID,claimNumber,claimedAmount,status,customer_ID,claimType_ID,policy_ID",
+
+                            $orderby:
+                                "claimNumber desc"
+                        }
+                    );
+
+
+                return oClaimsBinding
+                    .requestContexts(
+                        0,
+                        200
+                    )
+                    .then(
+                        function (aContexts) {
+
+                            var aClaims =
+                                aContexts.map(
+                                    function (oCtx) {
+
+                                        var oData =
+                                            oCtx.getObject();
+
+                                        var oPolicy =
+                                            mPolicies[
+                                                oData.policy_ID
+                                            ];
+
+
+                                        return Object.assign(
+                                            {},
+                                            oData,
+                                            {
+
+                                                customerName:
+                                                    mCustomers[
+                                                        oData.customer_ID
+                                                    ] || "",
+
+
+                                                claimTypeName:
+                                                    mClaimTypes[
+                                                        oData.claimType_ID
+                                                    ] || "",
+
+
+                                                policyNumber:
+                                                    oPolicy &&
+                                                    oPolicy.policyNumber
+                                                        ? oPolicy.policyNumber
+                                                        : "",
+
+
+                                                /*
+                                                 * Policies entity does not
+                                                 * contain a name field.
+                                                 *
+                                                 * Therefore we display the
+                                                 * Claim Type name associated
+                                                 * with the Policy.
+                                                 */
+
+                                                policyName:
+                                                    oPolicy &&
+                                                    oPolicy.claimType_ID
+                                                        ? (
+                                                            mClaimTypes[
+                                                                oPolicy.claimType_ID
+                                                            ] || ""
+                                                        )
+                                                        : ""
+                                            }
+                                        );
+                                    }
+                                );
+
+
+                            var oDash =
+                                this.getView()
+                                    .getModel("dash");
+
+
+                            /* Total Claims */
+
+                            oDash.setProperty(
+                                "/totalClaims",
+                                aClaims.length
+                            );
+
+
+                            /* Pending Approval */
+
+                            oDash.setProperty(
+                                "/pendingApproval",
+
+                                aClaims.filter(
+                                    function (c) {
+
+                                        return (
+                                            c.status ===
+                                                "PendingApproval" ||
+
+                                            c.status ===
+                                                "UnderReview"
+                                        );
+                                    }
+                                ).length
+                            );
+
+
+                            /* Rejected */
+
+                            oDash.setProperty(
+                                "/rejectedClaims",
+
+                                aClaims.filter(
+                                    function (c) {
+
+                                        return c.status ===
+                                            "Rejected";
+                                    }
+                                ).length
+                            );
+
+
+                            /* Submitted */
+
+                            oDash.setProperty(
+                                "/submittedClaims",
+
+                                aClaims.filter(
+                                    function (c) {
+
+                                        return c.status ===
+                                            "Submitted";
+                                    }
+                                ).length
+                            );
+
+
+                            /* Approved */
+
+                            oDash.setProperty(
+                                "/approvedClaims",
+
+                                aClaims.filter(
+                                    function (c) {
+
+                                        return c.status ===
+                                            "Approved";
+                                    }
+                                ).length
+                            );
+
+
+                            this._buildStatusChart(
+                                aClaims
+                            );
+
+
+                            this.getView()
+                                .getModel("recent")
+                                .setData(
+                                    aClaims.slice(0, 5)
+                                );
+
+                        }.bind(this)
+                    );
+            },
+
+
+            /* =========================================================
+             * STATUS CHART
+             * ========================================================= */
+
+            _buildStatusChart: function (
+                aClaims
+            ) {
+
+                var mStatusCounts = {};
+
+                aClaims.forEach(
+                    function (oClaim) {
+
+                        var sKey =
+                            oClaim.status ===
+                                "PendingApproval" ||
+
+                            oClaim.status ===
+                                "UnderReview"
+
+                                ? "Pending / review"
+
+                                : (
+                                    oClaim.status ||
+                                    "Unknown"
+                                );
+
+
+                        mStatusCounts[sKey] =
+                            (
+                                mStatusCounts[sKey] ||
+                                0
+                            ) + 1;
+                    }
+                );
+
+
+                var iTotal =
+                    aClaims.length || 1;
+
+
+                var aItems =
+                    Object.keys(
+                        mStatusCounts
+                    )
+                    .map(
+                        function (
+                            sStatus,
+                            iIndex
+                        ) {
+
+                            var iCount =
+                                mStatusCounts[
+                                    sStatus
+                                ];
+
+                            var fShare =
+                                (
+                                    iCount /
+                                    iTotal
+                                ) * 100;
+
+
+                            var sColor =
+                                STATUS_COLORS[
+                                    sStatus
+                                ] ||
+
+                                FALLBACK_PALETTE[
+                                    iIndex %
+                                    FALLBACK_PALETTE.length
+                                ];
+
+
+                            return {
+
+                                status:
+                                    sStatus,
+
+                                count:
+                                    iCount,
+
+                                percentOfTotal:
+                                    Math.round(
+                                        fShare
+                                    ),
+
+                                color:
+                                    sColor
+                            };
+                        }
+                    );
+
+
+                this.getView()
+                    .getModel("statusChart")
+                    .setData({
+                        items: aItems
                     });
-                    resolve(mMap);
-                }).catch(function (oErr) {
-                    console.warn("[Dashboard] Could not load " + sPath + ", falling back to raw IDs", oErr);
-                    resolve({});
-                });
-            });
-        },
+            },
 
-        _loadClaims: function (oModel, mClaimTypes, mCustomers) {
-            var oClaimsBinding = oModel.bindList("/Claims", undefined, undefined, undefined, {
-                // No $expand — customer/claimType are on a different service (admin/
-                // mainService), so they can never be expanded from here regardless of
-                // the nav-property name. Resolved via the lookup maps instead.
-                $select: "ID,claimNumber,claimedAmount,status,customer_ID,claimType_ID",
-                $orderby: "claimNumber desc"
-            });
 
-            return oClaimsBinding.requestContexts(0, 200).then(function (aContexts) {
-                var aClaims = aContexts.map(function (oCtx) {
-                    var oData = oCtx.getObject();
-                    return Object.assign({}, oData, {
-                        customerName: mCustomers[oData.customer_ID] || oData.customer_ID || "",
-                        claimTypeName: mClaimTypes[oData.claimType_ID] || oData.claimType_ID || ""
+            /* =========================================================
+             * STATUS PILL
+             * ========================================================= */
+
+            formatStatusPillHtml: function (
+                sStatus
+            ) {
+
+                var oColors =
+                    STATUS_PILL_COLORS[
+                        sStatus
+                    ] ||
+
+                    {
+                        bg: "#F0F0EC",
+                        text: "#6E6E6E",
+                        label:
+                            sStatus ||
+                            "Unknown"
+                    };
+
+
+                return (
+                    "<span class='statusPill' style='background:" +
+                    oColors.bg +
+                    ";color:" +
+                    oColors.text +
+                    ";'>" +
+
+                    this._escapeHtml(
+                        oColors.label
+                    ) +
+
+                    "</span>"
+                );
+            },
+
+
+            /* =========================================================
+             * CURRENCY
+             * ========================================================= */
+
+            formatCurrency: function (
+                vAmount
+            ) {
+
+                if (
+                    vAmount === null ||
+                    vAmount === undefined ||
+                    vAmount === ""
+                ) {
+
+                    return "—";
+                }
+
+
+                var fAmount =
+                    Number(vAmount);
+
+
+                if (isNaN(fAmount)) {
+                    return String(vAmount);
+                }
+
+
+                return (
+                    "₹ " +
+                    fAmount.toLocaleString(
+                        "en-IN",
+                        {
+                            maximumFractionDigits: 2
+                        }
+                    )
+                );
+            },
+
+
+            /* =========================================================
+             * POLICY SVG
+             * ========================================================= */
+
+            formatPolicyTypeChartSvg: function (
+                aItems
+            ) {
+
+                if (
+                    !aItems ||
+                    !aItems.length
+                ) {
+
+                    return (
+                        "<div class='legendEmpty'>" +
+                        "No policy data" +
+                        "</div>"
+                    );
+                }
+
+
+                var iBarWidth = 30;
+                var iGap = 22;
+                var iChartHeight = 140;
+                var iTopPad = 28;
+                var iLabelHeight = 60;
+                var iSidePad = 40;
+
+
+                var iChartWidth =
+                    aItems.length *
+                    (
+                        iBarWidth +
+                        iGap
+                    ) +
+                    iGap;
+
+
+                var iWidth =
+                    iChartWidth +
+                    iSidePad;
+
+
+                var iHeight =
+                    iTopPad +
+                    iChartHeight +
+                    iLabelHeight;
+
+
+                var iMaxCount =
+                    Math.max.apply(
+                        null,
+                        aItems.map(
+                            function (oItem) {
+                                return oItem.count;
+                            }
+                        )
+                    ) || 1;
+
+
+                var iTickCount =
+                    Math.min(
+                        iMaxCount,
+                        4
+                    );
+
+
+                var sGrid = "";
+
+
+                for (
+                    var t = 0;
+                    t <= iTickCount;
+                    t++
+                ) {
+
+                    var fRatio =
+                        t /
+                        iTickCount;
+
+
+                    var iY =
+                        iTopPad +
+                        iChartHeight -
+                        Math.round(
+                            fRatio *
+                            iChartHeight
+                        );
+
+
+                    var iTickValue =
+                        Math.round(
+                            fRatio *
+                            iMaxCount
+                        );
+
+
+                    sGrid +=
+
+                        "<line x1='0' y1='" +
+                        iY +
+                        "' x2='" +
+                        iWidth +
+                        "' y2='" +
+                        iY +
+                        "' class='chartGridLine'></line>" +
+
+                        "<text x='2' y='" +
+                        (iY - 3) +
+                        "' class='chartGridLabel'>" +
+
+                        iTickValue +
+
+                        "</text>";
+                }
+
+
+                var sBars =
+                    aItems.map(
+                        function (
+                            oItem,
+                            i
+                        ) {
+
+                            var iBarHeight =
+                                Math.max(
+                                    8,
+                                    Math.round(
+                                        (
+                                            oItem.count /
+                                            iMaxCount
+                                        ) *
+                                        iChartHeight
+                                    )
+                                );
+
+
+                            var iX =
+                                iSidePad / 2 +
+                                iGap +
+                                i *
+                                (
+                                    iBarWidth +
+                                    iGap
+                                );
+
+
+                            var iY =
+                                iTopPad +
+                                iChartHeight -
+                                iBarHeight;
+
+
+                            var iLabelY =
+                                iTopPad +
+                                iChartHeight +
+                                18;
+
+
+                            var iCenterX =
+                                iX +
+                                iBarWidth / 2;
+
+
+                            var sLabel =
+                                oItem.type;
+
+
+                            return (
+
+                                "<rect x='" +
+                                iX +
+                                "' y='" +
+                                iY +
+                                "' width='" +
+                                iBarWidth +
+                                "' height='" +
+                                iBarHeight +
+                                "' fill='" +
+                                oItem.color +
+                                "' rx='5'>" +
+
+                                "<title>" +
+
+                                this._escapeHtml(
+                                    oItem.type
+                                ) +
+
+                                " — " +
+
+                                oItem.count +
+
+                                "</title></rect>" +
+
+
+                                "<text x='" +
+                                iCenterX +
+                                "' y='" +
+                                (iY - 9) +
+                                "' text-anchor='middle' class='chartBarValue'>" +
+
+                                oItem.count +
+
+                                "</text>" +
+
+
+                                "<text x='" +
+                                iCenterX +
+                                "' y='" +
+                                iLabelY +
+                                "' text-anchor='end' class='chartBarLabel' " +
+
+                                "transform='rotate(-40 " +
+                                iCenterX +
+                                " " +
+                                iLabelY +
+                                ")'>" +
+
+                                this._escapeHtml(
+                                    sLabel
+                                ) +
+
+                                "</text>"
+                            );
+
+                        }.bind(this)
+                    )
+                    .join("");
+
+
+                return (
+                    "<svg viewBox='0 0 " +
+                    iWidth +
+                    " " +
+                    iHeight +
+                    "' class='policyChartSvg' preserveAspectRatio='none'>" +
+
+                    sGrid +
+                    sBars +
+
+                    "</svg>"
+                );
+            },
+
+
+            /* =========================================================
+             * POLICY COUNTS
+             * ========================================================= */
+
+            _loadPolicyCounts: function (
+                oModel
+            ) {
+
+                if (!oModel) {
+                    return;
+                }
+
+
+                var oAllBinding =
+                    oModel.bindList(
+                        "/Policies",
+                        undefined,
+                        undefined,
+                        undefined,
+                        {
+                            $select: "ID"
+                        }
+                    );
+
+
+                oAllBinding
+                    .requestContexts(
+                        0,
+                        1000
+                    )
+                    .then(
+                        function (aCtx) {
+
+                            this.getView()
+                                .getModel("dash")
+                                .setProperty(
+                                    "/totalPolicies",
+                                    aCtx.length
+                                );
+
+                        }.bind(this)
+                    )
+                    .catch(
+                        function (oErr) {
+
+                            console.warn(
+                                "[Dashboard] Total policies failed",
+                                oErr
+                            );
+                        }
+                    );
+
+
+                var oActiveBinding =
+                    oModel.bindList(
+                        "/Policies",
+                        undefined,
+                        undefined,
+                        new Filter(
+                            "status",
+                            FilterOperator.EQ,
+                            "Active"
+                        ),
+                        {
+                            $select: "ID",
+                            $$operationMode:
+                                "Server"
+                        }
+                    );
+
+
+                oActiveBinding
+                    .requestContexts(
+                        0,
+                        1000
+                    )
+                    .then(
+                        function (aCtx) {
+
+                            this.getView()
+                                .getModel("dash")
+                                .setProperty(
+                                    "/activePolicies",
+                                    aCtx.length
+                                );
+
+                        }.bind(this)
+                    )
+                    .catch(
+                        function (oErr) {
+
+                            console.warn(
+                                "[Dashboard] Active policies failed",
+                                oErr
+                            );
+                        }
+                    );
+            },
+
+
+            /* =========================================================
+             * CUSTOMER COUNT
+             * ========================================================= */
+
+            _loadCustomerCount: function (
+                oAdminModel
+            ) {
+
+                if (!oAdminModel) {
+                    return;
+                }
+
+
+                var oBinding =
+                    oAdminModel.bindList(
+                        "/Customers",
+                        undefined,
+                        undefined,
+                        undefined,
+                        {
+                            $select: "ID"
+                        }
+                    );
+
+
+                oBinding
+                    .requestContexts(
+                        0,
+                        1000
+                    )
+                    .then(
+                        function (aCtx) {
+
+                            this.getView()
+                                .getModel("dash")
+                                .setProperty(
+                                    "/totalCustomers",
+                                    aCtx.length
+                                );
+
+                        }.bind(this)
+                    )
+                    .catch(
+                        function (oErr) {
+
+                            console.warn(
+                                "[Dashboard] Customers count failed",
+                                oErr
+                            );
+                        }
+                    );
+            },
+
+
+            /* =========================================================
+             * CLAIM TYPE COUNT
+             * ========================================================= */
+
+            _loadClaimTypeCount: function (
+                oAdminModel
+            ) {
+
+                if (!oAdminModel) {
+                    return;
+                }
+
+
+                var oBinding =
+                    oAdminModel.bindList(
+                        "/ClaimTypes",
+                        undefined,
+                        undefined,
+                        undefined,
+                        {
+                            $select: "ID"
+                        }
+                    );
+
+
+                oBinding
+                    .requestContexts(
+                        0,
+                        1000
+                    )
+                    .then(
+                        function (aCtx) {
+
+                            this.getView()
+                                .getModel("dash")
+                                .setProperty(
+                                    "/totalClaimTypes",
+                                    aCtx.length
+                                );
+
+                        }.bind(this)
+                    )
+                    .catch(
+                        function (oErr) {
+
+                            console.warn(
+                                "[Dashboard] ClaimTypes count failed",
+                                oErr
+                            );
+                        }
+                    );
+            },
+
+
+            /* =========================================================
+             * POLICY TYPE CHART
+             * ========================================================= */
+
+            _loadPolicyTypeChart: function (
+                oModel,
+                oAdminModel
+            ) {
+
+                if (!oModel) {
+                    return;
+                }
+
+
+                this._loadLookupMap(
+                    oAdminModel,
+                    "/ClaimTypes",
+                    "name"
+                )
+                .then(
+                    function (mClaimTypes) {
+
+                        var oBinding =
+                            oModel.bindList(
+                                "/Policies",
+                                undefined,
+                                undefined,
+                                undefined,
+                                {
+                                    $select:
+                                        "ID,claimType_ID"
+                                }
+                            );
+
+
+                        return oBinding
+                            .requestContexts(
+                                0,
+                                500
+                            )
+                            .then(
+                                function (aContexts) {
+
+                                    var aPolicies =
+                                        aContexts.map(
+                                            function (oCtx) {
+
+                                                var oData =
+                                                    oCtx.getObject();
+
+                                                return {
+
+                                                    type:
+                                                        mClaimTypes[
+                                                            oData.claimType_ID
+                                                        ] ||
+
+                                                        oData.claimType_ID ||
+
+                                                        "Unknown"
+                                                };
+                                            }
+                                        );
+
+
+                                    this._buildPolicyTypeChart(
+                                        aPolicies
+                                    );
+
+                                }.bind(this)
+                            );
+                    }.bind(this)
+                )
+                .catch(
+                    function (oErr) {
+
+                        console.error(
+                            "[Dashboard] Policy type chart failed",
+                            oErr
+                        );
+                    }
+                );
+            },
+
+
+            /* =========================================================
+             * BUILD POLICY TYPE CHART
+             * ========================================================= */
+
+            _buildPolicyTypeChart: function (
+                aPolicies
+            ) {
+
+                var mCounts = {};
+
+
+                aPolicies.forEach(
+                    function (oPolicy) {
+
+                        var sKey =
+                            oPolicy.type ||
+                            "Unknown";
+
+
+                        mCounts[sKey] =
+                            (
+                                mCounts[sKey] ||
+                                0
+                            ) + 1;
+                    }
+                );
+
+
+                var aItems =
+                    Object.keys(
+                        mCounts
+                    )
+                    .map(
+                        function (
+                            sType,
+                            iIndex
+                        ) {
+
+                            return {
+
+                                type:
+                                    sType,
+
+                                count:
+                                    mCounts[sType],
+
+                                color:
+                                    FALLBACK_PALETTE[
+                                        iIndex %
+                                        FALLBACK_PALETTE.length
+                                    ]
+                            };
+                        }
+                    )
+                    .sort(
+                        function (a, b) {
+
+                            return (
+                                b.count -
+                                a.count
+                            );
+                        }
+                    );
+
+
+                this.getView()
+                    .getModel(
+                        "policyTypeChart"
+                    )
+                    .setData({
+                        items: aItems
                     });
-                });
-
-                var oDash = this.getView().getModel("dash");
-                oDash.setProperty("/totalClaims", aClaims.length);
-                oDash.setProperty("/pendingApproval", aClaims.filter(function (c) {
-                    return c.status === "PendingApproval" || c.status === "UnderReview";
-                }).length);
-
-                this._buildStatusChart(aClaims);
-
-                // FIX — this populated the "recent" model, but nothing in the view
-                // was bound to it. See the "Recent claims" panel added back below.
-                this.getView().getModel("recent").setData(aClaims.slice(0, 5));
-            }.bind(this));
-        },
-
-_buildStatusChart: function (aClaims) {
-    var mStatusCounts = {};
-    aClaims.forEach(function (c) {
-        var sKey = (c.status === "PendingApproval" || c.status === "UnderReview")
-            ? "Pending / review"
-            : c.status;
-        mStatusCounts[sKey] = (mStatusCounts[sKey] || 0) + 1;
-    });
-
-    var iTotal = aClaims.length || 1;
-    var aCounts = Object.keys(mStatusCounts).map(function (k) { return mStatusCounts[k]; });
-    var iMax = aCounts.length ? Math.max.apply(null, aCounts) : 1;
-
-    var fCursor = 0;
-    var aItems = Object.keys(mStatusCounts).map(function (sStatus, iIndex) {
-        var iCount = mStatusCounts[sStatus];
-        var sState = sStatus === "Rejected" ? "Error"
-                   : sStatus === "Approved" || sStatus === "Paid" ? "Success"
-                   : sStatus === "Pending / review" ? "Warning"
-                   : "None";
-
-        var sColor = STATUS_COLORS[sStatus] || FALLBACK_PALETTE[iIndex % FALLBACK_PALETTE.length];
-
-        var fShare = (iCount / iTotal) * 100;
-        var iPct = Math.round((iCount / iMax) * 100);
-        var oItem = {
-            status: sStatus,
-            count: iCount,
-            percent: iPct,
-            percentOfTotal: Math.round(fShare),
-            state: sState,
-            color: sColor,
-            barHtml: this.formatStatusBarHtml(iPct, sColor),
-            startAngle: fCursor * 3.6,
-            endAngle: (fCursor + fShare) * 3.6
-        };
-        fCursor += fShare;
-        return oItem;
-    }.bind(this));
-
-    var aStops = aItems.map(function (oItem) {
-        return oItem.color + " " + (oItem.startAngle / 3.6).toFixed(2) + "% " + (oItem.endAngle / 3.6).toFixed(2) + "%";
-    });
-    var sPieBackground = aStops.length
-        ? "conic-gradient(" + aStops.join(", ") + ")"
-        : "conic-gradient(#EDEDE8 0% 100%)";
-
-    this.getView().getModel("statusChart").setData({
-        items: aItems,
-        pieBackground: sPieBackground,
-        selectedLabel: ""
-    });
-},
-
-onPieChartPress: function (oEvent) {
-    var oDomRef = oEvent.getSource().getDomRef
-        ? oEvent.getSource().getDomRef().querySelector(".pieChart")
-        : null;
-
-    if (!oDomRef) { return; }
-
-    var oRect = oDomRef.getBoundingClientRect();
-    var fCenterX = oRect.left + oRect.width / 2;
-    var fCenterY = oRect.top + oRect.height / 2;
-
-    var fClickX = oEvent.originalEvent ? oEvent.originalEvent.clientX : oEvent.clientX;
-    var fClickY = oEvent.originalEvent ? oEvent.originalEvent.clientY : oEvent.clientY;
-
-    var fDx = fClickX - fCenterX;
-    var fDy = fClickY - fCenterY;
-
-    var fAngle = (Math.atan2(fDy, fDx) * 180 / Math.PI) + 90;
-    if (fAngle < 0) { fAngle += 360; }
-
-    var oModel = this.getView().getModel("statusChart");
-    var aItems = oModel.getProperty("/items");
-
-    var oMatch = aItems.find(function (oItem) {
-        return fAngle >= oItem.startAngle && fAngle < oItem.endAngle;
-    });
-
-    oModel.setProperty("/selectedLabel", oMatch ? (oMatch.status + " — " + oMatch.count + " claims (" + oMatch.percentOfTotal + "%)") : "");
-},
+            },
 
 
-        formatStatusBarHtml: function (iPercent, sColor) {
-            var iPct = iPercent || 0;
-            var sSafeColor = sColor || STATE_COLORS.None;
-            return "<div style=\"height:100%;border-radius:4px;width:" + iPct + "%;background:" + sSafeColor + ";\"></div>";
-        },
+            /* =========================================================
+             * CLAIM PRESS
+             * ========================================================= */
 
-        // Builds the pie <div> plus one absolutely-positioned label per slice,
-// placed at the mid-angle of that slice, so it's clear which name
-// belongs to which colored wedge.
-formatPieChartHtml: function (aItems, sPieBackground) {
-    if (!aItems || !aItems.length) {
-        return "<div class=\"pieChart\" style=\"background:conic-gradient(#EDEDE8 0% 100%)\"></div>";
-    }
+            onClaimPress: function (
+                oEvent
+            ) {
 
-    var aLabels = aItems.map(function (oItem) {
-        // Skip labels for very thin slices to avoid text overlap
-        if (oItem.percentOfTotal < 6) { return ""; }
+                var oCtx =
+                    oEvent
+                        .getSource()
+                        .getBindingContext(
+                            "recent"
+                        );
 
-        var fMidAngle = (oItem.startAngle + oItem.endAngle) / 2;
-        var fRad = fMidAngle * Math.PI / 180;
-        var fRadiusFraction = 0.66; // 0 = center, 1 = edge of circle
 
-        var fLeft = 50 + fRadiusFraction * 50 * Math.sin(fRad);
-        var fTop  = 50 - fRadiusFraction * 50 * Math.cos(fRad);
+                if (!oCtx) {
+                    return;
+                }
 
-        return "<span class=\"pieSliceLabel\" style=\"left:" + fLeft.toFixed(2)
-            + "%;top:" + fTop.toFixed(2) + "%;\">" + oItem.status + "</span>";
-    }).join("");
 
-    return "<div class=\"pieChart\" style=\"background:" + sPieBackground + "\">" + aLabels + "</div>";
-},
+                var sClaimId =
+                    oCtx.getProperty(
+                        "ID"
+                    );
 
-// FIX — this was referenced by the view (formatter: '.formatLegendListHtml')
-// but never existed, so the space beside the pie chart was always empty.
-// This builds one row per status with a color dot, name, % share and count —
-// which is the "number of claims beside the pie chart" you were expecting.
-formatLegendListHtml: function (aItems) {
-    if (!aItems || !aItems.length) {
-        return "<div class=\"legendEmpty\">No data</div>";
-    }
 
-    return aItems.map(function (oItem) {
-        return "<div class=\"legendRow\" style=\"display:flex;align-items:center;\">"
-            + "<span class=\"legendDot\" style=\"background:" + oItem.color + ";\"></span>"
-            + "<span class=\"legendLabel\">" + oItem.status + "</span>"
-            + "<span class=\"legendPercent\">" + oItem.percentOfTotal + "%</span>"
-            + "</div>";
-    }).join("");
-},
+                this.getOwnerComponent()
+                    .getRouter()
+                    .navTo(
+                        "claimDetail",
+                        {
+                            claimId:
+                                sClaimId
+                        }
+                    );
+            },
 
-// NEW — builds a vertical bar chart in raw SVG for Policies by type.
-// One bar per policy type, scaled to the tallest bar, with a % label
-// above each bar and a rotated type-name label below. Bound from the
-// view via formatPolicyTypeChartSvg. Uses the same oItem.color values
-// _buildPolicyTypeChart already assigns, so it stays visually consistent
-// with the rest of the dashboard's palette.
-formatPolicyTypeChartSvg: function (aItems) {
-    if (!aItems || !aItems.length) {
-        return "<div class=\"legendEmpty\">No data</div>";
-    }
 
-    var iBarWidth = 28, iGap = 14, iChartHeight = 110, iTopPad = 20, iLabelHeight = 46;
-    var iWidth = aItems.length * (iBarWidth + iGap) + iGap;
-    var iHeight = iTopPad + iChartHeight + iLabelHeight;
-    var iMaxPct = Math.max.apply(null, aItems.map(function (o) { return o.percentOfTotal; })) || 1;
+            /* =========================================================
+             * NAVIGATION
+             * ========================================================= */
 
-    var sBars = aItems.map(function (oItem, i) {
-        var iBarHeight = Math.round((oItem.percentOfTotal / iMaxPct) * iChartHeight);
-        var iX = iGap + i * (iBarWidth + iGap);
-        var iY = iTopPad + iChartHeight - iBarHeight;
-        var iLabelY = iTopPad + iChartHeight + 16;
-        var iCenterX = iX + iBarWidth / 2;
-        var sLabel = oItem.type.length > 14 ? oItem.type.substring(0, 13) + "…" : oItem.type;
+            onViewAllClaims: function () {
+                this.onNavClaims();
+            },
 
-        return "<rect x=\"" + iX + "\" y=\"" + iY + "\" width=\"" + iBarWidth + "\" height=\"" + iBarHeight
-            + "\" fill=\"" + oItem.color + "\" rx=\"3\"></rect>"
-            + "<text x=\"" + iCenterX + "\" y=\"" + (iY - 6) + "\" text-anchor=\"middle\" font-size=\"11\" fill=\"#2C2C2A\">"
-            + oItem.percentOfTotal + "%</text>"
-            + "<text x=\"" + iCenterX + "\" y=\"" + iLabelY + "\" text-anchor=\"end\" font-size=\"10\" fill=\"#6E6E6E\" "
-            + "transform=\"rotate(-40 " + iCenterX + " " + iLabelY + ")\">" + sLabel + "</text>";
-    }).join("");
 
-    return "<svg viewBox=\"0 0 " + iWidth + " " + iHeight + "\" style=\"width:100%;height:auto;max-width:"
-        + iWidth + "px;display:block;\">" + sBars + "</svg>";
-},
+            onNavClaims: function () {
 
-        _loadFraudRisk: function (oModel) {
-            if (!oModel) {
-                console.warn("[Dashboard] No model available for FraudRiskScores");
-                return;
+                this.getOwnerComponent()
+                    .getRouter()
+                    .navTo("claims");
+            },
+
+
+            onNavPolicies: function () {
+
+                this.getOwnerComponent()
+                    .getRouter()
+                    .navTo("policies");
+            },
+
+
+            onNavCustomers: function () {
+
+                this.getOwnerComponent()
+                    .getRouter()
+                    .navTo(
+                        "admin",
+                        {
+                            "?query": {
+                                tab: "customers"
+                            }
+                        }
+                    );
+            },
+
+
+            onNavClaimTypes: function () {
+
+                this.getOwnerComponent()
+                    .getRouter()
+                    .navTo(
+                        "admin",
+                        {
+                            "?query": {
+                                tab: "claimTypes"
+                            }
+                        }
+                    );
+            },
+
+
+            /* =========================================================
+             * KPI NAVIGATION
+             * ========================================================= */
+
+            onKpiPendingApproval: function () {
+
+                this.getOwnerComponent()
+                    .getRouter()
+                    .navTo(
+                        "claims",
+                        {
+                            "?query": {
+                                status: "Pending"
+                            }
+                        }
+                    );
+            },
+
+
+            onKpiRejected: function () {
+
+                this.getOwnerComponent()
+                    .getRouter()
+                    .navTo(
+                        "claims",
+                        {
+                            "?query": {
+                                status: "Rejected"
+                            }
+                        }
+                    );
+            },
+
+
+            onKpiSubmitted: function () {
+
+                this.getOwnerComponent()
+                    .getRouter()
+                    .navTo(
+                        "claims",
+                        {
+                            "?query": {
+                                status: "Submitted"
+                            }
+                        }
+                    );
+            },
+
+
+            onKpiApproved: function () {
+
+                this.getOwnerComponent()
+                    .getRouter()
+                    .navTo(
+                        "claims",
+                        {
+                            "?query": {
+                                status: "Approved"
+                            }
+                        }
+                    );
+            },
+
+
+            onKpiActivePolicies: function () {
+
+                this.getOwnerComponent()
+                    .getRouter()
+                    .navTo(
+                        "policies",
+                        {
+                            "?query": {
+                                status: "Active"
+                            }
+                        }
+                    );
+            },
+
+
+            /* =========================================================
+             * HTML ESCAPE
+             * ========================================================= */
+
+            _escapeHtml: function (
+                sValue
+            ) {
+
+                return String(
+                    sValue === null ||
+                    sValue === undefined
+                        ? ""
+                        : sValue
+                )
+                .replace(
+                    /&/g,
+                    "&amp;"
+                )
+                .replace(
+                    /</g,
+                    "&lt;"
+                )
+                .replace(
+                    />/g,
+                    "&gt;"
+                )
+                .replace(
+                    /"/g,
+                    "&quot;"
+                )
+                .replace(
+                    /'/g,
+                    "&#039;"
+                );
             }
 
-            var oBinding = oModel.bindList("/FraudRiskScores", undefined, undefined,
-                new Filter("riskLevel", FilterOperator.EQ, "High"),
-                { $select: "ID", $$operationMode: "Server" }
-            );
-
-            oBinding.requestContexts(0, 500).then(function (aCtx) {
-                this.getView().getModel("dash").setProperty("/highFraudRisk", aCtx.length);
-            }.bind(this)).catch(function (oErr) {
-                console.warn("[Dashboard] FraudRiskScores not available, leaving highFraudRisk at 0", oErr);
-            });
-        },
-
-      _loadActivePolicies: function (oModel) {
-    var oPolBinding = oModel.bindList("/Policies", undefined, undefined,
-        new Filter("status", FilterOperator.EQ, "Active"),
-        { $select: "ID", $$operationMode: "Server" }
-    );
-
-    oPolBinding.requestContexts(0, 500).then(function (aCtx) {
-        this.getView().getModel("dash").setProperty("/activePolicies", aCtx.length);
-    }.bind(this)).catch(function (oErr) {
-        console.error("[Dashboard] Failed to load policies", oErr);
-    });
-},
-
-// Loads all policies (not just Active) so we can break them down by status
-_loadPolicyStatusChart: function (oModel) {
-    if (!oModel) {
-        console.warn("[Dashboard] No model available for Policies");
-        return;
-    }
-
-    var oBinding = oModel.bindList("/Policies", undefined, undefined, undefined, {
-        $select: "ID,status"
-    });
-
-    oBinding.requestContexts(0, 500).then(function (aContexts) {
-        var aPolicies = aContexts.map(function (oCtx) {
-            return oCtx.getObject();
-        });
-        this._buildPolicyStatusChart(aPolicies);
-    }.bind(this)).catch(function (oErr) {
-        console.error("[Dashboard] Failed to load policy status chart", oErr);
-    });
-},
-
-// Same grouping pattern as _buildStatusChart, but for policies
-_buildPolicyStatusChart: function (aPolicies) {
-    var mStatusCounts = {};
-    aPolicies.forEach(function (p) {
-        var sKey = p.status || "Unknown";
-        mStatusCounts[sKey] = (mStatusCounts[sKey] || 0) + 1;
-    });
-
-    var iTotal = aPolicies.length || 1;
-    var aCounts = Object.keys(mStatusCounts).map(function (k) { return mStatusCounts[k]; });
-    var iMax = aCounts.length ? Math.max.apply(null, aCounts) : 1;
-
-    var aItems = Object.keys(mStatusCounts).map(function (sStatus, iIndex) {
-        var iCount = mStatusCounts[sStatus];
-        var sColor = STATUS_COLORS[sStatus] || FALLBACK_PALETTE[iIndex % FALLBACK_PALETTE.length];
-        var iPct = Math.round((iCount / iMax) * 100);
-        return {
-            status: sStatus,
-            count: iCount,
-            percent: iPct,
-            percentOfTotal: Math.round((iCount / iTotal) * 100),
-            color: sColor,
-            // FIX — computed here (controller) instead of via a multi-part
-            // relative binding in the view, which was not resolving reliably.
-            barHtml: this.formatStatusBarHtml(iPct, sColor)
-        };
-    }.bind(this));
-
-    this.getView().getModel("policyChart").setData({ items: aItems });
-},
-
-// FIXED — Policies has no "type" field; it has a claimType ASSOCIATION to
-// ClaimTypes. Resolve claimType_ID -> ClaimTypes.name via a lookup map
-// (same pattern _loadClaims already uses), then group by that name.
-_loadPolicyTypeChart: function (oModel, oAdminModel) {
-    if (!oModel) {
-        console.warn("[Dashboard] No model available for Policies (type breakdown)");
-        return;
-    }
-
-    this._loadLookupMap(oAdminModel, "/ClaimTypes", "name").then(function (mClaimTypes) {
-        var oBinding = oModel.bindList("/Policies", undefined, undefined, undefined, {
-            $select: "ID,claimType_ID"
-        });
-
-        return oBinding.requestContexts(0, 500).then(function (aContexts) {
-            var aPolicies = aContexts.map(function (oCtx) {
-                var oData = oCtx.getObject();
-                return {
-                    type: mClaimTypes[oData.claimType_ID] || oData.claimType_ID || "Unknown"
-                };
-            });
-            this._buildPolicyTypeChart(aPolicies);
-        }.bind(this));
-    }.bind(this)).catch(function (oErr) {
-        console.error("[Dashboard] Failed to load policy type chart", oErr);
-    });
-},
-
-// Same grouping pattern as _buildPolicyStatusChart, sorted largest-first
-_buildPolicyTypeChart: function (aPolicies) {
-    var mCounts = {};
-    aPolicies.forEach(function (p) {
-        var sKey = p.type || "Unknown";
-        mCounts[sKey] = (mCounts[sKey] || 0) + 1;
-    });
-
-    var iTotal = aPolicies.length || 1;
-    var aItems = Object.keys(mCounts).map(function (sType, iIndex) {
-        var iCount = mCounts[sType];
-        var sColor = FALLBACK_PALETTE[iIndex % FALLBACK_PALETTE.length];
-        var iPct = Math.round((iCount / iTotal) * 100);
-        return {
-            type: sType,
-            count: iCount,
-            percentOfTotal: iPct,
-            color: sColor,
-            // FIX — same reasoning as _buildPolicyStatusChart above
-            barHtml: this.formatStatusBarHtml(iPct, sColor)
-        };
-    }.bind(this)).sort(function (a, b) { return b.count - a.count; });
-
-    this.getView().getModel("policyTypeChart").setData({ items: aItems });
-},
-
-        onClaimPress: function (oEvent) {
-            var oCtx = oEvent.getSource().getBindingContext("recent");
-            var sClaimId = oCtx.getProperty("ID");
-            this.getOwnerComponent().getRouter().navTo("claimDetail", { claimId: sClaimId });
-        },
-
-        onNavClaims: function () {
-            this.getOwnerComponent().getRouter().navTo("claims");
-        },
-
-        onNavPolicies: function () {
-            this.getOwnerComponent().getRouter().navTo("policies");
-        },
-
-        onNavAdministration: function () {
-            // NOTE: verify this route name matches the one in manifest.json's
-            // "routing/routes" section (the URL you shared uses "#/admin", so
-            // "admin" is the most likely route name — adjust if yours differs).
-            this.getOwnerComponent().getRouter().navTo("admin");
         }
-    });
+    );
 });
