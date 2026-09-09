@@ -262,20 +262,29 @@ entity Approvals : cuid {
 
 entity Payouts : cuid {
 
-    payoutNumber : String(50)            @mandatory;
+    payoutNumber  : String(50)            @mandatory;
 
-    claim        : Association to Claims @mandatory;
+    claim         : Association to Claims @mandatory;
 
-    amount       : Decimal(15, 2)        @mandatory;
+    amount        : Decimal(15, 2)        @mandatory;
 
-    status       : String(30) enum {
+    paymentMethod : String(30) enum {
+        BankTransfer;
+        NEFT;
+        RTGS;
+        UPI;
+    } default 'BankTransfer';
+
+    payoutDate    : Date;
+
+    status        : String(30) enum {
         Pending;
         Processing;
         Processed;
         Failed;
     } default 'Pending';
 
-    processedBy  : Association to Employees;
+    processedBy   : Association to Employees;
 
 }
 
