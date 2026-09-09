@@ -1048,24 +1048,27 @@ sap.ui.define([
             // INVESTIGATION STATUS
             // =====================================================
 
-            formatInvestigationState:
-                function (sStatus) {
+          formatInvestigationState: function (sStatus) {
+            switch (sStatus) {
+                case "Assigned":
+                    return "Warning";       // Orange
 
-                    switch (sStatus) {
+                case "InProgress":
+                    return "Information";   // Blue
 
-                        case "Assigned":
-                            return "Warning";
+                case "Completed":
+                    return "Success";       // Green
 
-                        case "InProgress":
-                            return "Information";
+                case "Pending":
+                    return "Warning";       // Orange
 
-                        case "Completed":
-                            return "Success";
+                case "Rejected":
+                    return "Error";         // Red
 
-                        default:
-                            return "None";
-                    }
-                },
+                default:
+                    return "None";
+            }
+        },
 
 
             // =====================================================

@@ -6,7 +6,10 @@
                 width="100%"
                 growing="true"
                 growingThreshold="20"
-                class="sapUiResponsiveMargin"
+                mode="MultiSelect"
+                selectionChange="onSelectionChange"
+                autoPopinMode="true"
+                class="policyTable"
                 items="{
                     path: '/Policies',
                     parameters: {
@@ -17,30 +20,103 @@
                 }"
                 noDataText="{i18n>noClaims}">
 
-                <headerToolbar>
-                    <OverflowToolbar>
-                        <Title text="{i18n>navPolicies}" level="H2"/>
-                        <ToolbarSpacer/>
-                        <SearchField id="policiesSearch" width="12rem" search="onSearch" placeholder="Search policies..."/>
-                        <Button
-                            text="Create Policy"
-                            type="Emphasized"
-                            icon="sap-icon://add"
-                            class="sapUiResponsiveMargin"
-                            press="onCreatePolicy"/>
-                    </OverflowToolbar>
-                </headerToolbar>
+<headerToolbar>
+    <OverflowToolbar
+        id="policyToolbar"
+        class="policyToolbar">
 
-                <columns>
-                    <Column><Text text="{i18n>colPolicyNumber}"/></Column>
-                    <Column><Text text="{i18n>colCustomer}"/></Column>
-                    <Column demandPopin="true" minScreenWidth="Tablet"><Text text="{i18n>colClaimType}"/></Column>
-                    <Column hAlign="End"><Text text="{i18n>colCoverage}"/></Column>
-                    <Column demandPopin="true" minScreenWidth="Desktop"><Text text="{i18n>colStartDate}"/></Column>
-                    <Column demandPopin="true" minScreenWidth="Desktop"><Text text="{i18n>colEndDate}"/></Column>
-                    <Column><Text text="{i18n>colStatus}"/></Column>
-                    <Column demandPopin="true" minScreenWidth="Tablet" hAlign="Begin"><Text text="Actions"/></Column>
-                </columns>
+        <Title
+            text="{i18n>navPolicies}"
+            level="H2"
+            class="policyToolbarTitle"/>
+
+        <ToolbarSpacer/>
+
+        <SearchField
+            id="policiesSearch"
+            width="16rem"
+            search="onSearch"
+            placeholder="Search policies..."
+            class="policySearch">
+
+            <layoutData>
+                <OverflowToolbarLayoutData
+                    priority="High"
+                    shrinkable="true"/>
+            </layoutData>
+
+        </SearchField>
+
+        <Button
+            text="Edit"
+            icon="sap-icon://edit"
+            enabled="{toolbar>/editEnabled}"
+            press="onEditPolicy"
+            class="policyActionButton"
+            type="Emphasized">
+
+            <layoutData>
+                <OverflowToolbarLayoutData
+                    priority="Low"/>
+            </layoutData>
+
+        </Button>
+
+        <Button
+            text="{i18n>btnCancel}"
+            icon="sap-icon://sys-cancel"
+            enabled="{toolbar>/cancelEnabled}"
+            press="onCancelPolicy"
+            class="policyActionButton"
+            type="Emphasized">
+
+            <layoutData>
+                <OverflowToolbarLayoutData
+                    priority="Low"/>
+            </layoutData>
+
+        </Button>
+
+        <Button
+            text="Delete"
+            icon="sap-icon://delete"
+            type="Reject"
+            enabled="{toolbar>/deleteEnabled}"
+            press="onDeletePolicy"
+            class="policyActionButton">
+
+            <layoutData>
+                <OverflowToolbarLayoutData
+                    priority="Low"/>
+            </layoutData>
+
+        </Button>
+
+        <Button
+            text="Create Policy"
+            icon="sap-icon://add"
+            type="Emphasized"
+            press="onCreatePolicy"
+            class="createPolicyButton">
+
+            <layoutData>
+                <OverflowToolbarLayoutData
+                    priority="High"/>
+            </layoutData>
+
+        </Button>
+
+    </OverflowToolbar>
+</headerToolbar>
+           <columns>
+                <Column><Text text="{i18n>colPolicyNumber}"/></Column>
+                <Column demandPopin="true" minScreenWidth="Tablet"><Text text="{i18n>colCustomer}"/></Column>
+                <Column demandPopin="true" minScreenWidth="Desktop"><Text text="{i18n>colClaimType}"/></Column>
+                <Column hAlign="End"><Text text="{i18n>colCoverage}"/></Column>
+                <Column demandPopin="true" minScreenWidth="Desktop"><Text text="{i18n>colStartDate}"/></Column>
+                <Column demandPopin="true" minScreenWidth="Desktop"><Text text="{i18n>colEndDate}"/></Column>
+                <Column><Text text="{i18n>colStatus}"/></Column>
+            </columns>
 
                 <items>
                     <ColumnListItem>
@@ -54,17 +130,10 @@
                                 parts: [{path: 'claimType_ID'}, {path: 'lookups>/claimTypes'}],
                                 formatter: '.idToName'
                             }"/>
-                            <ObjectNumber number="{ path: 'coverageLimit', formatter: '.formatCurrency' }" unit="USD"/>
+                            <ObjectNumber number="{ path: 'coverageLimit' }"/>
                             <Text text="{ path: 'startDate', formatter: '.formatShortDate' }"/>
                             <Text text="{ path: 'endDate', formatter: '.formatShortDate' }"/>
                             <ObjectStatus text="{status}" state="{ path: 'status', formatter: '.formatStatusState' }"/>
-                            <HBox wrap="Wrap" class="sapUiTinyGap" justifyContent="Start">
-                                <Button text="Edit" press="onEditPolicy"
-                                    visible="{ path: 'status', formatter: '.canEditPolicy' }" class="sapUiResponsiveMargin"/>
-                                <Button text="{i18n>btnCancel}" press="onCancelPolicy"
-                                    visible="{ path: 'status', formatter: '.canCancelPolicy' }" class="sapUiResponsiveMargin"/>
-                                <Button text="Delete" type="Reject" press="onDeletePolicy" class="sapUiResponsiveMargin"/>
-                            </HBox>
                         </cells>
                     </ColumnListItem>
                 </items>

@@ -10,67 +10,189 @@ sap.ui.define([
 
     return Controller.extend("claimsure.app.controller.Policies", {
 
-        onInit: function () {
-            // Local JSON model backing the Create/Edit dialog form fields.
-            var oDialogModel = new JSONModel({
-                dialogTitle: "",
-                mode: "create",     // "create" | "edit"
-                ID: null,           // set only in edit mode
-                policyNumber: "",
-                customer_ID: "",
-                claimType_ID: "",
-                coverageLimit: "",
-                startDate: "",
-                endDate: "",
-                status: "Active",
-                busy: false
-            });
-            this.getView().setModel(oDialogModel, "policyDialog");
+onInit: function () {
+    var oDialogModel = new JSONModel({
+        dialogTitle: "",
+        mode: "create",
+        ID: null,
+        policyNumber: "",
+        customer_ID: "",
+        claimType_ID: "",
+        coverageLimit: "",
+        startDate: "",
+        endDate: "",
+        status: "Active",
+        busy: false
+    });
+    this.getView().setModel(oDialogModel, "policyDialog");
 
-            this._loadLookups();
-        },
+    // ADD THIS — drives Edit/Cancel/Delete enabled state
+    var oToolbarModel = new JSONModel({
+        editEnabled: false,
+        cancelEnabled: false,
+        deleteEnabled: false
+    });
+    this.getView().setModel(oToolbarModel, "toolbar");
 
-        // =================================================================
-        // Lookups: STATIC data (per request) instead of fetching from the
-        // backend. IDs below match what's visible in your Policies table
-        // (customer_ID / claimType_ID columns). Names for POL002-POL008
-        // match what your app showed before the columns broke; POL001 and
-        // POL009 names are placeholders ("Ravi Kumar", "Test Customer") —
-        // replace them with the real values if different.
-        //
-        // Add/edit rows here as your real customers/claim types change —
-        // this is the single place both the table columns and the Create/
-        // Edit dialog dropdowns read from.
-        // =================================================================
+    this._loadLookups();
 
-        _loadLookups: function () {
-            var oLookupModel = new JSONModel({
-                customers: [
-                    { ID: "11111111-1111-1111-1111-111111111111", name: "Ravi Kumar" },
-                    { ID: "22222222-2222-2222-2222-222222222222", name: "Anita Sharma" },
-                    { ID: "33333333-3333-3333-3333-333333333333", name: "Arjun Reddy" },
-                    { ID: "44444444-4444-4444-4444-444444444444", name: "Priya Patel" },
-                    { ID: "55555555-5555-5555-5555-555555555555", name: "Vikram Singh" },
-                    { ID: "66666666-6666-6666-6666-666666666666", name: "Neha Verma" },
-                    { ID: "77777777-7777-7777-7777-777777777777", name: "Karan Mehta" },
-                    { ID: "88888888-8888-8888-8888-888888888888", name: "Sneha Iyer" },
-                    { ID: "99999999-9999-9999-9999-999999999999", name: "Test Customer" }
-                ],
-                claimTypes: [
-                    { ID: "a1000001-0001-0001-0001-000000000001", name: "Vehicle Accident" },
-                    { ID: "a1000002-0002-0002-0002-000000000002", name: "Vehicle Theft" },
-                    { ID: "a1000003-0003-0003-0003-000000000003", name: "Vehicle Damage" },
-                    { ID: "a1000004-0004-0004-0004-000000000004", name: "Medical Expense" },
-                    { ID: "a1000005-0005-0005-0005-000000000005", name: "Hospitalization" },
-                    { ID: "a1000006-0006-0006-0006-000000000006", name: "Emergency Treatment" },
-                    { ID: "a1000007-0007-0007-0007-000000000007", name: "Property Damage" },
-                    { ID: "a1000008-0008-0008-0008-000000000008", name: "Fire Damage" },
-                    { ID: "a1000009-0009-0009-0009-000000000009", name: "Theft Damage" }
-                ]
-            });
-            this.getView().setModel(oLookupModel, "lookups");
-        },
+    this.getOwnerComponent().getRouter()
+        .getRoute("policies")
+        .attachPatternMatched(this._onRouteMatched, this);
+},
 
+onSelectionChange: function () {
+    var oTable = this.byId("policiesTable");
+    var aSelected = oTable.getSelectedItems();
+    var oToolbarModel = this.getView().getModel("toolbar");
+
+    if (aSelected.length !== 1) {
+        oToolbarModel.setData({
+            editEnabled: false,
+            cancelEnabled: false,
+            deleteEnabled: false
+        });
+        return;
+    }
+
+    var oData = aSelected[0].getBindingContext().getObject();
+
+    oToolbarModel.setData({
+        editEnabled: this.canEditPolicy(oData.status),
+        cancelEnabled: this.canCancelPolicy(oData.status),
+        deleteEnabled: true
+    });
+},
+
+_getSelectedContext: function () {
+    var oTable = this.byId("policiesTable");
+    var aSelected = oTable.getSelectedItems();
+
+    if (aSelected.length !== 1) {
+        MessageToast.show("Please select exactly one policy.");
+        return null;
+    }
+
+    return aSelected[0].getBindingContext();
+},
+
+_clearSelection: function () {
+    var oTable = this.byId("policiesTable");
+    oTable.removeSelections(true);
+    this.getView().getModel("toolbar").setData({
+        editEnabled: false,
+        cancelEnabled: false,
+        deleteEnabled: false
+    });
+},
+
+// NEW
+_onRouteMatched: function (oEvent) {
+    var oQuery = oEvent.getParameter("arguments")["?query"] || {};
+    var oTable = this.byId("policiesTable");
+    if (!oTable) { return; }
+
+    var oBinding = oTable.getBinding("items");
+    if (!oBinding) { return; }
+
+    var aFilters = [];
+    if (oQuery.status === "Active") {
+        aFilters.push(new Filter("status", FilterOperator.EQ, "Active"));
+    }
+
+    oBinding.filter(aFilters);
+},
+       
+_loadLookups: function () {
+    var oAdminModel = this.getOwnerComponent().getModel("admin");
+
+    if (!oAdminModel) {
+        console.error("[Policies] admin model not found");
+        MessageBox.error("MainService model 'admin' not found.");
+        return;
+    }
+
+    var oLookupModel = new JSONModel({
+        customers: [],
+        claimTypes: []
+    });
+
+    this.getView().setModel(oLookupModel, "lookups");
+
+    // Customers
+    var oCustomerBinding = oAdminModel.bindList(
+        "/Customers",
+        undefined,
+        undefined,
+        undefined,
+        {
+            $select: "ID,firstName,lastName"
+        }
+    );
+
+    // Claim Types
+    var oClaimTypeBinding = oAdminModel.bindList(
+        "/ClaimTypes",
+        undefined,
+        undefined,
+        undefined,
+        {
+            $select: "ID,name"
+        }
+    );
+
+    Promise.all([
+        oCustomerBinding.requestContexts(0, 1000),
+        oClaimTypeBinding.requestContexts(0, 1000)
+    ]).then(function (aResults) {
+
+        // ============================================================
+        // CUSTOMERS
+        // ============================================================
+
+        var aCustomers = aResults[0].map(function (oContext) {
+            var oData = oContext.getObject();
+
+            return {
+                ID: oData.ID,
+                name: [
+                    oData.firstName,
+                    oData.lastName
+                ].filter(Boolean).join(" ")
+            };
+        });
+
+        // ============================================================
+        // CLAIM TYPES
+        // ============================================================
+
+        var aClaimTypes = aResults[1].map(function (oContext) {
+            var oData = oContext.getObject();
+
+            return {
+                ID: oData.ID,
+                name: oData.name
+            };
+        });
+
+        console.log("[Policies] Customers loaded:", aCustomers);
+        console.log("[Policies] Claim Types loaded:", aClaimTypes);
+
+        oLookupModel.setData({
+            customers: aCustomers,
+            claimTypes: aClaimTypes
+        });
+
+    }).catch(function (oError) {
+
+        console.error("[Policies] Lookup loading failed:", oError);
+
+        MessageBox.error(
+            "Could not load customers and claim types.\n\n" +
+            (oError.message || "Unknown error")
+        );
+    });
+},
         // =================================================================
         // Formatters (plain controller methods, referenced in the view as
         // formatter: '.methodName' — no separate formatter.js file)
@@ -169,16 +291,18 @@ sap.ui.define([
             this._callAction("renewPolicy", oCtx.getProperty("ID"), "Policy renewed");
         },
 
-        onCancelPolicy: function (oEvent) {
-            var oCtx = oEvent.getSource().getBindingContext();
-            MessageBox.confirm("Cancel this policy?", {
-                onClose: function (sAction) {
-                    if (sAction === MessageBox.Action.OK) {
-                        this._callAction("cancelPolicy", oCtx.getProperty("ID"), "Policy cancelled");
-                    }
-                }.bind(this)
-            });
-        },
+onCancelPolicy: function () {
+    var oCtx = this._getSelectedContext();
+    if (!oCtx) { return; }
+
+    MessageBox.confirm("Cancel this policy?", {
+        onClose: function (sAction) {
+            if (sAction === MessageBox.Action.OK) {
+                this._callAction("cancelPolicy", oCtx.getProperty("ID"), "Policy cancelled");
+            }
+        }.bind(this)
+    });
+},
 
         // =================================================================
         // CRUD: Create / Edit (dialog is defined inline in the view, id="policyDialog")
@@ -202,28 +326,29 @@ sap.ui.define([
             this.byId("policyDialog").open();
         },
 
-        onEditPolicy: function (oEvent) {
-            var oCtx = oEvent.getSource().getBindingContext();
-            var oData = oCtx.getObject();
-            var oDialogModel = this.getView().getModel("policyDialog");
+onEditPolicy: function () {
+    var oCtx = this._getSelectedContext();
+    if (!oCtx) { return; }
 
-            oDialogModel.setData({
-                dialogTitle: "Edit Policy",
-                mode: "edit",
-                ID: oData.ID,
-                policyNumber: oData.policyNumber,
-                customer_ID: oData.customer_ID,
-                claimType_ID: oData.claimType_ID,
-                coverageLimit: oData.coverageLimit,
-                // Normalize to yyyy-MM-dd for the DatePicker's valueFormat
-                startDate: oData.startDate ? new Date(oData.startDate).toISOString().slice(0, 10) : "",
-                endDate: oData.endDate ? new Date(oData.endDate).toISOString().slice(0, 10) : "",
-                status: oData.status,
-                busy: false
-            });
+    var oData = oCtx.getObject();
+    var oDialogModel = this.getView().getModel("policyDialog");
 
-            this.byId("policyDialog").open();
-        },
+    oDialogModel.setData({
+        dialogTitle: "Edit Policy",
+        mode: "edit",
+        ID: oData.ID,
+        policyNumber: oData.policyNumber,
+        customer_ID: oData.customer_ID,
+        claimType_ID: oData.claimType_ID,
+        coverageLimit: oData.coverageLimit,
+        startDate: oData.startDate ? new Date(oData.startDate).toISOString().slice(0, 10) : "",
+        endDate: oData.endDate ? new Date(oData.endDate).toISOString().slice(0, 10) : "",
+        status: oData.status,
+        busy: false
+    });
+
+    this.byId("policyDialog").open();
+},
 
         _validateDialog: function (oData) {
             if (!oData.policyNumber || !oData.customer_ID || !oData.claimType_ID ||
@@ -303,24 +428,27 @@ sap.ui.define([
             this.byId("policyDialog").close();
         },
 
-        onDeletePolicy: function (oEvent) {
-            var oCtx = oEvent.getSource().getBindingContext();
-            var sPolicyNumber = oCtx.getProperty("policyNumber");
+onDeletePolicy: function () {
+    var oCtx = this._getSelectedContext();
+    if (!oCtx) { return; }
 
-            MessageBox.confirm("Delete policy " + sPolicyNumber + "? This cannot be undone.", {
-                title: "Confirm Delete",
-                onClose: function (sAction) {
-                    if (sAction !== MessageBox.Action.OK) {
-                        return;
-                    }
-                    oCtx.delete().then(function () {
-                        MessageToast.show("Policy deleted");
-                    }).catch(function (oErr) {
-                        console.error("[Policies] Delete failed", oErr);
-                        MessageBox.error(oErr.message || "Could not delete policy.");
-                    });
-                }
+    var sPolicyNumber = oCtx.getProperty("policyNumber");
+
+    MessageBox.confirm("Delete policy " + sPolicyNumber + "? This cannot be undone.", {
+        title: "Confirm Delete",
+        onClose: function (sAction) {
+            if (sAction !== MessageBox.Action.OK) {
+                return;
+            }
+            oCtx.delete().then(function () {
+                MessageToast.show("Policy deleted");
+                this._clearSelection();
+            }.bind(this)).catch(function (oErr) {
+                console.error("[Policies] Delete failed", oErr);
+                MessageBox.error(oErr.message || "Could not delete policy.");
             });
-        }
+        }.bind(this)
+    });
+}
     });
 });
