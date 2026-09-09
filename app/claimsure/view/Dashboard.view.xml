@@ -2,10 +2,7 @@
     controllerName="claimsure.app.controller.Dashboard"
     xmlns="sap.m"
     xmlns:mvc="sap.ui.core.mvc"
-    xmlns:core="sap.ui.core"
-    xmlns:viz="sap.viz.ui5.controls"
-    xmlns:viz.data="sap.viz.ui5.data"
-    xmlns:viz.feeds="sap.viz.ui5.controls.common.feeds">
+    xmlns:core="sap.ui.core">
 
     <Page
         title="{i18n>navDashboard}"
@@ -16,11 +13,12 @@
             <VBox class="dashboardContent">
 
                 <!-- Welcome banner -->
+              
                 <VBox class="welcomeBanner sapUiMediumMarginBottom">
                     <HBox justifyContent="SpaceBetween" alignItems="Center" wrap="Wrap">
                         <VBox class="welcomeCopy">
                             <Title
-                                text="{= 'Welcome back, ' + ${app>/currentUser/name} }"
+                                text="{= 'Welcome back,!! ' }"
                                 level="H2"
                                 class="welcomeTitle"/>
                             <Text
@@ -28,18 +26,6 @@
                                 class="welcomeSubtitle"/>
                         </VBox>
 
-                        <!-- Lightweight SAPUI5-safe illustration; no external image required -->
-                        <core:HTML
-                            content="&lt;div class='welcomeIllustration' aria-hidden='true'&gt;
-                                &lt;div class='illustrationWindow'&gt;
-                                    &lt;div class='illustrationDots'&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;/div&gt;
-                                    &lt;div class='illustrationBody'&gt;
-                                        &lt;div class='miniDonut'&gt;&lt;/div&gt;
-                                        &lt;div class='miniBars'&gt;&lt;i&gt;&lt;/i&gt;&lt;i&gt;&lt;/i&gt;&lt;i&gt;&lt;/i&gt;&lt;i&gt;&lt;/i&gt;&lt;/div&gt;
-                                    &lt;/div&gt;
-                                &lt;/div&gt;
-                                &lt;div class='illustrationShield'&gt;✓&lt;/div&gt;
-                            &lt;/div&gt;"/>
                     </HBox>
                 </VBox>
 
@@ -156,6 +142,8 @@
                     </VBox>
 
                 </HBox>
+                
+
 
                 <!-- Analytics -->
                 <Panel
@@ -170,47 +158,23 @@
                             <Text text="Claims by status" class="chartSectionTitle"/>
 
                             <HBox class="pieRow" wrap="Wrap" alignItems="Center">
-                              <VBox class="pieChartWrap" alignItems="Center" justifyContent="Center">
-                                    <viz:VizFrame
-                                        id="statusVizFrame"
-                                        uiConfig="{applicationSet:'fiori'}"
-                                        height="400px"
-                                        width="500px"
-                                        vizType="donut">
 
-                                     
-
-                                        <viz:dataset>
-                                            <viz.data:FlattenedDataset data="{statusChart>/items}">
-                                                <viz.data:dimensions>
-                                                    <viz.data:DimensionDefinition
-                                                        name="Status"
-                                                        value="{statusChart>status}"/>
-                                                </viz.data:dimensions>
-                                                <viz.data:measures>
-                                                    <viz.data:MeasureDefinition
-                                                        name="Count"
-                                                        value="{statusChart>count}"/>
-                                                    <viz.data:MeasureDefinition
-                                                        name="Percent"
-                                                        value="{statusChart>percentOfTotal}"/>
-                                                </viz.data:measures>
-                                            </viz.data:FlattenedDataset>
-                                        </viz:dataset>
-
-                                        <viz:feeds>
-                                            <viz.feeds:FeedItem
-                                                uid="size"
-                                                type="Measure"
-                                                values="Count"/>
-                                            <viz.feeds:FeedItem
-                                                uid="color"
-                                                type="Dimension"
-                                                values="Status"/>
-                                        </viz:feeds>
-
-                                    </viz:VizFrame>
+                                <VBox class="pieChartWrap" alignItems="Center" justifyContent="Center">
+                                    <core:HTML
+                                        content="{
+                                            path: 'statusChart>/items',
+                                            formatter: '.formatStatusDonutHtml'
+                                        }"/>
                                 </VBox>
+
+                                <VBox class="pieLegend">
+                                    <core:HTML
+                                        content="{
+                                            path: 'statusChart>/items',
+                                            formatter: '.formatStatusLegendHtml'
+                                        }"/>
+                                </VBox>
+
                             </HBox>
 
                             <Text
@@ -219,52 +183,30 @@
                         </VBox>
 
                         <!-- Policies by type -->
-                        <VBox class="policyTypeCol">
-                            <Text text="Policies by type" class="chartSectionTitle"/>
+              <!-- Policies trend -->
+                    <VBox class="policyTypeCol">
+                        <HBox justifyContent="SpaceBetween" alignItems="Center" class="chartHeaderRow">
+                            <Text text="Policies trend" class="chartSectionTitle"/>
+                            <Select
+                                id="policyYearSelect"
+                                items="{yearsModel>/years}"
+                                selectedKey="{yearsModel>/selectedYear}"
+                                change="onPolicyYearChange"
+                                class="yearSelectDropdown">
+                                <core:Item key="{yearsModel>key}" text="{yearsModel>text}"/>
+                            </Select>
+                        </HBox>
 
-                            <viz:VizFrame
-                                id="policyTypeVizFrame"
-                                uiConfig="{applicationSet:'fiori'}"
-                                height="280px"
-                                width="100%"
-                                vizType="column">
+                        <core:HTML
+                            content="{
+                                path: 'policyTrendChart>/items',
+                                formatter: '.formatPolicyTrendChartSvg'
+                            }"/>
 
-                                <viz:dataset>
-                                    <viz.data:FlattenedDataset data="{policyTypeChart>/items}">
-                                        <viz.data:dimensions>
-                                            <viz.data:DimensionDefinition
-                                                name="Type"
-                                                value="{policyTypeChart>type}"/>
-                                        </viz.data:dimensions>
-                                        <viz.data:measures>
-                                            <viz.data:MeasureDefinition
-                                                name="Count"
-                                                value="{policyTypeChart>count}"/>
-                                        </viz.data:measures>
-                                    </viz.data:FlattenedDataset>
-                                </viz:dataset>
-
-                                <viz:feeds>
-                                    <viz.feeds:FeedItem
-                                        uid="valueAxis"
-                                        type="Measure"
-                                        values="Count"/>
-                                    <viz.feeds:FeedItem
-                                        uid="categoryAxis2"
-                                        type="Dimension"
-                                        values="Type"/>
-                                    <viz.feeds:FeedItem
-                                        uid="color"
-                                        type="Dimension"
-                                        values="Type"/>
-                                </viz:feeds>
-
-                            </viz:VizFrame>
-
-                            <Text
-                                text="{= 'Total Policies: ' + ${dash>/totalPolicies} }"
-                                class="chartFooterCaption"/>
-                        </VBox>
+                        <Text
+                            text="{= 'Total Policies: ' + ${dash>/totalPolicies} }"
+                            class="chartFooterCaption"/>
+                    </VBox>
 
                     </HBox>
                 </Panel>
@@ -293,70 +235,66 @@
                         growing="false"
                         class="recentClaimsTable">
 
-               <columns>
+                        <columns>
 
-                  <Column>
-                        <Text text="Claim Number"/>
-                    </Column>
+                            <Column>
+                                <Text text="Claim Number"/>
+                            </Column>
 
-                    <Column>
-                        <Text text="Claim"/>
-                    </Column>
+                            <Column>
+                                <Text text="Claim"/>
+                            </Column>
 
-                 
+                            <Column>
+                                <Text text="Customer"/>
+                            </Column>
 
-                    <Column>
-                        <Text text="Customer"/>
-                    </Column>
+                            <Column>
+                                <Text text="Status"/>
+                            </Column>
 
-                    <Column>
-                        <Text text="Status"/>
-                    </Column>
+                            <Column>
+                                <Text text="Amount"/>
+                            </Column>
+                        </columns>
 
-                    <Column>
-                        <Text text="Amount"/>
-                    </Column>
-                </columns>
+                        <items>
+                            <ColumnListItem
+                                type="Active"
+                                press="onClaimPress">
 
-                <items>
-                    <ColumnListItem
-                        type="Active"
-                        press="onClaimPress">
+                                <cells>
+                                    <Text text="{recent>claimNumber}" class="stmtPayoutNumber"/>
 
-                        <cells>
-                            <Text text="{recent>claimNumber}"/>
-                            <!-- Claim Type / Claim Name -->
-                          <Text text="{recent>claimTypeName}"/>
+                                    <!-- Claim Type / Claim Name -->
+                                    <Text text="{recent>claimTypeName}"/>
 
-                            <!-- Policy Name -->
-                       
+                                    <!-- Customer -->
+                                    <Text text="{recent>customerName}"/>
 
-                            <!-- Customer -->
-                            <Text text="{recent>customerName}"/>
+                                    <!-- Status -->
+                                    <core:HTML
+                                        content="{
+                                            path: 'recent>status',
+                                            formatter: '.formatStatusPillHtml'
+                                        }"/>
 
-                            <!-- Status -->
-                            <core:HTML
-                                content="{
-                                    path: 'recent>status',
-                                    formatter: '.formatStatusPillHtml'
-                                }"/>
+                                    <!-- Amount -->
+                                    <Text
+                                        text="{
+                                            path: 'recent>claimedAmount',
+                                            formatter: '.formatCurrency'
+                                        }"
+                                        textAlign="End"/>
 
-                            <!-- Amount -->
-                            <Text
-                                text="{
-                                    path: 'recent>claimedAmount',
-                                    formatter: '.formatCurrency'
-                                }"
-                                textAlign="End"/>
+                                </cells>
 
-                        </cells>
-
-                    </ColumnListItem>
-                </items>
+                            </ColumnListItem>
+                        </items>
                     </Table>
                 </Panel>
 
-                <Text text="© 2024 ClaimSure. All rights reserved." class="dashboardFooter"/>
+                <!-- <Text text="© 2024 ClaimSure. All rights reserved." class="dashboardFooter"/> -->
 
             </VBox>
         </content>
