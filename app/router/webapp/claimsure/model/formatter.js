@@ -102,6 +102,19 @@ sap.ui.define([], function () {
             return sId;
         },
 
+        assignAgent: function(oName,oClaim){
+
+            console.log("testing data from claims details", oName);
+            console.log("testing data from claims details", oClaim);
+            
+            var claimData = oClaim;
+
+            console.log(Array[oClaim]);
+             
+            
+
+        },
+
 
         currency: function (value) {
 

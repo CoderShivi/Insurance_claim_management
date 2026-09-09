@@ -30,20 +30,74 @@ sap.ui.define([
                         console.error("Error loading claims");
                         return;
                     }
-
-                    // Temporary diagnostic — remove once confirmed working
-                    var aItems = oTable.getItems();
-                    aItems.forEach(function (oItem) {
-                        var oContext = oItem.getBindingContext();
-                        if (oContext) {
-                            console.log(
-                                "Claim:", oContext.getProperty("claimNumber"),
-                                "| Status:", JSON.stringify(oContext.getProperty("status"))
-                            );
-                        }
-                    });
                 });
             }
+
+            this.getOwnerComponent().getRouter()
+                .getRoute("claims")
+                .attachPatternMatched(this._onRouteMatched, this);
+        },
+
+        onKpiPendingApproval: function () {
+            this.getOwnerComponent().getRouter().navTo("claims", {
+                "?query": { status: "PendingApproval,UnderReview" }
+            });
+        },
+
+        _onRouteMatched: function (oEvent) {
+            var oQuery = oEvent.getParameter("arguments")["?query"] || {};
+            this._applyStatusFromQuery(oQuery.status);
+        },
+
+        _applyStatusFromQuery: function (sStatus) {
+            var oTable = this.byId("claimsTable");
+            var oBinding = oTable.getBinding("items");
+            var oComboBox = this.byId("statusFilter");
+
+            if (!oBinding) {
+                return;
+            }
+
+            var sExistingSearch = this.byId("claimsSearch")
+                ? this.byId("claimsSearch").getValue()
+                : "";
+
+            var aFilters = [];
+
+            if (sExistingSearch) {
+                aFilters.push(new Filter("claimNumber", FilterOperator.Contains, sExistingSearch));
+            }
+
+            if (sStatus) {
+                var aStatuses = sStatus.split(",");
+
+                if (aStatuses.length > 1) {
+                    aFilters.push(
+                        new Filter({
+                            filters: aStatuses.map(function (s) {
+                                return new Filter("status", FilterOperator.EQ, s);
+                            }),
+                            and: false
+                        })
+                    );
+                } else {
+                    aFilters.push(new Filter("status", FilterOperator.EQ, aStatuses[0]));
+                }
+
+                if (oComboBox && aStatuses.length === 1) {
+                    var oMatch = oComboBox.getItems().filter(function (oItem) {
+                        return oItem.getKey() === aStatuses[0];
+                    })[0];
+
+                    if (oMatch) {
+                        oComboBox.setSelectedItem(oMatch);
+                    }
+                }
+            } else if (oComboBox) {
+                oComboBox.setSelectedKey(null);
+            }
+
+            oBinding.filter(aFilters);
         },
 
         onSearch: function (oEvent) {
@@ -183,6 +237,7 @@ sap.ui.define([
         onCreateClaim: function () {
             if (!this._oCreateClaimDialog) {
                 Fragment.load({
+                    id: "createClaim",
                     name: "claimsure.app.view.CreateClaimDialog",
                     controller: this
                 }).then(function (oDialog) {
@@ -199,20 +254,41 @@ sap.ui.define([
             if (this._oCreateClaimDialog) {
                 this._oCreateClaimDialog.close();
             }
+            this._resetCreateClaimForm();
+        },
+
+        onDocumentFileChange: function (oEvent) {
+            var aFiles = oEvent.getParameter("files");
+            this._oSelectedFile = (aFiles && aFiles.length) ? aFiles[0] : null;
         },
 
         onConfirmCreateClaim: function () {
             var oDialog = this._oCreateClaimDialog;
 
-            var sCustomerId = oDialog.byId("ccCustomer").getSelectedKey();
-            var sPolicyId = oDialog.byId("ccPolicy").getSelectedKey();
-            var sClaimTypeId = oDialog.byId("ccClaimType").getSelectedKey();
-            var fAmount = parseFloat(oDialog.byId("ccAmount").getValue());
-            var sDate = oDialog.byId("ccDate").getValue();
-            var sDescription = oDialog.byId("ccDesc").getValue();
+            var oCustomer = Fragment.byId("createClaim", "ccCustomer");
+            var oPolicy = Fragment.byId("createClaim", "ccPolicy");
+            var oClaimType = Fragment.byId("createClaim", "ccClaimType");
+            var oAmount = Fragment.byId("createClaim", "ccAmount");
+            var oDate = Fragment.byId("createClaim", "ccDate");
+            var oDesc = Fragment.byId("createClaim", "ccDesc");
+
+            if (!oCustomer || !oPolicy || !oClaimType) {
+                MessageBox.error("Unable to find claim form controls.");
+                return;
+            }
+
+            var sCustomerId = oCustomer.getSelectedKey();
+            var sPolicyId = oPolicy.getSelectedKey();
+            var sClaimTypeId = oClaimType.getSelectedKey();
+
+            var fAmount = parseFloat(oAmount.getValue());
+            var sDate = oDate.getValue();
+            var sDescription = oDesc.getValue();
 
             if (!sCustomerId || !sPolicyId || !sClaimTypeId) {
-                MessageBox.warning("Please select customer, policy and claim type.");
+                MessageBox.warning(
+                    "Please select customer, policy and claim type."
+                );
                 return;
             }
 
@@ -223,6 +299,11 @@ sap.ui.define([
 
             if (!sDate) {
                 MessageBox.warning("Please enter the incident date.");
+                return;
+            }
+
+             if (!this._oSelectedFile) {
+                MessageBox.warning("Please attach a supporting document.");
                 return;
             }
 
@@ -248,19 +329,91 @@ sap.ui.define([
 
             oContext.created()
                 .then(function () {
-                    MessageToast.show("Claim created successfully.");
-                    oDialog.close();
-
                     var sClaimId = oContext.getProperty("ID");
+
+                    if (this._oSelectedFile) {
+                        this._createAndUploadDocument(sClaimId, this._oSelectedFile);
+                    }
+
+                    MessageToast.show("Claim created successfully.");
+
+                    oDialog.close();
+                    this._resetCreateClaimForm();
 
                     this.getOwnerComponent()
                         .getRouter()
-                        .navTo("claimDetail", { claimId: sClaimId });
+                        .navTo("claimDetail", {
+                            claimId: sClaimId
+                        });
                 }.bind(this))
                 .catch(function (oError) {
                     console.error("Create claim error:", oError);
-                    MessageBox.error(oError.message || "Failed to create claim.");
+
+                    MessageBox.error(
+                        oError.message || "Failed to create claim."
+                    );
                 });
+        },
+
+        _createAndUploadDocument: function (sClaimId, oFile) {
+            var oModel = this.getView().getModel();
+            var oDocBinding = oModel.bindList("/Claims(" + sClaimId + ")/documents");
+
+            var oDocContext = oDocBinding.create({
+                documentType: "Supporting",
+                fileName: oFile.name,
+                mediaType: oFile.type || "application/octet-stream"
+            });
+
+            oDocContext.created()
+                .then(function () {
+                    var sDocId = oDocContext.getProperty("ID");
+                    this._uploadFileContent(sClaimId, sDocId, oFile);
+                }.bind(this))
+                .catch(function (oError) {
+                    console.error("Create document error:", oError);
+                    MessageBox.error("Claim was created, but the document record could not be saved.");
+                });
+        },
+
+        _uploadFileContent: function (sClaimId, sDocId, oFile) {
+            var oModel = this.getView().getModel();
+            var sBaseUrl = oModel.getServiceUrl();
+            var sUrl = sBaseUrl.replace(/\/$/, "") +
+                "/Claims(" + sClaimId + ")/documents(" + sDocId + ")/content";
+
+            fetch(sUrl, { method: "HEAD", headers: { "X-CSRF-Token": "Fetch" } })
+                .then(function (oResp) {
+                    var sToken = oResp.headers.get("X-CSRF-Token");
+                    return fetch(sUrl, {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": oFile.type || "application/octet-stream",
+                            "X-CSRF-Token": sToken
+                        },
+                        body: oFile,
+                        credentials: "include"
+                    });
+                })
+                .then(function (oPutResp) {
+                    if (oPutResp.ok) {
+                        MessageToast.show("Document uploaded.");
+                    } else {
+                        MessageBox.error("Failed to upload the document file.");
+                    }
+                })
+                .catch(function (oError) {
+                    console.error("Upload error:", oError);
+                    MessageBox.error("Failed to upload the document file.");
+                });
+        },
+
+        _resetCreateClaimForm: function () {
+            var oFileUploader = Fragment.byId("createClaim", "ccFile");
+            if (oFileUploader) {
+                oFileUploader.clear();
+            }
+            this._oSelectedFile = null;
         }
     });
 });

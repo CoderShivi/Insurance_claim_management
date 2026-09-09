@@ -1,6 +1,32 @@
 const cds = require('@sap/cds')
 const { executeHttpRequest } = require('@sap-cloud-sdk/http-client');
+const ExcelJS = require('exceljs');
+const path = require('path');
+const fs = require('fs');
+const nodemailer = require("nodemailer");
 
+
+
+// ==========================================
+// MAIL CONFIGURATION
+// ==========================================
+
+const MAIL_CONFIG = {
+    host: process.env.MAIL_HOST,
+    port: Number(process.env.MAIL_PORT || 465),
+    secure: process.env.MAIL_SECURE === 'true',
+
+    auth: {
+        user: process.env.MAIL_USER,
+        pass: process.env.MAIL_PASSWORD
+    },
+
+    from: process.env.MAIL_FROM,
+
+    to: process.env.MAIL_TO
+        ? process.env.MAIL_TO.split(",").map(email => email.trim())
+        : []
+};
 
 module.exports = cds.service.impl(async function () {
 
@@ -9,13 +35,14 @@ module.exports = cds.service.impl(async function () {
     const {
         Policies,
         Claims,
-        ClaimDocuments
+        ClaimDocuments,
     } = this.entities;
 
     const db = await cds.connect.to('db');
 
     const {
-        FraudRiskScores
+        FraudRiskScores,
+        AlertLog
     } = db.entities;
 
     this.before('CREATE', 'FraudRiskScores', async (req) => {
@@ -250,17 +277,9 @@ module.exports = cds.service.impl(async function () {
 
         const { claimID } = req.data;
 
-        // ------------------------------------------------------------
-        // Validate Claim ID
-        // ------------------------------------------------------------
-
         if (!claimID) {
             return req.reject(400, "Claim ID is required");
         }
-
-        // ------------------------------------------------------------
-        // Get Claim
-        // ------------------------------------------------------------
 
         const claim = await SELECT.one
             .from(Claims)
@@ -271,17 +290,28 @@ module.exports = cds.service.impl(async function () {
         if (!claim) {
             return req.reject(404, "Claim not found");
         }
+
         const riskScore = await SELECT.one
             .from(FraudRiskScores)
             .where({
                 claim_ID: claimID
             });
-        console.log("Risk Score:", riskScore?.riskScore);
-        console.log("Risk Level:", riskScore?.riskLevel);
-        // ------------------------------------------------------------
-        // Claim must be Submitted
-        // ----------------
-        // --------------------------------------------
+
+        const score = riskScore
+            ? Number(riskScore.riskScore)
+            : 0;
+
+        const riskLevel = riskScore
+            ? riskScore.riskLevel
+            : "Low";
+
+        const claimedAmount = Number(claim.claimedAmount);
+
+        console.log("========== SUBMIT CLAIM ==========");
+        console.log("Claim ID:", claimID);
+        console.log("Claim Amount:", claimedAmount);
+        console.log("Risk Score:", score);
+        console.log("Risk Level:", riskLevel);
 
         if (claim.status !== "Submitted") {
             return req.reject(
@@ -290,23 +320,28 @@ module.exports = cds.service.impl(async function () {
             );
         }
 
+        const investigationRequired =
+            claimedAmount > 100000 ||
+            riskLevel === "High" ||
+            riskLevel === "Critical" ||
+            score > 75;
+
+
+        const initialStatus = investigationRequired
+            ? "UnderReview"
+            : "PendingApproval";
+
+        await UPDATE(Claims)
+            .set({
+                status: initialStatus
+            })
+            .where({
+                ID: claimID
+            });
+
+        console.log("Initial claim status:", initialStatus);
+
         try {
-
-            // --------------------------------------------------------
-            // First move claim to UnderReview
-            // --------------------------------------------------------
-
-            await UPDATE(Claims)
-                .set({
-                    status: "UnderReview"
-                })
-                .where({
-                    ID: claimID
-                });
-
-            // --------------------------------------------------------
-            // Start BPA workflow
-            // --------------------------------------------------------
 
             const response = await executeHttpRequest(
                 {
@@ -324,14 +359,10 @@ module.exports = cds.service.impl(async function () {
                         context: {
                             claimid: claim.ID,
                             claimnumber: claim.claimNumber,
-                            claimedamount: Number(claim.claimedAmount),
+                            claimedamount: claimedAmount,
                             description: claim.description || "",
-                            riskScore: riskScore
-                                ? Number(riskScore.riskScore)
-                                : 0,
-                            riskLevel: riskScore
-                                ? riskScore.riskLevel
-                                : "Low"
+                            riskScore: score,
+                            riskLevel: riskLevel
                         }
                     }
                 },
@@ -344,10 +375,6 @@ module.exports = cds.service.impl(async function () {
                 "BPA workflow started:",
                 response.status
             );
-
-            // --------------------------------------------------------
-            // Get updated claim
-            // --------------------------------------------------------
 
             const updatedClaim = await SELECT.one
                 .from(Claims)
@@ -378,10 +405,7 @@ module.exports = cds.service.impl(async function () {
                 )
             );
 
-            // --------------------------------------------------------
-            // If workflow could not start,
-            // move claim back to Submitted
-            // --------------------------------------------------------
+
 
             await UPDATE(Claims)
                 .set({
@@ -397,6 +421,9 @@ module.exports = cds.service.impl(async function () {
             );
         }
     });
+
+
+
     this.on('moveToPendingApproval', async (req) => {
 
         const { claimID } = req.data;
@@ -470,6 +497,483 @@ module.exports = cds.service.impl(async function () {
     });
 
 
+    this.on('processPendingClaims', async (req) => {
+
+        console.log(
+            "========== PROCESS PENDING CLAIMS =========="
+        );
+
+
+        // ==========================================
+        // 1. GET PENDING APPROVAL CLAIMS
+        // ==========================================
+
+        const pendingClaims = await SELECT
+            .from(Claims)
+            .where({
+                status: 'PendingApproval'
+            });
+
+
+        console.log(
+            "Pending claims found:",
+            pendingClaims.length
+        );
+
+
+        // ==========================================
+        // IF NO PENDING CLAIMS
+        // ==========================================
+
+        if (pendingClaims.length === 0) {
+
+            console.log(
+                "No pending approval claims found."
+            );
+
+            return {
+
+                message:
+                    "No pending approval claims found.",
+
+                pendingApprovalsCount: 0,
+
+                pendingApprovals: [],
+
+                escalatedCount: 0
+            };
+        }
+
+
+        // ==========================================
+        // 2. CREATE EXCEL WORKBOOK
+        // ==========================================
+
+        const workbook =
+            new ExcelJS.Workbook();
+
+
+        const worksheet =
+            workbook.addWorksheet(
+                "Pending Claims"
+            );
+
+
+        // ==========================================
+        // EXCEL HEADERS
+        // ==========================================
+
+        worksheet.addRow([
+
+            "Claim Number",
+
+            "Claim ID",
+
+            "Claimed Amount",
+
+            "Status",
+
+            "Incident Date"
+
+        ]);
+
+
+        // ==========================================
+        // ADD CLAIM DATA TO EXCEL
+        // ==========================================
+
+        for (const claim of pendingClaims) {
+
+            worksheet.addRow([
+
+                claim.claimNumber || "",
+
+                claim.ID || "",
+
+                Number(
+                    claim.claimedAmount || 0
+                ),
+
+                claim.status || "",
+
+                claim.incidentDate || ""
+
+            ]);
+
+        }
+
+
+        // ==========================================
+        // EXCEL HEADER FORMATTING
+        // ==========================================
+
+        worksheet.getRow(1).font = {
+
+            bold: true
+
+        };
+
+
+        // ==========================================
+        // EXCEL COLUMN WIDTH
+        // ==========================================
+
+        worksheet.getColumn(1).width = 20;
+
+        worksheet.getColumn(2).width = 40;
+
+        worksheet.getColumn(3).width = 20;
+
+        worksheet.getColumn(4).width = 25;
+
+        worksheet.getColumn(5).width = 20;
+
+
+        // ==========================================
+        // 3. CREATE EXPORT DIRECTORY
+        // ==========================================
+
+        const exportDirectory = path.join(
+
+            process.cwd(),
+
+            "exports"
+
+        );
+
+
+        if (!fs.existsSync(exportDirectory)) {
+
+            fs.mkdirSync(
+
+                exportDirectory,
+
+                {
+                    recursive: true
+                }
+
+            );
+
+        }
+
+
+        // ==========================================
+        // 4. CREATE EXCEL FILE
+        // ==========================================
+
+        const filePath = path.join(
+
+            exportDirectory,
+
+            "Pending_Claims.xlsx"
+
+        );
+
+
+        await workbook.xlsx.writeFile(
+
+            filePath
+
+        );
+
+
+        console.log(
+
+            "Excel generated successfully:",
+
+            filePath
+
+        );
+
+
+        // ==========================================
+        // 5. CREATE HTML EMAIL CONTENT
+        // ==========================================
+
+        let claimsRows = "";
+
+
+        for (const claim of pendingClaims) {
+
+            claimsRows += `
+
+            <tr>
+
+                <td>${claim.claimNumber || ""}</td>
+
+                <td>${claim.claimedAmount || ""}</td>
+
+                <td>${claim.status || ""}</td>
+
+                <td>${claim.incidentDate || ""}</td>
+
+            </tr>
+
+        `;
+
+        }
+
+
+        const htmlContent = `
+
+        <!DOCTYPE html>
+
+        <html>
+
+        <head>
+
+            <style>
+
+                body {
+                    font-family: Arial, sans-serif;
+                    padding: 20px;
+                }
+
+                table {
+                    border-collapse: collapse;
+                    width: 100%;
+                }
+
+                th {
+                    background-color: #eeeeee;
+                }
+
+                th,
+                td {
+                    border: 1px solid #cccccc;
+                    padding: 10px;
+                    text-align: left;
+                }
+
+            </style>
+
+        </head>
+
+
+        <body>
+
+            <h2>
+                Pending Claims Approval Report
+            </h2>
+
+
+            <p>
+
+                Hello,
+
+            </p>
+
+
+            <p>
+
+                There are currently
+
+                <strong>
+                    ${pendingClaims.length}
+                </strong>
+
+                claims waiting for approval.
+
+            </p>
+
+
+            <h3>
+                Pending Claims Summary
+            </h3>
+
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Claim Number
+                        </th>
+
+                        <th>
+                            Claimed Amount
+                        </th>
+
+                        <th>
+                            Status
+                        </th>
+
+                        <th>
+                            Incident Date
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    ${claimsRows}
+
+                </tbody>
+
+            </table>
+
+
+            <br>
+
+
+            <p>
+
+                The complete Pending Claims report
+                is attached as an Excel file.
+
+            </p>
+
+
+            <p>
+
+                Regards,
+
+                <br>
+
+                ClaimSure Insurance System
+
+            </p>
+
+
+        </body>
+
+        </html>
+
+    `;
+
+
+        // ==========================================
+        // 6. CREATE EMAIL TRANSPORTER
+        // ==========================================
+
+        const transporter =
+            nodemailer.createTransport({
+
+                host: MAIL_CONFIG.host,
+
+                port: MAIL_CONFIG.port,
+
+                secure: MAIL_CONFIG.secure,
+
+                auth: {
+
+                    user:
+                        MAIL_CONFIG.auth.user,
+
+                    pass:
+                        MAIL_CONFIG.auth.pass
+
+                }
+
+            });
+
+
+        // ==========================================
+        // 7. SEND EMAIL
+        // ==========================================
+
+        try {
+
+            const mailResult = await transporter.sendMail({
+                from: MAIL_CONFIG.from,
+
+                to: MAIL_CONFIG.to,
+
+                subject:
+                    `Pending Claims Report - ${pendingClaims.length} Claims`,
+
+                html: htmlContent,
+
+                attachments: [
+                    {
+                        filename: "Pending_Claims.xlsx",
+                        path: filePath,
+                        contentType:
+                            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                    }
+                ]
+            });
+
+
+            console.log(
+                "Email sent successfully"
+            );
+
+
+            console.log(
+                "Message ID:",
+                mailResult.messageId
+            );
+
+
+        }
+        catch (error) {
+
+            console.error(
+                "EMAIL ERROR:",
+                error.message
+            );
+
+            return req.error(
+
+                500,
+
+                `Excel generated but email sending failed: ${error.message}`
+
+            );
+
+        }
+
+
+        // ==========================================
+        // 8. RETURN JOB RESPONSE
+        // ==========================================
+
+        return {
+
+            message:
+
+                `Pending claims processed successfully. Excel generated and email sent to recipients.`,
+
+
+            pendingApprovalsCount:
+
+                pendingClaims.length,
+
+
+            pendingApprovals:
+
+                pendingClaims.map(
+                    claim => ({
+
+                        claimID:
+                            claim.ID,
+
+                        claimNumber:
+                            claim.claimNumber,
+
+                        claimedAmount:
+                            claim.claimedAmount,
+
+                        status:
+                            claim.status
+
+                    })
+                ),
+
+
+            escalatedCount: 0
+
+        };
+
+    });
+
+
     this.on('rejectClaim', async (req) => {
 
         const { claimID } = req.data;
@@ -513,38 +1017,38 @@ module.exports = cds.service.impl(async function () {
             });
     });
 
-this.on('rejectFraudClaim', async (req) => {
+    this.on('rejectFraudClaim', async (req) => {
 
-    const { claimID } = req.data;
+        const { claimID } = req.data;
 
-    console.log("========== rejectFraudClaim ==========");
-    console.log("Received claimID:", claimID);
+        console.log("========== rejectFraudClaim ==========");
+        console.log("Received claimID:", claimID);
 
-    const claim = await SELECT.one
-        .from(Claims)
-        .where({ ID: claimID });
+        const claim = await SELECT.one
+            .from(Claims)
+            .where({ ID: claimID });
 
-    console.log("Claim found:", claim);
+        console.log("Claim found:", claim);
 
-    if (!claim) {
-        return req.error(404, 'Claim not found');
-    }
+        if (!claim) {
+            return req.error(404, 'Claim not found');
+        }
 
-    if (claim.status !== 'UnderReview') {
-        return req.error(
-            400,
-            `Fraud claim cannot be rejected. Current status: ${claim.status}`
-        );
-    }
+        if (claim.status !== 'UnderReview') {
+            return req.error(
+                400,
+                `Fraud claim cannot be rejected. Current status: ${claim.status}`
+            );
+        }
 
-    await UPDATE(Claims)
-        .set({ status: 'Rejected' })
-        .where({ ID: claimID });
+        await UPDATE(Claims)
+            .set({ status: 'Rejected' })
+            .where({ ID: claimID });
 
-    return await SELECT.one
-        .from(Claims)
-        .where({ ID: claimID });
-});
+        return await SELECT.one
+            .from(Claims)
+            .where({ ID: claimID });
+    });
 
     this.on('getClaimStatus', async (req) => {
 
