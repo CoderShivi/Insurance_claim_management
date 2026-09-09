@@ -1,7 +1,7 @@
 namespace claimsure;
 
+using { cuid } from '@sap/cds/common';
 
-using {cuid} from '@sap/cds/common';
 
 entity Customers : cuid {
 
