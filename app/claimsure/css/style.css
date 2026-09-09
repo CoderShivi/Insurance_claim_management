@@ -1605,6 +1605,36 @@ body {
 .donutLabel {
     color: #8A8FA3;
     font-size: 10px;
+<<<<<<< HEAD
+=======
+.ledgerPage .sapMPageScroll {
+    overflow-x: hidden !important;
+}
+
+.chartHeaderRow {
+    margin-bottom: 0.9rem;
+}
+
+.yearSelectDropdown {
+    min-width: 90px;
+}
+
+.chartLinePath {
+    fill: none;
+    stroke: #3E7CB1;
+    stroke-width: 2.5;
+}
+
+.chartLinePoint {
+    fill: #3E7CB1;
+    stroke: #FFFFFF;
+    stroke-width: 2;
+    cursor: pointer;
+}
+
+.chartLinePoint:hover {
+    fill: #2C567F;
+>>>>>>> 4f63e2e (Updated payout csv)
 }
 
 
