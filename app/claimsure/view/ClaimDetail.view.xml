@@ -106,22 +106,20 @@
 
                         <!-- AMOUNT -->
 
-                        <VBox
-                            alignItems="End">
+                     <VBox alignItems="End">
 
-                            <Label
-                                text="Claimed Amount"
-                                class="sapUiTinyMarginBottom"/>
+                        <Label
+                            text="Claim Amount"
+                            class="sapUiTinyMarginBottom"/>
 
-                            <ObjectNumber
-                                number="{
-                                    path: 'claimDetail>/claimedAmount',
-                                    formatter: '.formatter.currency'
-                                }"
-                                unit="USD"
-                                emphasized="true"/>
+                        <ObjectNumber
+                            number="{
+                                path: 'claimDetail>/claimedAmount',
+                                formatter: '.formatter.indianCurrency'
+                            }"
+                            emphasized="true"/>
 
-                        </VBox>
+                    </VBox>
 
                     </HBox>
 
@@ -250,14 +248,13 @@
 
                                         <!-- AMOUNT -->
 
-                                        <Label text="Claimed Amount"/>
+                                        <Label text="Claim Amount"/>
 
                                         <ObjectNumber
                                             number="{
                                                 path: 'claimDetail>/claimedAmount',
-                                                formatter: '.formatter.currency'
-                                            }"
-                                            unit="USD"/>
+                                                formatter: '.formatter.indianCurrency'
+                                            }"/>
 
 
                                         <!-- STATUS -->
@@ -425,22 +422,15 @@
                                         </columns>
 
 
-                                        <items>
-
-                                            <ColumnListItem>
-
-                                                <cells>
-
-                                                    <Text
-                                                        text="{claimDetail>fileName}"/>
-
-                                                    <ObjectStatus
-                                                        text="{claimDetail>documentType}"/>
-
-                                                </cells>
-
-                                            </ColumnListItem>
-
+                                       <items>
+                                        <ColumnListItem>
+                                            <cells>
+                                                <Link
+                                                    text="{claimDetail>fileName}"
+                                                    press="onDocumentPress"/>
+                                                <ObjectStatus text="{claimDetail>documentType}"/>
+                                            </cells>
+                                        </ColumnListItem>
                                         </items>
 
                                     </Table>
