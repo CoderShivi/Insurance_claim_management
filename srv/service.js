@@ -4,9 +4,6 @@ const ExcelJS = require('exceljs');
 const path = require('path');
 const fs = require('fs');
 const nodemailer = require("nodemailer");
-
-
-
 // ==========================================
 // MAIL CONFIGURATION
 // ==========================================
