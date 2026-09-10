@@ -8,6 +8,7 @@ build-parameters:
   before-all:
     - builder: custom
       commands:
+        - npm ci
         - npx cds build --production
         - rm -rf app/router/webapp/claimsure
         - mkdir -p app/router/webapp

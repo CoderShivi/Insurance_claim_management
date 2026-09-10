@@ -1,4 +1,4 @@
-<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:u="sap.ui.unified">
     <Dialog id="createClaimDialog" title="New Claim" contentWidth="28rem">
         <content>
             <VBox class="sapUiSmallMargin">
@@ -25,9 +25,17 @@
 
                 <Label text="Incident Date" labelFor="ccDate" required="true"/>
                 <DatePicker id="ccDate" width="100%" class="sapUiTinyMarginBottom" valueFormat="yyyy-MM-dd" displayFormat="medium"/>
-
+                 <Label text="Supporting Document" labelFor="ccFile" required="true"/>
+                <u:FileUploader
+                    id="ccFile"
+                    width="100%"
+                    class="sapUiTinyMarginBottom"
+                    fileType="pdf,jpg,jpeg,png,doc,docx"
+                    placeholder="Choose a file to attach"
+                    change="onDocumentFileChange"/>
                 <Label text="Description" labelFor="ccDesc"/>
                 <TextArea id="ccDesc" width="100%" rows="3"/>
+                
             </VBox>
         </content>
         <beginButton>
