@@ -138,6 +138,29 @@ sap.ui.define([], function () {
 
             return fValue.toFixed(2);
         },
+indianCurrency: function (fAmount) {
+
+    if (fAmount === null || fAmount === undefined || fAmount === "") {
+        return "";
+    }
+
+    // Strip any thousands separators (commas) that the
+    // OData Decimal type may have already applied.
+    var sCleaned = String(fAmount).replace(/,/g, "");
+
+    var fValue = parseFloat(sCleaned);
+
+    if (isNaN(fValue)) {
+        return "";
+    }
+
+    var sFormatted = new Intl.NumberFormat("en-IN", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+    }).format(fValue);
+
+    return "\u20B9 " + sFormatted;
+},
 
 
         shortDate: function (value) {

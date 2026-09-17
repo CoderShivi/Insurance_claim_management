@@ -353,8 +353,8 @@ module.exports = cds.service.impl(async function () {
                     url: "/workflow/rest/v1/workflow-instances",
 
                     data: {
-                        definitionId:
-                            "us10.547c31aatrial.claimsureclaimmanagement.claimApprovalProcess",
+                            "definitionId": "us10.f3b9ba19trial.claimsureclaimmanagementv2.claimApprovalProcess",
+
 
                         context: {
                             claimid: claim.ID,

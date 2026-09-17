@@ -3,25 +3,15 @@ sap.ui.define([
     "sap/ui/model/json/JSONModel",
     "sap/ui/model/Filter",
     "sap/ui/model/FilterOperator",
-    "sap/viz/ui5/controls/Popover",
-    "sap/m/List",
-    "sap/m/StandardListItem",
-    "sap/m/VBox",
-    "sap/m/HBox",
-    "sap/m/Text",
-    "sap/ui/core/Icon"
+    "sap/m/Popover",
+    "sap/ui/core/HTML"
 ], function (
     Controller,
     JSONModel,
     Filter,
     FilterOperator,
-    VizPopover,
-    List,
-    StandardListItem,
-    VBox,
-    HBox,
-    Text,
-    Icon
+    Popover,
+    HTML
 ) {
     "use strict";
 
@@ -97,217 +87,240 @@ sap.ui.define([
              * INIT
              * ========================================================= */
 
-            onInit: function () {
+      onInit: function () {
 
-                this.getView().setModel(
-                    new JSONModel({
-                        totalClaims: 0,
-                        pendingApproval: 0,
-                        rejectedClaims: 0,
-                        submittedClaims: 0,
-                        approvedClaims: 0,
-                        totalPolicies: 0,
-                        activePolicies: 0,
-                        totalCustomers: 0,
-                        newCustomersThisMonth: 0,
-                        totalClaimTypes: 0
-                    }),
-                    "dash"
-                );
+    this.getView().setModel(
+        new JSONModel({
+            totalClaims: 0,
+            pendingApproval: 0,
+            rejectedClaims: 0,
+            submittedClaims: 0,
+            approvedClaims: 0,
+            totalPolicies: 0,
+            activePolicies: 0,
+            totalCustomers: 0,
+            newCustomersThisMonth: 0,
+            totalClaimTypes: 0
+        }),
+        "dash"
+    );
 
-                this.getView().setModel(
-                    new JSONModel([]),
-                    "recent"
-                );
+    this.getView().setModel(
+        new JSONModel([]),
+        "recent"
+    );
 
-                this.getView().setModel(
-                    new JSONModel({
-                        items: []
-                    }),
-                    "statusChart"
-                );
+    this.getView().setModel(
+        new JSONModel({
+            items: []
+        }),
+        "statusChart"
+    );
 
-                this.getView().setModel(
-                    new JSONModel({
-                        items: []
-                    }),
-                    "policyTypeChart"
-                );
+    this.getView().setModel(
+        new JSONModel({
+            items: []
+        }),
+        "policyTrendChart"
+    );
 
-                this._loadDashboardData();
-            },
+    this.getView().setModel(
+        new JSONModel({
+            years: [],
+            selectedYear: null
+        }),
+        "yearsModel"
+    );
 
+    this._loadDashboardData();
+},
 
             /* =========================================================
              * AFTER RENDERING
              * ========================================================= */
 
-            onAfterRendering: function () {
+          onAfterRendering: function () {
 
-                var oView = this.getView();
+    var oView = this.getView();
 
-                var mHandlers = {
-                    "navCardClaims": this.onNavClaims,
-                    "navCardPolicies": this.onNavPolicies,
-                    "navCardCustomers": this.onNavCustomers,
-                    "navCardClaimTypes": this.onNavClaimTypes,
+    var mHandlers = {
+        "navCardClaims": this.onNavClaims,
+        "navCardPolicies": this.onNavPolicies,
+        "navCardCustomers": this.onNavCustomers,
+        "navCardClaimTypes": this.onNavClaimTypes,
 
-                    "kpiPendingApproval":
-                        this.onKpiPendingApproval,
+        "kpiPendingApproval":
+            this.onKpiPendingApproval,
 
-                    "kpiRejected":
-                        this.onKpiRejected,
+        "kpiRejected":
+            this.onKpiRejected,
 
-                    "kpiSubmitted":
-                        this.onKpiSubmitted,
+        "kpiSubmitted":
+            this.onKpiSubmitted,
 
-                    "kpiApproved":
-                        this.onKpiApproved,
+        "kpiApproved":
+            this.onKpiApproved,
 
-                    "kpiActivePolicies":
-                        this.onKpiActivePolicies
-                };
+        "kpiActivePolicies":
+            this.onKpiActivePolicies
+    };
 
-                Object.keys(mHandlers).forEach(
-                    function (sId) {
+    Object.keys(mHandlers).forEach(
+        function (sId) {
 
-                        var oControl =
-                            oView.byId(sId);
+            var oControl =
+                oView.byId(sId);
 
-                        if (
-                            oControl &&
-                            oControl.getDomRef()
-                        ) {
+            if (
+                oControl &&
+                oControl.getDomRef()
+            ) {
 
-                            oControl.$()
-                                .off("click.dashboardCard")
-                                .on(
-                                    "click.dashboardCard",
-                                    mHandlers[sId].bind(this)
-                                )
+                oControl.$()
+                    .off("click.dashboardCard")
+                    .on(
+                        "click.dashboardCard",
+                        mHandlers[sId].bind(this)
+                    )
 
-                                .off("keydown.dashboardCard")
-                                .on(
-                                    "keydown.dashboardCard",
-                                    function (oEvent) {
+                    .off("keydown.dashboardCard")
+                    .on(
+                        "keydown.dashboardCard",
+                        function (oEvent) {
 
-                                        if (
-                                            oEvent.key === "Enter" ||
-                                            oEvent.key === " "
-                                        ) {
+                            if (
+                                oEvent.key === "Enter" ||
+                                oEvent.key === " "
+                            ) {
 
-                                            oEvent.preventDefault();
+                                oEvent.preventDefault();
 
-                                            mHandlers[sId].call(
-                                                this
-                                            );
-                                        }
-
-                                    }.bind(this)
+                                mHandlers[sId].call(
+                                    this
                                 );
-                        }
+                            }
 
-                    }.bind(this)
-                );
+                        }.bind(this)
+                    );
+            }
 
-                this._attachVizPopover();
-            },
+        }.bind(this)
+    );
 
+
+    // Delegated handler: bound once on the view root, so it
+    // keeps working even though the donut/legend markup is
+    // regenerated (via core:HTML) whenever statusChart>/items
+    // changes.
+    oView.$()
+        .off("click.statusSegment")
+        .on(
+            "click.statusSegment",
+            ".pieSlice, .legendRowClickable",
+            function (oEvent) {
+                this._onStatusSegmentPress(oEvent);
+            }.bind(this)
+        );
+
+
+    // Delegated handler: bound once on the view root, so it
+    // keeps working even though the trend line markup is
+    // regenerated (via core:HTML) whenever policyTrendChart>/items
+    // changes.
+    oView.$()
+        .off("mouseenter.trendPoint")
+        .on(
+            "mouseenter.trendPoint",
+            ".chartLinePoint",
+            function (oEvent) {
+                this._onTrendPointHover(oEvent);
+            }.bind(this)
+        )
+        .off("mouseleave.trendPoint")
+        .on(
+            "mouseleave.trendPoint",
+            ".chartLinePoint",
+            function () {
+                if (this._oTrendPopover) {
+                    this._oTrendPopover.close();
+                }
+            }.bind(this)
+        );
+},
+_onTrendPointHover: function (oEvent) {
+
+    var oTarget = oEvent.currentTarget;
+
+    if (!oTarget) {
+        return;
+    }
+
+    var sMonth = oTarget.getAttribute("data-month") || "";
+    var sCount = oTarget.getAttribute("data-count") || "0";
+
+    this._openTrendPopover(oTarget, sMonth, sCount);
+},
+
+_openTrendPopover: function (oOpenByDomRef, sMonth, sCount) {
+
+    if (!this._oTrendPopover) {
+
+        this._oTrendPopover =
+            new Popover({
+                showHeader: false,
+                placement: "Top",
+                contentWidth: "160px"
+            });
+
+        this.getView().addDependent(
+            this._oTrendPopover
+        );
+    }
+
+    this._oTrendPopover.destroyContent();
+
+    this._oTrendPopover.addContent(
+        new HTML({
+            content:
+                "<div class='statusPopoverContent'>" +
+                "<div class='statusPopoverTitle'>" +
+                this._escapeHtml(sMonth) +
+                "</div>" +
+                "<div class='statusPopoverCount'>" +
+                sCount +
+                " polic" + (sCount === "1" ? "y" : "ies") +
+                "</div>" +
+                "</div>"
+        })
+    );
+
+    this._oTrendPopover.openBy(
+        oOpenByDomRef
+    );
+},
+
+onExit: function () {
+
+    if (this._oStatusPopover) {
+        this._oStatusPopover.destroy();
+        this._oStatusPopover = null;
+    }
+
+    if (this._oTrendPopover) {
+        this._oTrendPopover.destroy();
+        this._oTrendPopover = null;
+    }
+},
 
             /* =========================================================
-             * VIZ POPOVER
+             * CLEANUP
              * ========================================================= */
 
-            _attachVizPopover: function () {
+            onExit: function () {
 
-                var oStatusVizFrame =
-                    this.getView().byId(
-                        "statusVizFrame"
-                    );
-
-                if (
-                    oStatusVizFrame &&
-                    !this._oStatusVizPopover
-                ) {
-
-                    oStatusVizFrame.setVizProperties({
-
-                        title: {
-                            visible: false
-                        },
-
-                        legend: {
-                            visible: true,
-                            alignment: "center",
-                            layout: {
-                                position: "right"
-                            }
-                        },
-
-                        plotArea: {
-
-                            dataLabel: {
-                                visible: true,
-                                showTotal: false,
-                                distance: 15
-                            }
-                        }
-                    });
-
-                    this._oStatusVizPopover =
-                        new VizPopover();
-
-                    this._oStatusVizPopover.connect(
-                        oStatusVizFrame.getVizUid()
-                    );
-                }
-
-
-                var oPolicyVizFrame =
-                    this.getView().byId(
-                        "policyTypeVizFrame"
-                    );
-
-                if (
-                    oPolicyVizFrame &&
-                    !this._oPolicyVizPopover
-                ) {
-
-                    oPolicyVizFrame.setVizProperties({
-
-                        title: {
-                            visible: false
-                        },
-
-                        legend: {
-                            visible: false
-                        },
-
-                        plotArea: {
-
-                            dataLabel: {
-                                visible: true
-                            },
-
-                            colorPalette: [
-                                "#3E7CB1",
-                                "#1D9E75",
-                                "#EF9F27",
-                                "#7F77DD",
-                                "#D85A30",
-                                "#2FA8A0",
-                                "#C2571F",
-                                "#4C6EF5"
-                            ]
-                        }
-                    });
-
-                    this._oPolicyVizPopover =
-                        new VizPopover();
-
-                    this._oPolicyVizPopover.connect(
-                        oPolicyVizFrame.getVizUid()
-                    );
+                if (this._oStatusPopover) {
+                    this._oStatusPopover.destroy();
+                    this._oStatusPopover = null;
                 }
             },
 
@@ -378,11 +391,9 @@ sap.ui.define([
 
                 this._loadPolicyCounts(oModel);
 
-                this._loadPolicyTypeChart(
-                    oModel,
-                    oAdminModel
+               this._loadPolicyTrendChart(
+                    oModel
                 );
-
                 this._loadCustomerCount(
                     oAdminModel
                 );
@@ -759,7 +770,7 @@ sap.ui.define([
 
 
             /* =========================================================
-             * STATUS CHART
+             * STATUS CHART (data)
              * ========================================================= */
 
             _buildStatusChart: function (
@@ -849,6 +860,11 @@ sap.ui.define([
                                     sColor
                             };
                         }
+                    )
+                    .sort(
+                        function (a, b) {
+                            return b.count - a.count;
+                        }
                     );
 
 
@@ -857,6 +873,349 @@ sap.ui.define([
                     .setData({
                         items: aItems
                     });
+            },
+
+
+            /* =========================================================
+             * STATUS DONUT (view)
+             *
+             * Renders a real SVG donut (one <path> arc per status,
+             * carrying data-* attributes) so each slice is a clickable
+             * DOM node — a flat CSS conic-gradient div has no way to
+             * address individual slices for a click/popover.
+             *
+             * Data comes from the same statusChart>/items model that
+             * also feeds the legend; nothing about how that data is
+             * computed has changed.
+             * ========================================================= */
+
+            formatStatusDonutHtml: function (
+                aItems
+            ) {
+
+                if (
+                    !aItems ||
+                    !aItems.length
+                ) {
+
+                    return (
+                        "<div class='pieChart emptyPie'></div>"
+                    );
+                }
+
+
+                var iTotal =
+                    aItems.reduce(
+                        function (n, oItem) {
+                            return n + oItem.count;
+                        },
+                        0
+                    ) || 1;
+
+
+                var iSize = 210;
+                var iCenter = iSize / 2;
+                var iOuterR = 105;
+                var iInnerR = 72;
+
+                var fCumulative = 0;
+
+                var sPaths =
+                    aItems.map(
+                        function (oItem) {
+
+                            var fStartAngle =
+                                (fCumulative / iTotal) * 360;
+
+                            fCumulative += oItem.count;
+
+                            var fEndAngle =
+                                (fCumulative / iTotal) * 360;
+
+                            // Guard against a single 100% slice, where
+                            // start === end after a full revolution.
+                            if (fEndAngle - fStartAngle >= 359.99) {
+                                fEndAngle = fStartAngle + 359.99;
+                            }
+
+                            var iPercent =
+                                oItem.percentOfTotal !== undefined
+                                    ? oItem.percentOfTotal
+                                    : Math.round(
+                                        (oItem.count / iTotal) * 100
+                                    );
+
+                            return (
+                                "<path class='pieSlice' " +
+                                "d='" +
+                                this._donutSlicePath(
+                                    iCenter,
+                                    iCenter,
+                                    iOuterR,
+                                    iInnerR,
+                                    fStartAngle,
+                                    fEndAngle
+                                ) +
+                                "' " +
+                                "fill='" + oItem.color + "' " +
+                                "data-status='" + this._escapeHtml(oItem.status) + "' " +
+                                "data-count='" + oItem.count + "' " +
+                                "data-percent='" + iPercent + "' " +
+                                "data-color='" + oItem.color + "'>" +
+                                "<title>" +
+                                this._escapeHtml(oItem.status) +
+                                " — " + oItem.count +
+                                "</title>" +
+                                "</path>"
+                            );
+
+                        }.bind(this)
+                    )
+                    .join("");
+
+
+                return (
+                    "<div class='pieChart'>" +
+
+                    "<svg viewBox='0 0 " + iSize + " " + iSize + "' " +
+                    "width='" + iSize + "' height='" + iSize + "' " +
+                    "class='pieChartSvg'>" +
+
+                    sPaths +
+
+                    "</svg>" +
+
+                    "<div class='pieCenterLabel'>" +
+                    "<span class='pieCenterValue'>" +
+                    iTotal +
+                    "</span>" +
+                    "<span class='pieCenterCaption'>Total Claims</span>" +
+                    "</div>" +
+
+                    "</div>"
+                );
+            },
+
+
+            /* =========================================================
+             * DONUT SLICE PATH (geometry helper)
+             *
+             * Builds an SVG path for one ring segment between
+             * fStartAngle/fEndAngle (degrees, clockwise from the top).
+             * ========================================================= */
+
+            _donutSlicePath: function (
+                iCx,
+                iCy,
+                iOuterR,
+                iInnerR,
+                fStartAngle,
+                fEndAngle
+            ) {
+
+                function polarToCartesian(fAngleDeg, fRadius) {
+
+                    var fRad =
+                        (fAngleDeg - 90) *
+                        (Math.PI / 180);
+
+                    return {
+                        x: iCx + fRadius * Math.cos(fRad),
+                        y: iCy + fRadius * Math.sin(fRad)
+                    };
+                }
+
+                var oOuterStart = polarToCartesian(fEndAngle, iOuterR);
+                var oOuterEnd = polarToCartesian(fStartAngle, iOuterR);
+                var oInnerStart = polarToCartesian(fEndAngle, iInnerR);
+                var oInnerEnd = polarToCartesian(fStartAngle, iInnerR);
+
+                var iLargeArc =
+                    (fEndAngle - fStartAngle) <= 180 ? 0 : 1;
+
+                return [
+                    "M", oOuterStart.x, oOuterStart.y,
+                    "A", iOuterR, iOuterR, 0, iLargeArc, 0, oOuterEnd.x, oOuterEnd.y,
+                    "L", oInnerEnd.x, oInnerEnd.y,
+                    "A", iInnerR, iInnerR, 0, iLargeArc, 1, oInnerStart.x, oInnerStart.y,
+                    "Z"
+                ].join(" ");
+            },
+
+
+            /* =========================================================
+             * STATUS LEGEND (view)
+             * ========================================================= */
+
+            formatStatusLegendHtml: function (
+                aItems
+            ) {
+
+                if (
+                    !aItems ||
+                    !aItems.length
+                ) {
+
+                    return (
+                        "<div class='legendEmpty'>No claims data</div>"
+                    );
+                }
+
+
+                return aItems.map(
+                    function (oItem) {
+
+                        var iPercent =
+                            oItem.percentOfTotal !== undefined
+                                ? oItem.percentOfTotal
+                                : "";
+
+                        return (
+                            "<div class='legendRow legendRowClickable' " +
+                            "data-status='" + this._escapeHtml(oItem.status) + "' " +
+                            "data-count='" + oItem.count + "' " +
+                            "data-percent='" + iPercent + "' " +
+                            "data-color='" + oItem.color + "'>" +
+
+                            "<span class='legendDot' style='background:" +
+                            oItem.color +
+                            ";'></span>" +
+
+                            "<span class='legendLabel'>" +
+                            this._escapeHtml(oItem.status) +
+                            "</span>" +
+
+                            "<span class='legendPercent'>" +
+                            oItem.count +
+                            "</span>" +
+
+                            "</div>"
+                        );
+
+                    }.bind(this)
+                )
+                .join("");
+            },
+
+
+            /* =========================================================
+             * STATUS SEGMENT CLICK -> POPOVER
+             *
+             * Fired for both a donut slice (<path class='pieSlice'>)
+             * and a legend row (.legendRowClickable) — both carry the
+             * same data-* attributes, so one handler covers both.
+             * ========================================================= */
+
+            _onStatusSegmentPress: function (
+                oEvent
+            ) {
+
+                var oTarget = oEvent.currentTarget;
+
+                if (!oTarget) {
+                    return;
+                }
+
+                var sStatus = oTarget.getAttribute("data-status") || "";
+                var sColor = oTarget.getAttribute("data-color") || "#8A969F";
+                var sCount = oTarget.getAttribute("data-count") || "0";
+                var sPercent = oTarget.getAttribute("data-percent") || "";
+
+                this._openStatusPopover(
+                    oTarget,
+                    sStatus,
+                    sColor,
+                    sCount,
+                    sPercent
+                );
+            },
+
+
+            /* =========================================================
+             * STATUS POPOVER
+             * ========================================================= */
+
+            _openStatusPopover: function (
+                oOpenByDomRef,
+                sStatus,
+                sColor,
+                sCount,
+                sPercent
+            ) {
+
+                if (!this._oStatusPopover) {
+
+                    this._oStatusPopover =
+                        new Popover({
+                            showHeader: false,
+                            placement: "Auto",
+                            contentWidth: "230px"
+                        });
+
+                    this.getView().addDependent(
+                        this._oStatusPopover
+                    );
+                }
+
+                this._oStatusPopover.destroyContent();
+
+                this._oStatusPopover.addContent(
+                    new HTML({
+                        content:
+                            this._buildStatusPopoverHtml(
+                                sStatus,
+                                sColor,
+                                sCount,
+                                sPercent
+                            )
+                    })
+                );
+
+                this._oStatusPopover.openBy(
+                    oOpenByDomRef
+                );
+            },
+
+
+            /* =========================================================
+             * STATUS POPOVER CONTENT
+             * ========================================================= */
+
+            _buildStatusPopoverHtml: function (
+                sStatus,
+                sColor,
+                sCount,
+                sPercent
+            ) {
+
+                var sPercentLine =
+                    sPercent !== ""
+                        ? "<div class='statusPopoverPercent'>" +
+                          sPercent +
+                          "% of total claims</div>"
+                        : "";
+
+                return (
+                    "<div class='statusPopoverContent'>" +
+
+                    "<div class='statusPopoverHeader'>" +
+                    "<span class='statusPopoverDot' style='background:" +
+                    sColor +
+                    ";'></span>" +
+                    "<span class='statusPopoverTitle'>" +
+                    this._escapeHtml(sStatus) +
+                    "</span>" +
+                    "</div>" +
+
+                    "<div class='statusPopoverCount'>" +
+                    sCount +
+                    " claim" + (sCount === "1" ? "" : "s") +
+                    "</div>" +
+
+                    sPercentLine +
+
+                    "</div>"
+                );
             },
 
 
@@ -941,245 +1300,82 @@ sap.ui.define([
              * POLICY SVG
              * ========================================================= */
 
-            formatPolicyTypeChartSvg: function (
-                aItems
-            ) {
-
-                if (
-                    !aItems ||
-                    !aItems.length
-                ) {
-
-                    return (
-                        "<div class='legendEmpty'>" +
-                        "No policy data" +
-                        "</div>"
-                    );
-                }
-
-
-                var iBarWidth = 30;
-                var iGap = 22;
-                var iChartHeight = 140;
-                var iTopPad = 28;
-                var iLabelHeight = 60;
-                var iSidePad = 40;
-
-
-                var iChartWidth =
-                    aItems.length *
-                    (
-                        iBarWidth +
-                        iGap
-                    ) +
-                    iGap;
-
-
-                var iWidth =
-                    iChartWidth +
-                    iSidePad;
-
-
-                var iHeight =
-                    iTopPad +
-                    iChartHeight +
-                    iLabelHeight;
-
-
-                var iMaxCount =
-                    Math.max.apply(
-                        null,
-                        aItems.map(
-                            function (oItem) {
-                                return oItem.count;
-                            }
-                        )
-                    ) || 1;
-
-
-                var iTickCount =
-                    Math.min(
-                        iMaxCount,
-                        4
-                    );
-
-
-                var sGrid = "";
-
-
-                for (
-                    var t = 0;
-                    t <= iTickCount;
-                    t++
-                ) {
-
-                    var fRatio =
-                        t /
-                        iTickCount;
-
-
-                    var iY =
-                        iTopPad +
-                        iChartHeight -
-                        Math.round(
-                            fRatio *
-                            iChartHeight
-                        );
-
-
-                    var iTickValue =
-                        Math.round(
-                            fRatio *
-                            iMaxCount
-                        );
-
-
-                    sGrid +=
-
-                        "<line x1='0' y1='" +
-                        iY +
-                        "' x2='" +
-                        iWidth +
-                        "' y2='" +
-                        iY +
-                        "' class='chartGridLine'></line>" +
-
-                        "<text x='2' y='" +
-                        (iY - 3) +
-                        "' class='chartGridLabel'>" +
-
-                        iTickValue +
-
-                        "</text>";
-                }
-
-
-                var sBars =
-                    aItems.map(
-                        function (
-                            oItem,
-                            i
-                        ) {
-
-                            var iBarHeight =
-                                Math.max(
-                                    8,
-                                    Math.round(
-                                        (
-                                            oItem.count /
-                                            iMaxCount
-                                        ) *
-                                        iChartHeight
-                                    )
-                                );
-
-
-                            var iX =
-                                iSidePad / 2 +
-                                iGap +
-                                i *
-                                (
-                                    iBarWidth +
-                                    iGap
-                                );
-
-
-                            var iY =
-                                iTopPad +
-                                iChartHeight -
-                                iBarHeight;
-
-
-                            var iLabelY =
-                                iTopPad +
-                                iChartHeight +
-                                18;
-
-
-                            var iCenterX =
-                                iX +
-                                iBarWidth / 2;
-
-
-                            var sLabel =
-                                oItem.type;
-
-
-                            return (
-
-                                "<rect x='" +
-                                iX +
-                                "' y='" +
-                                iY +
-                                "' width='" +
-                                iBarWidth +
-                                "' height='" +
-                                iBarHeight +
-                                "' fill='" +
-                                oItem.color +
-                                "' rx='5'>" +
-
-                                "<title>" +
-
-                                this._escapeHtml(
-                                    oItem.type
-                                ) +
-
-                                " — " +
-
-                                oItem.count +
-
-                                "</title></rect>" +
-
-
-                                "<text x='" +
-                                iCenterX +
-                                "' y='" +
-                                (iY - 9) +
-                                "' text-anchor='middle' class='chartBarValue'>" +
-
-                                oItem.count +
-
-                                "</text>" +
-
-
-                                "<text x='" +
-                                iCenterX +
-                                "' y='" +
-                                iLabelY +
-                                "' text-anchor='end' class='chartBarLabel' " +
-
-                                "transform='rotate(-40 " +
-                                iCenterX +
-                                " " +
-                                iLabelY +
-                                ")'>" +
-
-                                this._escapeHtml(
-                                    sLabel
-                                ) +
-
-                                "</text>"
-                            );
-
-                        }.bind(this)
-                    )
-                    .join("");
-
-
-                return (
-                    "<svg viewBox='0 0 " +
-                    iWidth +
-                    " " +
-                    iHeight +
-                    "' class='policyChartSvg' preserveAspectRatio='none'>" +
-
-                    sGrid +
-                    sBars +
-
-                    "</svg>"
-                );
-            },
+         formatPolicyTrendChartSvg: function (aItems) {
+
+    if (!aItems || !aItems.length) {
+        return "<div class='legendEmpty'>No policy data</div>";
+    }
+
+    var iWidth = 560;
+    var iHeight = 200;
+    var iTopPad = 20;
+    var iBottomPad = 34;
+    var iSidePad = 30;
+    var iChartHeight = iHeight - iTopPad - iBottomPad;
+    var iChartWidth = iWidth - iSidePad * 2;
+
+    var iMaxCount = Math.max.apply(
+        null,
+        aItems.map(function (o) { return o.count; })
+    ) || 1;
+
+    var iStepX = iChartWidth / (aItems.length - 1 || 1);
+
+    var iTickCount = Math.min(iMaxCount, 4);
+    var sGrid = "";
+
+    for (var t = 0; t <= iTickCount; t++) {
+
+        var fRatio = t / iTickCount;
+        var iY = iTopPad + iChartHeight - Math.round(fRatio * iChartHeight);
+        var iTickValue = Math.round(fRatio * iMaxCount);
+
+        sGrid +=
+            "<line x1='" + iSidePad + "' y1='" + iY + "' x2='" +
+            (iWidth - iSidePad) + "' y2='" + iY +
+            "' class='chartGridLine'></line>" +
+
+            "<text x='2' y='" + (iY + 3) + "' class='chartGridLabel'>" +
+            iTickValue + "</text>";
+    }
+
+    var aPoints = aItems.map(function (oItem, i) {
+        var x = iSidePad + i * iStepX;
+        var y = iTopPad + iChartHeight - Math.round((oItem.count / iMaxCount) * iChartHeight);
+        return { x: x, y: y, item: oItem };
+    });
+
+    var sLinePath = aPoints.map(function (p, i) {
+        return (i === 0 ? "M" : "L") + p.x + " " + p.y;
+    }).join(" ");
+
+    var sCircles = aPoints.map(function (p) {
+    return (
+        "<circle cx='" + p.x + "' cy='" + p.y + "' r='4' class='chartLinePoint' " +
+        "data-month='" + this._escapeHtml(p.item.month) + "' " +
+        "data-count='" + p.item.count + "'>" +
+        "</circle>"
+    );
+}.bind(this)).join("");
+
+    var sLabels = aPoints.map(function (p) {
+        return (
+            "<text x='" + p.x + "' y='" + (iHeight - 10) +
+            "' text-anchor='middle' class='chartBarLabel'>" +
+            this._escapeHtml(p.item.month) + "</text>"
+        );
+    }.bind(this)).join("");
+
+    return (
+        "<svg viewBox='0 0 " + iWidth + " " + iHeight +
+        "' class='policyChartSvg' preserveAspectRatio='none'>" +
+        sGrid +
+        "<path d='" + sLinePath + "' class='chartLinePath'></path>" +
+        sCircles +
+        sLabels +
+        "</svg>"
+    );
+},
 
 
             /* =========================================================
@@ -1394,162 +1590,102 @@ sap.ui.define([
              * POLICY TYPE CHART
              * ========================================================= */
 
-            _loadPolicyTypeChart: function (
-                oModel,
-                oAdminModel
-            ) {
+_loadPolicyTrendChart: function (oModel) {
 
-                if (!oModel) {
-                    return;
-                }
+    if (!oModel) {
+        return;
+    }
 
+    var oBinding =
+        oModel.bindList(
+            "/Policies",
+            undefined,
+            undefined,
+            undefined,
+            {
+                $select: "ID,startDate"   // <-- changed
+            }
+        );
 
-                this._loadLookupMap(
-                    oAdminModel,
-                    "/ClaimTypes",
-                    "name"
-                )
-                .then(
-                    function (mClaimTypes) {
+    oBinding
+        .requestContexts(0, 1000)
+        .then(function (aContexts) {
 
-                        var oBinding =
-                            oModel.bindList(
-                                "/Policies",
-                                undefined,
-                                undefined,
-                                undefined,
-                                {
-                                    $select:
-                                        "ID,claimType_ID"
-                                }
-                            );
+            var aPolicies =
+                aContexts.map(function (oCtx) {
+                    return oCtx.getObject();
+                });
 
+            this._aAllPolicies = aPolicies;
 
-                        return oBinding
-                            .requestContexts(
-                                0,
-                                500
-                            )
-                            .then(
-                                function (aContexts) {
+            var aYears =
+                Array.from(
+                    new Set(
+                        aPolicies
+                            .filter(function (p) { return p.startDate; })   // <-- changed
+                            .map(function (p) {
+                                return new Date(p.startDate).getFullYear();  // <-- changed
+                            })
+                    )
+                ).sort(function (a, b) { return b - a; });
 
-                                    var aPolicies =
-                                        aContexts.map(
-                                            function (oCtx) {
+            if (!aYears.length) {
+                aYears = [new Date().getFullYear()];
+            }
 
-                                                var oData =
-                                                    oCtx.getObject();
+            var oYearsModel = this.getView().getModel("yearsModel");
 
-                                                return {
+            oYearsModel.setProperty(
+                "/years",
+                aYears.map(function (y) {
+                    return { key: String(y), text: String(y) };
+                })
+            );
 
-                                                    type:
-                                                        mClaimTypes[
-                                                            oData.claimType_ID
-                                                        ] ||
+            oYearsModel.setProperty("/selectedYear", String(aYears[0]));
 
-                                                        oData.claimType_ID ||
+            this._buildPolicyTrendChart(aPolicies, aYears[0]);
 
-                                                        "Unknown"
-                                                };
-                                            }
-                                        );
-
-
-                                    this._buildPolicyTypeChart(
-                                        aPolicies
-                                    );
-
-                                }.bind(this)
-                            );
-                    }.bind(this)
-                )
-                .catch(
-                    function (oErr) {
-
-                        console.error(
-                            "[Dashboard] Policy type chart failed",
-                            oErr
-                        );
-                    }
-                );
-            },
-
+        }.bind(this))
+        .catch(function (oErr) {
+            console.error("[Dashboard] Policy trend chart failed", oErr);
+        });
+},
 
             /* =========================================================
              * BUILD POLICY TYPE CHART
              * ========================================================= */
 
-            _buildPolicyTypeChart: function (
-                aPolicies
-            ) {
+_buildPolicyTrendChart: function (aPolicies, iYear) {
 
-                var mCounts = {};
+    var aMonthNames = [
+        "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    ];
 
+    var aCounts = new Array(12).fill(0);
 
-                aPolicies.forEach(
-                    function (oPolicy) {
+    aPolicies.forEach(function (oPolicy) {
 
-                        var sKey =
-                            oPolicy.type ||
-                            "Unknown";
+        if (!oPolicy.startDate) {          // <-- changed
+            return;
+        }
 
+        var oDate = new Date(oPolicy.startDate);   // <-- changed
 
-                        mCounts[sKey] =
-                            (
-                                mCounts[sKey] ||
-                                0
-                            ) + 1;
-                    }
-                );
+        if (oDate.getFullYear() === iYear) {
+            aCounts[oDate.getMonth()] += 1;
+        }
+    });
 
+    var aItems = aMonthNames.map(function (sName, i) {
+        return { month: sName, count: aCounts[i] };
+    });
 
-                var aItems =
-                    Object.keys(
-                        mCounts
-                    )
-                    .map(
-                        function (
-                            sType,
-                            iIndex
-                        ) {
-
-                            return {
-
-                                type:
-                                    sType,
-
-                                count:
-                                    mCounts[sType],
-
-                                color:
-                                    FALLBACK_PALETTE[
-                                        iIndex %
-                                        FALLBACK_PALETTE.length
-                                    ]
-                            };
-                        }
-                    )
-                    .sort(
-                        function (a, b) {
-
-                            return (
-                                b.count -
-                                a.count
-                            );
-                        }
-                    );
-
-
-                this.getView()
-                    .getModel(
-                        "policyTypeChart"
-                    )
-                    .setData({
-                        items: aItems
-                    });
-            },
-
-
+    this.getView()
+        .getModel("policyTrendChart")
+        .setData({ items: aItems });
+},
             /* =========================================================
              * CLAIM PRESS
              * ========================================================= */
@@ -1656,7 +1792,7 @@ sap.ui.define([
                         "claims",
                         {
                             "?query": {
-                                status: "Pending"
+                               status: "PendingApproval,UnderReview"
                             }
                         }
                     );

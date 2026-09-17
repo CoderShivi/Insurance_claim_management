@@ -49,6 +49,7 @@
 
             <SideNavigation
                 id="sideNav"
+                class="claimsureSideNav"
                 selectedKey="{app>/selectedKey}"
                 itemSelect="onNavItemSelect">
 

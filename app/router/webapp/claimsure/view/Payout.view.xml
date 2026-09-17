@@ -5,341 +5,97 @@
     xmlns:core="sap.ui.core">
 
     <Page
-        title="Settlement Ledger"
+        title=""
         showNavButton="false"
-        class="csPage ledgerPage">
+        showHeader="false"
+        class="csPage regPage">
 
         <content>
 
-            <VBox class="ledgerRoot sapUiMediumMargin">
+            <VBox class="regPageRoot">
 
-                <!-- ================= HEADER ================= -->
+                <!-- ================= BREADCRUMB + TITLE + BUTTON ================= -->
 
-                <HBox
-                    justifyContent="SpaceBetween"
-                    alignItems="End"
-                    class="ledgerHeader">
+                <Text text="Home / Payout" class="regBreadcrumb"/>
 
+                <HBox justifyContent="SpaceBetween" alignItems="Center" class="regTitleRow">
                     <VBox>
-
-                        <Text
-                            text="SETTLEMENT LEDGER"
-                            class="ledgerEyebrow"/>
-
-                        <Title
-                            text="Payout Register"
-                            level="H1"
-                            class="ledgerTitle"/>
-
-                        <Text
-                            text="Monitor claim settlements, payment health and exceptions"
-                            class="ledgerSubtitle"/>
-
+                        <Title text="Payout" level="H1" class="regTitle"/>
+                        <Text text="Monitor claim settlements, track payments and manage exceptions" class="regSubtitle"/>
                     </VBox>
-
-                    <Button
-                        text="Refresh Ledger"
-                        icon="sap-icon://refresh"
-                        type="Transparent"
-                        press="onRefresh"
-                        class="ledgerRefreshBtn"/>
-
+                    <Button text="+ Process Payout" type="Emphasized" press="onRefresh" class="regProcessBtn"/>
                 </HBox>
 
+                <!-- ================= STATUS + HEALTH ROW (BELOW BUTTON) ================= -->
 
-                <!-- ================= KPI STRIP ================= -->
+                <HBox class="statusHealthRow sapUiSmallMarginTop" wrap="Wrap">
 
-                <HBox
-                    class="kpiStrip sapUiMediumMarginTop"
-                    wrap="Wrap">
+                    <!-- PAYOUT STATUS DONUT -->
 
-                    <VBox class="kpiCell kpiCellPrimary">
+                    <VBox class="regSideCard statusHealthCard">
 
-                        <Text
-                            text="TOTAL VALUE"
-                            class="kpiTag"/>
+                        <Title text="Payout Status" level="H4" class="regSideTitle"/>
 
-                        <Title
-                            text="{path:'payout>/summary/totalAmount', formatter:'.formatAmount'}"
-                            level="H2"
-                            class="kpiFigure kpiFigurePrimary"/>
+                        <HBox alignItems="Center" class="sapUiSmallMarginTop">
 
-                        <Text
-                            text="{payout>/summary/totalCount} settlements"
-                            class="kpiFoot"/>
+                            <VBox class="donutOuter" alignItems="Center" justifyContent="Center" tooltip="{path: 'payout>/summary', formatter: '.formatDonutTooltip'}">
+    <VBox class="donutInner" alignItems="Center" justifyContent="Center">
+        <Title text="{payout>/summary/totalCount}" level="H2" class="donutNumber"/>
+        <Text text="Payouts" class="donutLabel"/>
+    </VBox>
+</VBox>
 
-                    </VBox>
+                            <VBox class="donutLegend sapUiMediumMarginBegin">
 
+                                <HBox justifyContent="SpaceBetween" alignItems="Center" class="legendLine"  tooltip="{path:'payout>/summary/processedAmount', formatter:'.formatAmount'}">
+                                    <HBox alignItems="Center"><VBox class="legendDot legendDotGreen"/><Text text="Completed" class="legendText sapUiTinyMarginBegin"/></HBox>
+                                    <Text text="{payout>/summary/processed} ({payout>/summary/processedPct}%)" class="legendValue"/>
+                                </HBox>
 
-                    <VBox class="kpiDivider"/>
+                                <HBox justifyContent="SpaceBetween" alignItems="Center" class="legendLine"  tooltip="{path:'payout>/summary/processedAmount', formatter:'.formatAmount'}">
+                                    <HBox alignItems="Center"><VBox class="legendDot legendDotAmber"/><Text text="Pending" class="legendText sapUiTinyMarginBegin"/></HBox>
+                                    <Text text="{payout>/summary/pending} ({payout>/summary/pendingPct}%)" class="legendValue"/>
+                                </HBox>
 
+                                <HBox justifyContent="SpaceBetween" alignItems="Center" class="legendLine"  tooltip="{path:'payout>/summary/processedAmount', formatter:'.formatAmount'}">
+                                    <HBox alignItems="Center"><VBox class="legendDot legendDotBlue"/><Text text="Processing" class="legendText sapUiTinyMarginBegin"/></HBox>
+                                    <Text text="{payout>/summary/processing} ({payout>/summary/processingPct}%)" class="legendValue"/>
+                                </HBox>
 
-                    <VBox class="kpiCell">
-
-                        <Text
-                            text="PENDING"
-                            class="kpiTag"/>
-
-                        <Title
-                            text="{payout>/summary/pending}"
-                            level="H2"
-                            class="kpiFigure kpiFigureAmber"/>
-
-                        <Text
-                            text="Awaiting processing"
-                            class="kpiFoot"/>
-
-                    </VBox>
-
-
-                    <VBox class="kpiDivider"/>
-
-
-                    <VBox class="kpiCell">
-
-                        <Text
-                            text="PROCESSING"
-                            class="kpiTag"/>
-
-                        <Title
-                            text="{payout>/summary/processing}"
-                            level="H2"
-                            class="kpiFigure kpiFigureBlue"/>
-
-                        <Text
-                            text="Currently in motion"
-                            class="kpiFoot"/>
-
-                    </VBox>
-
-
-                    <VBox class="kpiDivider"/>
-
-
-                    <VBox class="kpiCell">
-
-                        <Text
-                            text="FAILED"
-                            class="kpiTag"/>
-
-                        <Title
-                            text="{payout>/summary/failed}"
-                            level="H2"
-                            class="kpiFigure kpiFigureRed"/>
-
-                        <Text
-                            text="Requires attention"
-                            class="kpiFoot"/>
-
-                    </VBox>
-
-                </HBox>
-
-
-                <!-- ================= HEALTH + LIFECYCLE ================= -->
-
-                <HBox
-                    class="ledgerAnalyticsRow sapUiMediumMarginTop"
-                    wrap="Wrap">
-
-
-                    <!-- ================= HEALTH ================= -->
-
-                    <VBox class="panel healthPanel">
-
-                        <HBox
-                            justifyContent="SpaceBetween"
-                            alignItems="Center">
-
-                            <VBox>
-
-                                <Title
-                                    text="Settlement Health"
-                                    level="H3"
-                                    class="panelTitle"/>
-
-                                <Text
-                                    text="Overall payment processing performance"
-                                    class="panelSubtitle"/>
+                                <HBox justifyContent="SpaceBetween" alignItems="Center" class="legendLine"  tooltip="{path:'payout>/summary/processedAmount', formatter:'.formatAmount'}">
+                                    <HBox alignItems="Center"><VBox class="legendDot legendDotRed"/><Text text="Failed" class="legendText sapUiTinyMarginBegin"/></HBox>
+                                    <Text text="{payout>/summary/failed} ({payout>/summary/failedPct}%)" class="legendValue"/>
+                                </HBox>
 
                             </VBox>
 
-                            <Title
-                                text="{payout>/health/percentageText}"
-                                level="H1"
-                                class="healthBigNumber"/>
-
                         </HBox>
 
+                    </VBox>
+
+
+                    <!-- SETTLEMENT HEALTH -->
+
+                    <VBox class="regSideCard statusHealthCard">
+
+                        <Title text="Settlement Health" level="H4" class="regSideTitle"/>
+
+                        <HBox justifyContent="SpaceBetween" alignItems="Center" class="sapUiTinyMarginTop">
+                            <Title text="{payout>/health/percentageText}" level="H1" class="healthBigPct"/>
+                            <Text text="{payout>/health/text}" class="healthStateTag"/>
+                        </HBox>
+
+                        <Text text="{payout>/health/detail}" class="regFieldLabel sapUiTinyMarginTop"/>
 
                         <ProgressIndicator
                             percentValue="{payout>/health/percentage}"
                             displayValue=""
                             state="{payout>/health/state}"
-                            class="ledgerHealthBar sapUiMediumMarginTop"/>
+                            class="regHealthBar sapUiSmallMarginTop"/>
 
-
-                        <HBox
-                            justifyContent="SpaceBetween"
-                            class="sapUiTinyMarginTop">
-
-                            <Text
-                                text="{payout>/health/text}"
-                                class="healthStatusTag"/>
-
-                            <Text
-                                text="{payout>/health/detail}"
-                                class="panelSubtitle"/>
-
-                        </HBox>
-
-                    </VBox>
-
-
-                    <!-- ================= LIFECYCLE ================= -->
-
-                    <VBox class="panel lifecyclePanel">
-
-                        <Title
-                            text="Settlement Lifecycle"
-                            level="H3"
-                            class="panelTitle"/>
-
-                        <Text
-                            text="Click a stage to view its settlements"
-                            class="panelSubtitle"/>
-
-
-                        <HBox
-                            alignItems="Start"
-                            class="timelineTrack sapUiLargeMarginTop">
-
-
-                            <!-- ================= PENDING ================= -->
-
-                            <VBox
-                                alignItems="Center"
-                                class="timelineNode">
-
-                                <!-- CLICKABLE DOT -->
-
-                                <Button
-                                    icon="sap-icon://pending"
-                                    type="Transparent"
-                                    tooltip="View Pending settlements"
-                                    press="onLifecycleStatusPress"
-                                    class="timelineDot timelineDotAmber lifecycleButton">
-
-                                    <customData>
-
-                                        <core:CustomData
-                                            key="status"
-                                            value="Pending"/>
-
-                                    </customData>
-
-                                </Button>
-
-
-                                <Title
-                                    text="{payout>/summary/pending}"
-                                    level="H3"
-                                    class="timelineFigure"/>
-
-                                <Text
-                                    text="Pending"
-                                    class="timelineLabel"/>
-
-                            </VBox>
-
-
-                            <!-- ================= LINE ================= -->
-
-                            <VBox
-                                class="timelineLine"/>
-
-
-                            <!-- ================= PROCESSING ================= -->
-
-                            <VBox
-                                alignItems="Center"
-                                class="timelineNode">
-
-                                <!-- CLICKABLE DOT -->
-
-                                <Button
-                                    icon="sap-icon://synchronize"
-                                    type="Transparent"
-                                    tooltip="View Processing settlements"
-                                    press="onLifecycleStatusPress"
-                                    class="timelineDot timelineDotBlue lifecycleButton">
-
-                                    <customData>
-
-                                        <core:CustomData
-                                            key="status"
-                                            value="Processing"/>
-
-                                    </customData>
-
-                                </Button>
-
-
-                                <Title
-                                    text="{payout>/summary/processing}"
-                                    level="H3"
-                                    class="timelineFigure"/>
-
-                                <Text
-                                    text="Processing"
-                                    class="timelineLabel"/>
-
-                            </VBox>
-
-
-                            <!-- ================= LINE ================= -->
-
-                            <VBox
-                                class="timelineLine"/>
-
-
-                            <!-- ================= PROCESSED ================= -->
-
-                            <VBox
-                                alignItems="Center"
-                                class="timelineNode">
-
-                                <!-- CLICKABLE DOT -->
-
-                                <Button
-                                    icon="sap-icon://complete"
-                                    type="Transparent"
-                                    tooltip="View Processed settlements"
-                                    press="onLifecycleStatusPress"
-                                    class="timelineDot timelineDotGreen lifecycleButton">
-
-                                    <customData>
-
-                                        <core:CustomData
-                                            key="status"
-                                            value="Processed"/>
-
-                                    </customData>
-
-                                </Button>
-
-
-                                <Title
-                                    text="{payout>/summary/processed}"
-                                    level="H3"
-                                    class="timelineFigure"/>
-
-                                <Text
-                                    text="Processed"
-                                    class="timelineLabel"/>
-
-                            </VBox>
-
+                        <HBox class="healthWarnBanner sapUiSmallMarginTop" alignItems="Center">
+                            <core:Icon src="sap-icon://alert" class="healthWarnIcon"/>
+                            <Text text="{payout>/health/detail}" class="healthWarnText sapUiTinyMarginBegin"/>
                         </HBox>
 
                     </VBox>
@@ -347,273 +103,210 @@
                 </HBox>
 
 
-                <!-- ================= QUICK METRICS ================= -->
+                <!-- ================= MAIN + SIDEBAR ================= -->
 
-                <HBox
-                    class="metricStrip sapUiMediumMarginTop"
-                    wrap="Wrap">
+                <HBox class="regRoot sapUiMediumMarginTop" alignItems="Start" wrap="Wrap">
 
-                    <VBox class="metricCell">
+                    <!-- ================= MAIN COLUMN ================= -->
 
-                        <Text
-                            text="Average Payout"
-                            class="metricTag"/>
+                    <VBox class="regMain">
 
-                        <Title
-                            text="{path:'payout>/summary/averageAmount', formatter:'.formatAmount'}"
-                            level="H3"
-                            class="metricFigure"/>
+                        <!-- KPI ROW -->
 
-                    </VBox>
+                        <HBox class="regKpiRow" wrap="NoWrap">
 
+                            <HBox class="regKpiCard" alignItems="Center">
+                                <core:Icon src="sap-icon://money-bills" class="regKpiIcon regKpiIconBlue"/>
+                                <VBox class="regKpiTextBox sapUiTinyMarginBegin">
+                                    <Text text="Total Payout Value" class="regKpiLabel"/>
+                                    <Title text="{path:'payout>/summary/totalAmount', formatter:'.formatAmount'}" level="H3" class="regKpiValue"/>
+                                    <Text text="{payout>/summary/totalCount} payouts" class="regKpiFoot"/>
+                                </VBox>
+                            </HBox>
 
-                    <VBox class="metricCell">
+                            <HBox class="regKpiCard" alignItems="Center">
+                                <core:Icon src="sap-icon://pending" class="regKpiIcon regKpiIconAmber"/>
+                                <VBox class="regKpiTextBox sapUiTinyMarginBegin">
+                                    <Text text="Pending" class="regKpiLabel"/>
+                                    <Title text="{payout>/summary/pending}" level="H3" class="regKpiValue"/>
+                                    <Text text="{path:'payout>/summary/pendingAmount', formatter:'.formatAmount'}" class="regKpiFoot"/>
+                                </VBox>
+                            </HBox>
 
-                        <Text
-                            text="Highest Payout"
-                            class="metricTag"/>
+                            <HBox class="regKpiCard" alignItems="Center">
+                                <core:Icon src="sap-icon://synchronize" class="regKpiIcon regKpiIconBlue2"/>
+                                <VBox class="regKpiTextBox sapUiTinyMarginBegin">
+                                    <Text text="Processing" class="regKpiLabel"/>
+                                    <Title text="{payout>/summary/processing}" level="H3" class="regKpiValue"/>
+                                    <Text text="{path:'payout>/summary/processingAmount', formatter:'.formatAmount'}" class="regKpiFoot"/>
+                                </VBox>
+                            </HBox>
 
-                        <Title
-                            text="{path:'payout>/summary/highestAmount', formatter:'.formatAmount'}"
-                            level="H3"
-                            class="metricFigure"/>
+                            <HBox class="regKpiCard" alignItems="Center">
+                                <core:Icon src="sap-icon://error" class="regKpiIcon regKpiIconRed"/>
+                                <VBox class="regKpiTextBox sapUiTinyMarginBegin">
+                                    <Text text="Failed" class="regKpiLabel"/>
+                                    <Title text="{payout>/summary/failed}" level="H3" class="regKpiValue"/>
+                                    <Text text="{path:'payout>/summary/failedAmount', formatter:'.formatAmount'}" class="regKpiFoot"/>
+                                </VBox>
+                            </HBox>
 
-                    </VBox>
+                            <HBox class="regKpiCard" alignItems="Center">
+                                <core:Icon src="sap-icon://complete" class="regKpiIcon regKpiIconGreen"/>
+                                <VBox class="regKpiTextBox sapUiTinyMarginBegin">
+                                    <Text text="Completed" class="regKpiLabel"/>
+                                    <Title text="{payout>/summary/processed}" level="H3" class="regKpiValue"/>
+                                    <Text text="{path:'payout>/summary/processedAmount', formatter:'.formatAmount'}" class="regKpiFoot"/>
+                                </VBox>
+                            </HBox>
 
+                        </HBox>
 
-                    <VBox class="metricCell">
+                        <!-- TABLE PANEL -->
 
-                        <Text
-                            text="Processed Value"
-                            class="metricTag"/>
+                        <VBox class="regTablePanel sapUiMediumMarginTop">
 
-                        <Title
-                            text="{path:'payout>/summary/processedAmount', formatter:'.formatAmount'}"
-                            level="H3"
-                            class="metricFigure metricFigureGreen"/>
+                            <HBox justifyContent="SpaceBetween" alignItems="Center">
+                                <Title text="Payouts ({payout>/summary/totalCount})" level="H3" class="regPanelTitle"/>
+                            </HBox>
 
-                    </VBox>
+                            <HBox alignItems="Center" wrap="Wrap" class="regFilterBar sapUiSmallMarginTop">
 
+                                <SearchField width="320px" placeholder="Search by payout no., claim no., customer..." liveChange="onSearch" class="regSearch"/>
 
-                    <VBox class="metricCell">
+                                <Button text="Filters" icon="sap-icon://filter" type="Transparent" class="sapUiSmallMarginBegin"/>
 
-                        <Text
-                            text="Failed Value"
-                            class="metricTag"/>
+                                <Button text="Export" icon="sap-icon://export" type="Transparent" press="onExportPayouts" class="sapUiSmallMarginBegin"/>
 
-                        <Title
-                            text="{path:'payout>/summary/failedAmount', formatter:'.formatAmount'}"
-                            level="H3"
-                            class="metricFigure metricFigureRed"/>
+                            </HBox>
 
-                    </VBox>
+                            <Table
+                                id="settlementTable"
+                                items="{payout>/filteredTransactions}"
+                                width="100%"
+                                fixedLayout="Strict"
+                                growing="true"
+                                growingScrollToLoad="true"
+                                class="settlementTable">
 
-                </HBox>
+                                <columns >
+                                    <Column width="9rem"><Text text="Payout No." class="regHead"/></Column>
+                                    <Column width="9rem"><Text text="Claim No." class="regHead"/></Column>
+                                    <Column width="9rem"><Text text="Customer" class="regHead"/></Column>
+                                    <Column width="9rem"><Text text="Claim Type" class="regHead"/></Column>
+                                    <Column width="9rem"><Text text="Payout Amount" class="regHead"/></Column>
+                                    <Column width="9rem"><Text text="Payment Method" class="regHead"/></Column>
+                                    <Column width="9rem"><Text text="Status" class="regHead"/></Column>
+                                    <Column><Text text="Payout Date" class="regHead"/></Column>
+                                    <Column hAlign="Center" width="6rem"><Text text="Actions" class="regHead"/></Column>
+                                </columns>
 
+                                <items>
+                                    <ColumnListItem>
+                                        <cells>
 
-                <!-- ================= RECENT SETTLEMENTS ================= -->
+                                            <Text text="{payout>payoutNumber}" class="regPayoutNo"/>
 
-                <VBox
-                    class="panel statementPanel sapUiMediumMarginTop">
+                                            <Text text="{payout>claimNumberDisplay}" class="regMuted"/>
 
-                    <HBox
-                        justifyContent="SpaceBetween"
-                        alignItems="Center">
+                                            <Text text="{payout>claimDisplay}" class="regCustomer"/>
 
-                        <VBox>
+                                            <Text text="{payout>claimTypeDisplay}" class="regMuted"/>
 
-                            <Title
-                                text="Recent Settlements"
-                                level="H3"
-                                class="panelTitle"/>
+                                            <Text text="{path:'payout>amount', formatter:'.formatAmount'}" class="regAmount"/>
 
-                            <Text
-                                text="Review and manage recent payout transactions"
-                                class="panelSubtitle"/>
+                                            <Text text="{payout>paymentMethodDisplay}" class="regMuted"/>
+
+                                            <ObjectStatus
+                                                text="{payout>status}"
+                                                state="{path:'payout>status', formatter:'.formatStatusState'}"
+                                                class="regStatusPill"/>
+
+                                            <Text text="{payout>payoutDateDisplay}" class="regMuted"/>
+
+                                            <HBox justifyContent="Center">
+                                                <Button icon="sap-icon://display" type="Transparent" press="onViewPayout"/>
+                                            </HBox>
+
+                                        </cells>
+                                    </ColumnListItem>
+                                </items>
+
+                            </Table>
 
                         </VBox>
 
-
-                        <Button
-                            text="Refresh"
-                            icon="sap-icon://refresh"
-                            type="Transparent"
-                            press="onRefresh"/>
-
-                    </HBox>
-
-
-                    <!-- ================= FILTER BAR ================= -->
-
-                    <HBox
-                        alignItems="Center"
-                        wrap="Wrap"
-                        class="filterBar sapUiMediumMarginTop">
-
-                        <SearchField
-                            width="280px"
-                            placeholder="Search payout number..."
-                            liveChange="onSearch"/>
-
-
-                        <Select
-                            selectedKey="{payout>/filter/status}"
-                            change="onStatusFilter"
-                            class="sapUiSmallMarginBegin">
-
-                            <items>
-
-                                <core:Item
-                                    key="ALL"
-                                    text="All Statuses"/>
-
-                                <core:Item
-                                    key="Pending"
-                                    text="Pending"/>
-
-                                <core:Item
-                                    key="Processing"
-                                    text="Processing"/>
-
-                                <core:Item
-                                    key="Processed"
-                                    text="Processed"/>
-
-                                <core:Item
-                                    key="Failed"
-                                    text="Failed"/>
-
-                            </items>
-
-                        </Select>
-
-
-                        <Button
-                            text="Clear Filters"
-                            icon="sap-icon://clear-filter"
-                            type="Transparent"
-                            press="onClearFilters"
-                            class="sapUiSmallMarginBegin"/>
-
-                    </HBox>
-
-
-                    <!-- ================= SETTLEMENT TABLE ================= -->
-
-                    <Table
-                        items="{payout>/filteredTransactions}"
-                        growing="true"
-                        growingThreshold="10"
-                        noDataText="No payout transactions found."
-                        class="statementTable sapUiSmallMarginTop">
-
-                        <columns>
-
-                            <Column>
-
-                                <Text
-                                    text="Payout"
-                                    class="stmtHead"/>
-
-                            </Column>
-
-
-                            <Column hAlign="End">
-
-                                <Text
-                                    text="Amount"
-                                    class="stmtHead"/>
-
-                            </Column>
-
-
-                            <Column>
-
-                                <Text
-                                    text="Status"
-                                    class="stmtHead"/>
-
-                            </Column>
-
-
-                            <Column>
-
-                                <Text
-                                    text="Claim BY"
-                                    class="stmtHead"/>
-
-                            </Column>
-
-
-                            <Column>
-
-                                <Text
-                                    text="Processed By"
-                                    class="stmtHead"/>
-
-                            </Column>
-
-
-                            <Column
-                                hAlign="Center"
-                                width="8rem">
-
-                                <Text
-                                    text="Action"
-                                    class="stmtHead"/>
-
-                            </Column>
-
-                        </columns>
-
-
-                        <items>
-
-                            <ColumnListItem>
-
-                                <cells>
-
-                                    <Text
-                                        text="{payout>payoutNumber}"
-                                        class="stmtPayoutNumber"/>
-
-
-                                    <ObjectNumber
-                                        number="{payout>amount}"
-                                        unit="INR"
-                                        class="stmtAmount"/>
-
-
-                                    <ObjectStatus
-                                        text="{payout>status}"
-                                        state="{path:'payout>status', formatter:'.formatStatusState'}"/>
-
-
-                                    <Text
-                                        text="{payout>claimDisplay}"
-                                        class="stmtMuted"/>
-
-
-                                    <Text
-                                        text="{payout>processedByDisplay}"
-                                        class="stmtMuted"/>
-
-
-                                    <Button
-                                        text="View"
-                                        icon="sap-icon://display"
-                                        type="Transparent"
-                                        press="onViewPayout"/>
-
-                                </cells>
-
-                            </ColumnListItem>
-
-                        </items>
-
-                    </Table>
-
-                </VBox>
+                    </VBox>
+
+
+                    <!-- ================= RIGHT SIDEBAR (FILTERS ONLY) ================= -->
+
+                    <VBox class="regSidebar">
+
+                        <VBox class="regSideCard" width="10%">
+
+                            <HBox justifyContent="SpaceBetween" alignItems="Center">
+                                <Title text="Filters" level="H4" class="regSideTitle"/>
+                                <Button text="Reset" type="Transparent" press="onClearFilters" class="regResetBtn"/>
+                            </HBox>
+
+                            <Text text="Status" class="regFieldLabel sapUiMediumMarginTop"/>
+                            <Select selectedKey="{payout>/filter/status}" change="onStatusFilter" width="100%" class="regFieldInput">
+                                <items>
+                                    <core:Item key="ALL" text="All"/>
+                                    <core:Item key="Pending" text="Pending"/>
+                                    <core:Item key="Processing" text="Processing"/>
+                                    <core:Item key="Processed" text="Completed"/>
+                                    <core:Item key="Failed" text="Failed"/>
+                                </items>
+                            </Select>
+
+                            <Text text="Payment Method" class="regFieldLabel sapUiSmallMarginTop"/>
+                            <Select selectedKey="{payout>/filter/paymentMethod}" change="onPaymentMethodFilter" width="100%" class="regFieldInput">
+                                <items>
+                                    <core:Item key="ALL" text="All"/>
+                                    <core:Item key="BankTransfer" text="Bank Transfer"/>
+                                    <core:Item key="NEFT" text="NEFT"/>
+                                    <core:Item key="RTGS" text="RTGS"/>
+                                    <core:Item key="UPI" text="UPI"/>
+                                </items>
+                            </Select>
+
+                            <Text text="Payout Date" class="regFieldLabel sapUiSmallMarginTop"/>
+                            <DateRangeSelection
+                                id="payoutDateRange"
+                                width="100%"
+                                placeholder="Select date range"
+                                change="onPayoutDateFilter"
+                                class="regFieldInput"/>
+
+                            <Text text="Amount Range" class="regFieldLabel sapUiSmallMarginTop"/>
+                            <HBox class="regAmountRow">
+                                <Input id="amountMinInput" placeholder="Min" width="48%" type="Number" liveChange="onAmountRangeChange"/>
+                                <Text text="to" class="regToText"/>
+                                <Input id="amountMaxInput" placeholder="Max" width="48%" type="Number" liveChange="onAmountRangeChange"/>
+                            </HBox>
+
+                            <Text text="Customer" class="regFieldLabel sapUiSmallMarginTop"/>
+                            <SearchField liveChange="onSearch" placeholder="Search customer..." width="100%" class="regFieldInput"/>
+
+                            <Text text="Claim Type" class="regFieldLabel sapUiSmallMarginTop"/>
+                            <Select
+                                items="{payout>/claimTypes}"
+                                selectedKey="{payout>/filter/claimType}"
+                                change="onClaimTypeFilter"
+                                width="100%"
+                                class="regFieldInput">
+                                <core:Item key="{payout>key}" text="{payout>text}"/>
+                            </Select>
+
+                            <Button text="Apply Filters" type="Emphasized" width="100%" class="regApplyBtn sapUiMediumMarginTop" press="onStatusFilter"/>
+
+                        </VBox>
+
+                    </VBox>
+
+                </HBox>
 
             </VBox>
 
@@ -624,154 +317,42 @@
 
         <dependents>
 
-            <Dialog
-                id="payoutDetailsDialog"
-                title="Payout Details"
-                contentWidth="520px"
-                class="ledgerDialog">
+            <Dialog id="payoutDetailsDialog" title="Payout Details" contentWidth="480px" stretchOnPhone="true" class="regDialog">
 
                 <content>
 
-                    <VBox
-                        class="dialogContent sapUiMediumMargin">
+                    <VBox class="dialogPad">
 
-
-                        <!-- ================= PAYOUT HEADER ================= -->
-
-                        <HBox
-                            justifyContent="SpaceBetween"
-                            alignItems="Center">
-
+                        <HBox justifyContent="SpaceBetween" alignItems="Center">
                             <VBox>
-
-                                <Text
-                                    text="Payout Number"
-                                    class="dialogLabel"/>
-
-                                <Title
-                                    text="{payout>/selectedPayout/payoutNumber}"
-                                    level="H2"
-                                    class="dialogPayoutNumber"/>
-
+                                <Text text="Payout Number" class="regFieldLabel"/>
+                                <Title text="{payout>/selectedPayout/payoutNumber}" level="H2" class="regPayoutNo"/>
                             </VBox>
-
-
-                            <ObjectStatus
-                                text="{payout>/selectedPayout/status}"
-                                state="{payout>/selectedPayout/statusState}"/>
-
+                            <ObjectStatus text="{payout>/selectedPayout/status}" state="{payout>/selectedPayout/statusState}" class="regStatusPill"/>
                         </HBox>
 
-
-                        <!-- ================= AMOUNT + CLAIM ================= -->
-
-                        <HBox
-                            class="detailRow sapUiMediumMarginTop"
-                            justifyContent="SpaceBetween">
-
+                        <HBox class="sapUiMediumMarginTop" justifyContent="SpaceBetween">
                             <VBox>
-
-                                <Text
-                                    text="Amount"
-                                    class="dialogLabel"/>
-
-                                <Title
-                                    text="{path:'payout>/selectedPayout/amount', formatter:'.formatAmount'}"
-                                    level="H3"
-                                    class="dialogAmount"/>
-
+                                <Text text="Amount" class="regFieldLabel"/>
+                                <Title text="{path:'payout>/selectedPayout/amount', formatter:'.formatAmount'}" level="H3" class="regAmount"/>
                             </VBox>
-
-
                             <VBox>
-
-                                <Text
-                                    text="Claim"
-                                    class="dialogLabel"/>
-
-                                <Text
-                                    text="{payout>/selectedPayout/claimDisplay}"
-                                    class="dialogValue"/>
-
+                                <Text text="Customer" class="regFieldLabel"/>
+                                <Text text="{payout>/selectedPayout/claimDisplay}" class="regCustomer"/>
                             </VBox>
-
                         </HBox>
 
-
-                        <!-- ================= PROCESSED BY ================= -->
-
-                        <VBox
-                            class="detailSection sapUiMediumMarginTop">
-
-                            <Text
-                                text="Processed By"
-                                class="dialogLabel"/>
-
-                            <Text
-                                text="{payout>/selectedPayout/processedByDisplay}"
-                                class="dialogValue"/>
-
-                        </VBox>
-
-
-                        <!-- ================= STATUS TIMELINE ================= -->
-
-                        <VBox
-                            class="detailSection sapUiMediumMarginTop">
-
-                            <Title
-                                text="Settlement Status"
-                                level="H4"/>
-
-
-                            <VBox
-                                class="timeline sapUiSmallMarginTop">
-
-
-                                <HBox
-                                    alignItems="Center"
-                                    class="timelineRow">
-
-                                    <core:Icon
-                                        src="sap-icon://accept"
-                                        class="timelineIcon"/>
-
-                                    <Text
-                                        text="Payout Created"
-                                        class="timelineText"/>
-
-                                </HBox>
-
-
-                                <HBox
-                                    alignItems="Center"
-                                    class="timelineRow">
-
-                                    <core:Icon
-                                        src="sap-icon://process"
-                                        class="timelineIcon"/>
-
-                                    <Text
-                                        text="{payout>/selectedPayout/status}"
-                                        class="timelineText"/>
-
-                                </HBox>
-
-                            </VBox>
-
+                        <VBox class="sapUiMediumMarginTop">
+                            <Text text="Processed By" class="regFieldLabel"/>
+                            <Text text="{payout>/selectedPayout/processedByDisplay}" class="regCustomer"/>
                         </VBox>
 
                     </VBox>
 
                 </content>
 
-
                 <beginButton>
-
-                    <Button
-                        text="Close"
-                        press="onCloseDetails"/>
-
+                    <Button text="Close" press="onCloseDetails"/>
                 </beginButton>
 
             </Dialog>
