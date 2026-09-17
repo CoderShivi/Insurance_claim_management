@@ -31,6 +31,7 @@ service InsuranceService {
     action   rejectClaim(claimID: UUID)            returns Claims;
     action   rejectFraudClaim(claimID: UUID)       returns Claims;
 
+
     //job schedalr
     action   processPendingClaims()                returns ProcessPendingClaimsResult;
 
@@ -72,6 +73,7 @@ service PayoutService {
                           amount: Decimal(15, 2))  returns Payouts;
 
     action   processPayout(payoutID: UUID)         returns Payouts;
+    action   rejectPayout(payoutID: UUID)          returns Boolean;
 
 
     function calculateSLAStatus(claimID: UUID)     returns String;

@@ -1,5 +1,3 @@
-
-
 .csPage .sapMPageHeader {
     font-weight: 600;
 }
@@ -40,42 +38,33 @@ body {
 /* ==========================================================================
    Welcome Banner
    ========================================================================== */
-
+   
 .welcomeBanner {
-    box-sizing: border-box;
-    min-height: 122px;
+    min-height: 190px;
     padding: 1.45rem 1.65rem;
-    border: 1px solid #E5EDF7;
-    border-radius: 14px;
-    background:
-        radial-gradient(
-            circle at 80% 20%,
-            rgba(112, 166, 230, 0.14),
-            transparent 28%
-        ),
-        linear-gradient(
-            135deg,
-            #EAF2FB 0%,
-            #F5F8FC 100%
-        );
-    overflow: hidden;
-}
 
+    background: url("../img/welcome-banner1.png") center center / cover no-repeat !important;
+
+    border: 2px solid red;
+}
 .welcomeCopy {
     min-width: 280px;
 }
 
 .welcomeTitle {
     margin: 0;
-    color: #16283A;
+    color:#FFFFFF;
     font-size: 1.42rem;
     font-weight: 700;
+    text-shadow: 0 2px 4px rgba(0, 35, 45, 0.65);
 }
 
 .welcomeSubtitle {
-    margin-top: 0.3rem;
-    color: #5F6F7E;
-    font-size: 0.9rem;
+    margin-top: 0;
+    color:#FFFFFF;
+    font-weight: 500;
+    font-size: 1rem;
+    text-shadow: 0 2px 4px rgba(0, 35, 45, 0.75);
 }
 
 
@@ -203,6 +192,7 @@ body {
 .kpiRow {
     width: 100%;
     gap: 0.85rem;
+    
 }
 
 .navCard {
@@ -509,71 +499,88 @@ body {
 
 .chartSectionTitle {
     display: block;
-    margin-bottom: 0.65rem;
-    color: #4D5D6B;
-    font-size: 0.85rem;
+    margin-bottom: 0.9rem;
+    color: #243544;
+    font-size: 0.95rem;
     font-weight: 700;
 }
 
+
+/* ==========================================================================
+   Status Donut + Legend
+   (rendered via core:HTML from the same statusChart>/items model
+   that used to feed the VizFrame — data/binding unchanged)
+   ========================================================================== */
+
 .pieRow {
-    gap: 1.4rem;
+    gap: 1.6rem;
     align-items: center;
 }
 
 .pieChartWrap {
     flex-shrink: 0;
     padding: 0.35rem 0.2rem;
-    margin-left: 3rem;
-}
-
-.pieClickArea {
-    cursor: pointer;
+    margin-left: 1rem;
 }
 
 .pieChart {
     position: relative;
-    width: 220px;
-    height: 220px;
+    width: 210px;
+    height: 210px;
     border-radius: 50%;
     box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.65);
 }
 
-.pieChart::after {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    background: #FFFFFF;
-    transform: translate(-50%, -50%);
-}
-
 .emptyPie {
+    width: 210px;
+    height: 210px;
+    border-radius: 50%;
     background: #EDEDE8 !important;
 }
 
-.pieSelectedLabel {
-    min-height: 1.15rem;
-    margin-top: 0.45rem;
-    color: #354655;
-    font-size: 0.78rem;
-    font-weight: 600;
-    text-align: center;
+.pieChartSvg {
+    display: block;
 }
 
-.pieSliceLabel {
+.pieSlice {
+    cursor: pointer;
+    transition: opacity 0.12s ease, filter 0.12s ease;
+}
+
+.pieSlice:hover,
+.pieSlice:focus {
+    opacity: 0.86;
+    filter: brightness(1.04);
+    outline: none;
+}
+
+.pieCenterLabel {
     position: absolute;
+    top: 50%;
+    left: 50%;
     z-index: 2;
-    color: #FFFFFF;
-    font-size: 0.72rem;
-    font-weight: 700;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     text-align: center;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
     transform: translate(-50%, -50%);
     pointer-events: none;
-    white-space: nowrap;
+}
+
+.pieCenterValue {
+    display: block;
+    color: #172534;
+    font-size: 1.9rem;
+    line-height: 1.1;
+    font-weight: 700;
+}
+
+.pieCenterCaption {
+    display: block;
+    margin-top: 0.15rem;
+    color: #7B8791;
+    font-size: 0.78rem;
+    font-weight: 500;
 }
 
 .pieLegend {
@@ -584,9 +591,9 @@ body {
 .legendRow {
     display: flex;
     align-items: center;
-    gap: 0.55rem;
-    min-height: 28px;
-    padding: 0.18rem 0.4rem;
+    gap: 0.65rem;
+    min-height: 32px;
+    padding: 0.3rem 0.2rem;
     border-radius: 6px;
     transition: background 0.12s ease;
 }
@@ -595,15 +602,61 @@ body {
     cursor: pointer;
 }
 
-.legendRowClickable:hover {
+.legendRowClickable:hover,
+.legendRowClickable:focus {
     background: #F3F6F9;
+    outline: none;
+}
+
+
+/* ==========================================================================
+   Status Popover (opened from a donut slice or a legend row)
+   ========================================================================== */
+
+.statusPopoverContent {
+    padding: 0.9rem 1rem;
+    min-width: 190px;
+}
+
+.statusPopoverHeader {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.statusPopoverDot {
+    display: inline-block;
+    flex-shrink: 0;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+}
+
+.statusPopoverTitle {
+    color: #172534;
+    font-size: 0.92rem;
+    font-weight: 700;
+}
+
+.statusPopoverCount {
+    color: #243544;
+    font-size: 1.15rem;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+.statusPopoverPercent {
+    margin-top: 0.15rem;
+    color: #7B8791;
+    font-size: 0.8rem;
 }
 
 .legendDot {
     display: inline-block;
     flex-shrink: 0;
-    width: 9px;
-    height: 9px;
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
 }
 
@@ -611,17 +664,19 @@ body {
     flex: 1;
     min-width: 0;
     overflow: hidden;
-    color: #4A5662;
-    font-size: 0.8rem;
+    color: #37454F;
+    font-size: 0.88rem;
+    font-weight: 500;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
 .legendPercent {
     flex-shrink: 0;
-    width: 32px;
-    color: #71808D;
-    font-size: 0.78rem;
+    min-width: 24px;
+    color: #172534;
+    font-size: 0.9rem;
+    font-weight: 700;
     text-align: right;
 }
 
@@ -633,8 +688,8 @@ body {
 
 .chartFooterCaption {
     display: block;
-    margin-top: 0.55rem;
-    padding-top: 0.65rem;
+    margin-top: 0.9rem;
+    padding-top: 0.75rem;
     border-top: 1px solid #E9ECEF;
     color: #4D5D6B;
     font-size: 0.8rem;
@@ -1118,7 +1173,12 @@ body {
     .pieRow {
         gap: 1.4rem;
         align-items: center;
-        margin-top: 1.5rem;
+        margin-top: 1rem;
+        justify-content: center;
+    }
+
+    .pieChartWrap {
+        margin-left: 0;
     }
 
     .pieLegend {
@@ -1150,847 +1210,596 @@ body {
 }
 
 
+
 /* =========================================================
-   CLAIMSURE - SETTLEMENT LEDGER
-   Layout matched to Payout.view.xml
+   PAYOUT REGISTER — TWO-COLUMN OPERATIONS THEME (ROBUST)
    ========================================================= */
 
-/* ---------- PAGE ---------- */
+/* =========================================================
+   PAYOUT REGISTER — RESTRUCTURED LAYOUT (100% WIDTH SAFE)
+   ========================================================= */
 
-.csPage.ledgerPage {
-    background: #f5f7fa !important;
+.regPage {
+    background: #F5F6FA !important;
 }
 
-.ledgerPage .sapMPageScroll {
-    background: #f5f7fa !important;
+.regPage .sapMPageScroll,
+.regPage .sapMPageEnableScrolling {
     overflow-x: hidden !important;
-}
-
-.ledgerPage .sapMPageContent {
-    padding: 0 !important;
-    background: #f5f7fa !important;
-}
-
-
-/* ---------- MAIN CONTAINER ---------- */
-
-.ledgerRoot {
     width: 100% !important;
-    max-width: 1400px;
-    margin: 0 auto !important;
-    padding: 28px 32px 40px 32px !important;
-    box-sizing: border-box !important;
+    max-width: 100% !important;
 }
 
-
-/* =========================================================
-   HEADER
-   ========================================================= */
-
-.ledgerHeader {
-    width: 100% !important;
-    min-height: 72px;
-    box-sizing: border-box;
-    margin-bottom: 4px;
-}
-
-.ledgerEyebrow {
-    display: block;
-    font-size: 11px !important;
-    line-height: 16px !important;
-    font-weight: 700 !important;
-    letter-spacing: 1.5px;
-    color: #7a8696 !important;
-}
-
-.ledgerTitle {
-    display: block;
-    margin-top: 3px !important;
-    font-size: 28px !important;
-    line-height: 34px !important;
-    font-weight: 700 !important;
-    color: #182230 !important;
-}
-
-.ledgerSubtitle {
-    display: block;
-    margin-top: 5px !important;
-    font-size: 13px !important;
-    line-height: 20px !important;
-    color: #718096 !important;
-}
-
-.ledgerRefreshBtn {
-    height: 38px !important;
-    min-width: 145px !important;
-    border: 1px solid #d7dee7 !important;
-    border-radius: 7px !important;
-    background: #ffffff !important;
-}
-
-.ledgerRefreshBtn .sapMBtnInner {
-    height: 36px !important;
-    border: none !important;
-    background: transparent !important;
-}
-
-
-/* =========================================================
-   KPI STRIP
-   ========================================================= */
-
-.kpiStrip {
-    width: 100% !important;
-    min-height: 118px;
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: stretch !important;
-
-    background: #ffffff !important;
-    border: 1px solid #e1e6ed !important;
-    border-radius: 10px !important;
-
-    overflow: hidden !important;
-    box-sizing: border-box !important;
-
-    box-shadow: 0 2px 8px rgba(30, 45, 65, 0.04);
-}
-
-.kpiCell {
-    flex: 1 1 0 !important;
-    width: auto !important;
+.regPage .sapMFlexBox {
     min-width: 0 !important;
-
-    padding: 22px 24px !important;
     box-sizing: border-box !important;
-
-    justify-content: center !important;
 }
 
-.kpiCellPrimary {
-    flex: 1.35 1 0 !important;
+.regPage .sapMFlexItem {
+    min-width: 0 !important;
+    box-sizing: border-box !important;
 }
 
-.kpiDivider {
-    flex: 0 0 1px !important;
-    width: 1px !important;
-    min-width: 1px !important;
-    padding: 0 !important;
-    background: #e8ecf1 !important;
-}
+/* ---------- PAGE ROOT ---------- */
 
-.kpiTag {
-    font-size: 10px !important;
-    line-height: 14px !important;
-    font-weight: 700 !important;
-    letter-spacing: 1px;
-    color: #7a8696 !important;
-}
-
-.kpiFigure {
-    margin-top: 5px !important;
-    font-size: 23px !important;
-    line-height: 28px !important;
-    font-weight: 700 !important;
-    color: #273444 !important;
-}
-
-.kpiFigurePrimary {
-    color: #1f3b57 !important;
-}
-
-.kpiFigureAmber {
-    color: #b7791f !important;
-}
-
-.kpiFigureBlue {
-    color: #28659f !important;
-}
-
-.kpiFigureRed {
-    color: #c0392b !important;
-}
-
-.kpiFoot {
-    margin-top: 4px !important;
-    font-size: 11px !important;
-    line-height: 16px !important;
-    color: #8a95a3 !important;
-}
-
-
-/* =========================================================
-   ANALYTICS ROW
-   ========================================================= */
-
-.ledgerAnalyticsRow {
+.regPageRoot {
     width: 100% !important;
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: stretch !important;
+    max-width: 1400px !important;
+    margin: 0 auto !important;
+    padding: 20px !important;
+    box-sizing: border-box !important;
+}
 
+/* ---------- BREADCRUMB / TITLE ---------- */
+
+.regBreadcrumb {
+    color: #8A8FA3;
+    font-size: 12px;
+}
+
+.regTitleRow {
+    width: 100% !important;
+    margin-top: 6px !important;
+    margin-bottom: 4px !important;
+    flex-wrap: wrap !important;
+    gap: 12px !important;
+}
+
+.regTitle {
+    font-size: 24px;
+    font-weight: 800;
+    color: #1A1D29;
+    line-height: 1.25;
+}
+
+.regSubtitle {
+    color: #8A8FA3;
+    font-size: 13px;
+    margin-top: 3px;
+}
+
+.regProcessBtn {
+    border-radius: 8px !important;
+    flex-shrink: 0 !important;
+}
+
+/* ---------- STATUS + HEALTH ROW (below the button) ---------- */
+
+.statusHealthRow {
+    width: 100% !important;
+    max-width: 100% !important;
+    display: flex !important;
     gap: 16px !important;
     box-sizing: border-box !important;
 }
 
-.healthPanel {
-    flex: 1 1 50% !important;
-    width: auto !important;
-    min-width: 0 !important;
-}
-
-.lifecyclePanel {
-    flex: 1 1 50% !important;
-    width: auto !important;
-    min-width: 0 !important;
-}
-
-.panel {
-    background: #ffffff !important;
-    border: 1px solid #e1e6ed !important;
-    border-radius: 10px !important;
-    box-sizing: border-box !important;
-
-    box-shadow: 0 2px 8px rgba(30, 45, 65, 0.04);
-}
-
-.healthPanel,
-.lifecyclePanel {
-    min-height: 190px;
-    padding: 22px 24px !important;
-}
-
-.panelTitle {
-    font-size: 16px !important;
-    line-height: 21px !important;
-    font-weight: 700 !important;
-    color: #202936 !important;
-}
-
-.panelSubtitle {
-    margin-top: 3px !important;
-    font-size: 11px !important;
-    line-height: 17px !important;
-    color: #7a8696 !important;
-}
-
-
-/* =========================================================
-   HEALTH
-   ========================================================= */
-
-.healthBigNumber {
-    font-size: 25px !important;
-    line-height: 30px !important;
-    font-weight: 700 !important;
-    color: #25384a !important;
-}
-
-.ledgerHealthBar {
-    width: 100% !important;
-    height: 10px !important;
-    margin-top: 25px !important;
-}
-
-.ledgerHealthBar .sapMPI {
-    height: 10px !important;
-    border-radius: 10px !important;
-}
-
-.ledgerHealthBar .sapMPIBar {
-    border-radius: 10px !important;
-}
-
-.healthStatusTag {
-    font-size: 11px !important;
-    line-height: 17px !important;
-    font-weight: 700 !important;
-    color: #3f4d5c !important;
-}
-
-
-/* =========================================================
-   LIFECYCLE
-   ========================================================= */
-
-.timelineTrack {
-    width: 100% !important;
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: flex-start !important;
-
-    box-sizing: border-box !important;
-}
-
-.timelineNode {
-    flex: 0 0 76px !important;
-    width: 76px !important;
-
-    align-items: center !important;
-}
-
-.timelineLine {
-    flex: 1 1 auto !important;
-    height: 1px !important;
-    min-width: 20px !important;
-
-    margin-top: 22px !important;
-
-    background: #d8dee6 !important;
-}
-
-.lifecycleButton {
-    width: 44px !important;
-    height: 44px !important;
-    min-width: 44px !important;
-
-    padding: 0 !important;
-    border-radius: 50% !important;
-}
-
-.lifecycleButton .sapMBtnInner {
-    width: 44px !important;
-    height: 44px !important;
-    min-width: 44px !important;
-
-    padding: 0 !important;
-    border: none !important;
-    border-radius: 50% !important;
-}
-
-.lifecycleButton .sapUiIcon {
-    font-size: 17px !important;
-}
-
-.timelineDotAmber .sapMBtnInner {
-    background: #fff4d6 !important;
-    color: #b7791f !important;
-}
-
-.timelineDotBlue .sapMBtnInner {
-    background: #e6f0fa !important;
-    color: #28659f !important;
-}
-
-.timelineDotGreen .sapMBtnInner {
-    background: #e3f4eb !important;
-    color: #25845a !important;
-}
-
-.timelineFigure {
-    margin-top: 7px !important;
-    font-size: 16px !important;
-    line-height: 20px !important;
-    font-weight: 700 !important;
-    color: #283442 !important;
-}
-
-.timelineLabel {
-    margin-top: 2px !important;
-    font-size: 10px !important;
-    line-height: 14px !important;
-    color: #7a8696 !important;
-}
-
-
-/* =========================================================
-   METRIC STRIP
-   ========================================================= */
-
-.metricStrip {
-    width: 100% !important;
-
-    display: flex !important;
-    flex-direction: row !important;
-
-    background: #ffffff !important;
-    border: 1px solid #e1e6ed !important;
-    border-radius: 10px !important;
-
-    overflow: hidden !important;
-    box-sizing: border-box !important;
-
-    box-shadow: 0 2px 8px rgba(30, 45, 65, 0.04);
-}
-
-.metricCell {
+.statusHealthCard {
     flex: 1 1 0 !important;
-    min-width: 0 !important;
-
-    padding: 17px 22px !important;
-    box-sizing: border-box !important;
-
-    border-right: 1px solid #e8ecf1 !important;
-}
-
-.metricCell:last-child {
-    border-right: none !important;
-}
-
-.metricTag {
-    font-size: 10px !important;
-    line-height: 14px !important;
-    font-weight: 600 !important;
-    color: #7a8696 !important;
-}
-
-.metricFigure {
-    margin-top: 5px !important;
-    font-size: 16px !important;
-    line-height: 21px !important;
-    font-weight: 700 !important;
-    color: #263442 !important;
-}
-
-.metricFigureGreen {
-    color: #25845a !important;
-}
-
-.metricFigureRed {
-    color: #c0392b !important;
-}
-
-
-/* =========================================================
-   RECENT SETTLEMENTS PANEL
-   ========================================================= */
-
-.statementPanel {
-    width: 100% !important;
-    box-sizing: border-box !important;
-    padding: 22px 24px 18px 24px !important;
-
-    overflow: hidden !important;
-}
-
-.statementPanel > .sapMFlexBox:first-child {
-    width: 100% !important;
-}
-
-
-/* =========================================================
-   FILTER BAR
-   ========================================================= */
-
-.filterBar {
-    width: 100% !important;
-
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-
-    gap: 8px !important;
+    min-width: 300px !important;
+    max-width: 100% !important;
     box-sizing: border-box !important;
 }
 
-.filterBar .sapMSF {
-    width: 280px !important;
-    max-width: 280px !important;
-}
+/* ---------- MAIN + SIDEBAR ROOT ---------- */
 
-.filterBar .sapMSlt {
-    width: 155px !important;
-}
-
-.filterBar .sapMBtn {
-    margin-left: 0 !important;
-}
-
-
-/* =========================================================
-   TABLE
-   ========================================================= */
-
-.statementTable {
+.regRoot {
     width: 100% !important;
     max-width: 100% !important;
+    gap: 20px !important;
+    box-sizing: border-box !important;
+    flex-wrap: wrap !important;
+}
 
+.regMain {
+    flex: 1 1 640px !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+/* ---------- KPI CARDS — SINGLE ROW ---------- */
+
+.regKpiRow {
+    width: 100% !important;
+    max-width: 100% !important;
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    gap: 12px !important;
+    margin-bottom: 18px !important;
+    box-sizing: border-box !important;
+}
+
+.regKpiCard {
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    background: #FFFFFF !important;
+    border-radius: 12px !important;
+    padding: 14px !important;
+    box-shadow: 0 2px 8px rgba(17, 24, 39, 0.05) !important;
+    border: 1px solid #EEF0F6 !important;
     box-sizing: border-box !important;
     overflow: hidden !important;
 }
 
-.statementTable .sapMListTbl {
-    width: 100% !important;
-    table-layout: fixed !important;
+.regKpiIcon {
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px !important;
+    border-radius: 10px !important;
+    font-size: 16px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
 }
 
-.statementTable .sapMListTblHeader {
-    height: 42px !important;
-}
+.regKpiIconBlue  { background: #EAF0FF !important; color: #2563EB !important; }
+.regKpiIconAmber { background: #FFF3E0 !important; color: #D97706 !important; }
+.regKpiIconBlue2 { background: #E8F3FF !important; color: #0EA5E9 !important; }
+.regKpiIconRed   { background: #FDEAEA !important; color: #DC2626 !important; }
+.regKpiIconGreen { background: #E7F8EE !important; color: #16A34A !important; }
 
-.statementTable .sapMListTblHeaderCell {
-    background: #f8fafc !important;
-    border-bottom: 1px solid #dfe5ec !important;
-
-    padding: 10px 12px !important;
-    box-sizing: border-box !important;
-}
-
-.statementTable .sapMListTblCell {
-    padding: 13px 12px !important;
-    vertical-align: middle !important;
-
-    border-bottom: 1px solid #edf0f4 !important;
-
+.regKpiTextBox {
+    min-width: 0 !important;
     overflow: hidden !important;
-    text-overflow: ellipsis !important;
+    flex: 1 1 auto !important;
 }
 
-.statementTable .sapMListTblRow {
-    height: 55px !important;
+.regKpiLabel {
+    color: #8A8FA3;
+    font-size: 11px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.stmtHead {
-    font-size: 10px !important;
-    line-height: 14px !important;
-    font-weight: 700 !important;
-    letter-spacing: 0.7px;
-    text-transform: uppercase;
-    color: #6e7a89 !important;
+.regKpiValue {
+    font-family: 'SF Mono', ui-monospace, monospace;
+    font-size: 14px;
+    font-weight: 800;
+    color: #1A1D29;
+    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.stmtPayoutNumber {
-    font-size: 12px !important;
-    line-height: 18px !important;
-    font-weight: 700 !important;
-    color: #263442 !important;
+.regKpiFoot {
+    color: #8A8FA3;
+    font-size: 10px;
+    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
-
-.stmtAmount {
-    font-size: 12px !important;
-    font-weight: 600 !important;
-}
-
-.stmtMuted {
-    display: block !important;
-
-    font-size: 11px !important;
-    line-height: 17px !important;
-
-    color: #657285 !important;
-
-    overflow: hidden !important;
-    white-space: nowrap !important;
-    text-overflow: ellipsis !important;
-}
-
-
-/* =========================================================
-   TABLE STATUS
-   ========================================================= */
-
-.statementTable .sapMObjStatus {
-    white-space: nowrap !important;
-}
-
-
-/* =========================================================
-   DIALOG
-   ========================================================= */
-
-.ledgerDialog .sapMDialogTitle {
-    font-size: 17px !important;
-    font-weight: 700 !important;
-    color: #202936 !important;
-}
-
-.ledgerDialog .sapMDialogScrollCont {
-    padding: 0 !important;
-}
-
-.dialogContent {
-    width: 100% !important;
-    box-sizing: border-box !important;
-}
-
-.dialogLabel {
-    font-size: 10px !important;
-    line-height: 14px !important;
-    font-weight: 700 !important;
-
-    text-transform: uppercase;
-    letter-spacing: 0.7px;
-
-    color: #7a8696 !important;
-}
-
-.dialogPayoutNumber {
-    margin-top: 3px !important;
-
-    font-size: 21px !important;
-    line-height: 27px !important;
-    font-weight: 700 !important;
-
-    color: #202936 !important;
-}
-
-.dialogAmount {
-    margin-top: 4px !important;
-
-    font-size: 18px !important;
-    line-height: 24px !important;
-    font-weight: 700 !important;
-
-    color: #263b50 !important;
-}
-
-.dialogValue {
-    margin-top: 4px !important;
-
-    font-size: 12px !important;
-    line-height: 18px !important;
-
-    color: #354253 !important;
-}
-
-.detailRow {
-    width: 100% !important;
-    box-sizing: border-box !important;
-}
-
-.detailSection {
-    width: 100% !important;
-
-    border-top: 1px solid #e6ebf0 !important;
-    padding-top: 15px !important;
-}
-
-.timeline {
-    width: 100% !important;
-}
-
-.timelineRow {
-    min-height: 34px !important;
-}
-
-.timelineIcon {
-    width: 25px !important;
-    font-size: 13px !important;
-    color: #5f7081 !important;
-}
-
-.timelineText {
-    font-size: 12px !important;
-    color: #455363 !important;
-}
-
-
-/* =========================================================
-   SPACING OVERRIDES
-   ========================================================= */
-
-.ledgerRoot .sapUiMediumMarginTop {
-    margin-top: 16px !important;
-}
-
-.ledgerRoot .sapUiLargeMarginTop {
-    margin-top: 22px !important;
-}
-
-.ledgerRoot .sapUiSmallMarginTop {
-    margin-top: 10px !important;
-}
-
-.ledgerRoot .sapUiTinyMarginTop {
-    margin-top: 4px !important;
-}
-
-
-/* =========================================================
-   1200px - TABLET / SMALL LAPTOP
-   ========================================================= */
-
-@media (max-width: 1200px) {
-
-    .ledgerRoot {
-        padding-left: 22px !important;
-        padding-right: 22px !important;
-    }
-
-    .kpiCell {
-        padding-left: 18px !important;
-        padding-right: 18px !important;
-    }
-
-    .healthPanel,
-    .lifecyclePanel {
-        padding: 19px !important;
-    }
-
-    .statementPanel {
-        padding-left: 19px !important;
-        padding-right: 19px !important;
-    }
-
-    .stmtMuted {
-        font-size: 10px !important;
-    }
-}
-
-
-/* =========================================================
-   900px - STACK ANALYTICS
-   ========================================================= */
 
 @media (max-width: 900px) {
 
-    .ledgerRoot {
-        padding: 20px !important;
+    .regKpiRow {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
     }
 
-    .ledgerAnalyticsRow {
-        flex-direction: column !important;
-    }
-
-    .healthPanel,
-    .lifecyclePanel {
-        width: 100% !important;
-        flex: none !important;
-    }
-
-    .kpiStrip {
-        flex-wrap: wrap !important;
-    }
-
-    .kpiCell {
-        flex: 1 1 50% !important;
-        width: 50% !important;
-    }
-
-    .kpiDivider {
-        display: none !important;
-    }
-
-    .metricStrip {
-        flex-wrap: wrap !important;
-    }
-
-    .metricCell {
-        flex: 1 1 50% !important;
-        width: 50% !important;
-    }
-
-    .metricCell:nth-child(2) {
-        border-right: none !important;
-    }
-
-    .metricCell:nth-child(3) {
-        border-top: 1px solid #e8ecf1 !important;
-    }
-
-    .metricCell:nth-child(4) {
-        border-top: 1px solid #e8ecf1 !important;
-        border-right: none !important;
+    .regKpiCard {
+        flex: 0 0 160px !important;
+        min-width: 160px !important;
     }
 }
 
+/* ---------- TABLE PANEL ---------- */
+
+.regTablePanel {
+    background: #FFFFFF !important;
+    border-radius: 14px !important;
+    padding: 20px !important;
+    border: 1px solid #EEF0F6 !important;
+    box-shadow: 0 2px 8px rgba(17, 24, 39, 0.05) !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+}
+
+.regPanelTitle {
+    font-size: 16px;
+    font-weight: 800;
+    color: #1A1D29;
+}
+
+.regFilterBar {
+    width: 100% !important;
+    gap: 8px !important;
+    flex-wrap: wrap !important;
+    box-sizing: border-box !important;
+}
+
+.regSearch {
+    max-width: 100% !important;
+}
+
+.settlementTable {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    overflow-x: auto !important;
+    display: block !important;
+}
+
+.settlementTable .sapMListTbl {
+    width: 100% !important;
+}
+
+.settlementTable .sapMListTblHeader {
+    background: #FAFBFD !important;
+}
+
+.regHead {
+    color: #48568c !important;
+    font-size: 12px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.6px !important;
+    text-transform: uppercase !important;
+    white-space: nowrap !important;
+}
+
+.regPayoutNo {
+    font-weight: 800 !important;
+    color: #1A1D29 !important;
+   
+}
+
+.regCustomer {
+    font-weight: 600 !important;
+    color: #1A1D29 !important;
+}
+
+.regMuted {
+    color: #8A8FA3 !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+}
+
+.regAmount {
+    font-family: 'SF Mono', ui-monospace, monospace !important;
+    font-weight: 700 !important;
+    color: #1A1D29 !important;
+    white-space: nowrap !important;
+}
+
+.regStatusPill .sapMObjStatusText {
+    border-radius: 999px !important;
+    padding: 3px 10px !important;
+    font-weight: 700 !important;
+    font-size: 11px !important;
+    display: inline-block !important;
+}
+
+/* ---------- RIGHT SIDEBAR (FILTERS ONLY NOW) ---------- */
+
+.regSidebar {
+    width: 230px !important;
+    min-width: 280px !important;
+    max-width: 100% !important;
+    flex-shrink: 0 !important;
+    box-sizing: border-box !important;
+}
+
+.regSideCard {
+    background: #FFFFFF !important;
+    border-radius: 14px !important;
+    padding: 18px !important;
+    border: 1px solid #EEF0F6 !important;
+    box-shadow: 0 2px 8px rgba(17, 24, 39, 0.05) !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+}
+
+.regSideTitle {
+    font-size: 15px;
+    font-weight: 800;
+    color: #1A1D29;
+}
+
+.regResetBtn {
+    font-size: 12px !important;
+    padding: 0 8px !important;
+    color: #6366F1 !important;
+}
+
+.regFieldLabel {
+    color: #8A8FA3 !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    margin-bottom: 4px !important;
+    display: block !important;
+}
+
+.regFieldInput {
+    margin-top: 4px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+.regAmountRow {
+    align-items: center !important;
+    gap: 6px !important;
+    margin-top: 4px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+.regToText {
+    color: #8A8FA3;
+    font-size: 12px;
+    flex-shrink: 0 !important;
+}
+
+.regApplyBtn {
+    border-radius: 8px !important;
+    width: 100% !important;
+}
+
+/* ---------- DONUT ---------- */
+
+
+
+.donutOuter {
+    width: 110px !important;
+    height: 110px !important;
+    min-width: 110px !important;
+    border-radius: 50% !important;
+    background: conic-gradient(
+        #16A34A 0% 23%,
+        #D97706 23% 50%,
+        #2563EB 50% 77%,
+        #DC2626 77% 100%
+    ) !important;
+    padding: 12px !important;
+    box-sizing: border-box !important;
+    flex-shrink: 0 !important;
+     cursor: default !important;
+    transition: transform 0.2s ease !important;
+}
+.donutOuter:hover {
+    transform: scale(1.04) !important;
+}
+.donutInner {
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 50% !important;
+    background: #FFFFFF !important;
+}
+
+.donutNumber {
+    font-family: 'SF Mono', ui-monospace, monospace;
+    font-size: 20px;
+    font-weight: 800;
+    color: #1A1D29;
+}
+
+.donutLabel {
+    color: #8A8FA3;
+    font-size: 10px;
+<<<<<<< HEAD
+=======
+.ledgerPage .sapMPageScroll {
+    overflow-x: hidden !important;
+}
+
+.chartHeaderRow {
+    margin-bottom: 0.9rem;
+}
+
+.yearSelectDropdown {
+    min-width: 90px;
+}
+
+.chartLinePath {
+    fill: none;
+    stroke: #3E7CB1;
+    stroke-width: 2.5;
+}
+
+.chartLinePoint {
+    fill: #3E7CB1;
+    stroke: #FFFFFF;
+    stroke-width: 2;
+    cursor: pointer;
+}
+
+.chartLinePoint:hover {
+    fill: #2C567F;
+>>>>>>> 4f63e2e (Updated payout csv)
+}
+
+
+
+.donutLegend {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+}
+
+.legendLine {
+    cursor: default !important;
+    transition: background 0.15s ease, transform 0.15s ease !important;
+    border-radius: 6px !important;
+    padding-left: 6px !important;
+    padding-right: 6px !important;
+}
+
+.legendLine:hover {
+    background: #F5F6FA !important;
+    transform: translateX(2px) !important;
+}
+
+.legendDot {
+    width: 8px !important;
+    height: 8px !important;
+    border-radius: 50% !important;
+    flex-shrink: 0 !important;
+}
+
+.legendDotGreen { background: #16A34A !important; }
+.legendDotAmber { background: #D97706 !important; }
+.legendDotBlue  { background: #2563EB !important; }
+.legendDotRed   { background: #DC2626 !important; }
+
+.legendText {
+    font-size: 12px;
+    color: #4B5060;
+    white-space: nowrap;
+}
+
+.legendValue {
+    font-size: 11px;
+    color: #8A8FA3;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/* ---------- SETTLEMENT HEALTH ---------- */
+
+.healthBigPct {
+    font-family: 'SF Mono', ui-monospace, monospace;
+    font-size: 28px;
+    font-weight: 800;
+    color: #1A1D29;
+}
+
+.healthStateTag {
+    font-weight: 700;
+    font-size: 12px;
+    color: #6366F1;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.regHealthBar {
+    width: 100% !important;
+}
+
+.regHealthBar .sapMPI {
+    height: 8px !important;
+    border-radius: 999px !important;
+    width: 100% !important;
+}
+
+.healthWarnBanner {
+    background: #FDEAEA !important;
+    border-radius: 10px !important;
+    padding: 10px 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+.healthWarnIcon {
+    color: #DC2626 !important;
+    font-size: 14px !important;
+    flex-shrink: 0 !important;
+}
+
+.healthWarnText {
+    color: #B91C1C !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+}
+
+/* ---------- DIALOG ---------- */
+
+.regDialog .sapMDialogTitle {
+    font-weight: 800;
+    color: #1A1D29;
+}
+
+.dialogPad {
+    padding: 22px !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    max-width: 100% !important;
+}
 
 /* =========================================================
-   600px - MOBILE
+   RESPONSIVE
    ========================================================= */
 
-@media (max-width: 600px) {
+@media (max-width: 1100px) {
 
-    .ledgerRoot {
-        padding: 16px !important;
+    .regRoot {
+        flex-direction: column !important;
     }
 
-    .ledgerHeader {
+    .regMain {
+        flex: 1 1 100% !important;
+        width: 100% !important;
+    }
+
+    .regSidebar {
+        width: 50% !important;
+    }
+}
+
+@media (max-width: 900px) {
+
+    .statusHealthRow {
+        flex-direction: column !important;
+    }
+
+    .statusHealthCard {
+        min-width: 100% !important;
+    }
+}
+
+@media (max-width: 640px) {
+
+    .regPageRoot {
+        padding: 12px !important;
+    }
+
+    .regKpiCard {
+        flex: 1 1 100% !important;
+    }
+
+    .regTitleRow {
         flex-direction: column !important;
         align-items: flex-start !important;
-        gap: 12px !important;
     }
 
-    .ledgerTitle {
-        font-size: 23px !important;
-        line-height: 29px !important;
-    }
-
-    .ledgerSubtitle {
-        font-size: 12px !important;
-    }
-
-    .ledgerRefreshBtn {
-        min-width: 130px !important;
-    }
-
-    .kpiStrip {
-        flex-direction: column !important;
-    }
-
-    .kpiCell {
+    .regProcessBtn {
         width: 100% !important;
-        flex: none !important;
-
-        padding: 15px 18px !important;
-
-        border-bottom: 1px solid #e8ecf1 !important;
     }
 
-    .kpiCell:last-child {
-        border-bottom: none !important;
+    .donutOuter {
+        width: 90px !important;
+        height: 90px !important;
+        min-width: 90px !important;
     }
-
-    .metricStrip {
-        flex-direction: column !important;
-    }
-
-    .metricCell {
-        width: 100% !important;
-        flex: none !important;
-
-        border-right: none !important;
-        border-bottom: 1px solid #e8ecf1 !important;
-    }
-
-    .metricCell:last-child {
-        border-bottom: none !important;
-    }
-
-    .healthPanel,
-    .lifecyclePanel,
-    .statementPanel {
-        padding: 17px !important;
-    }
-
-    .timelineTrack {
-        overflow-x: auto !important;
-        padding-bottom: 8px !important;
-    }
-
-    .timelineNode {
-        flex: 0 0 65px !important;
-        width: 65px !important;
-    }
-
-    .timelineLine {
-        min-width: 25px !important;
-    }
-
-    .filterBar {
-        flex-direction: column !important;
-        align-items: stretch !important;
-    }
-
-    .filterBar .sapMSF,
-    .filterBar .sapMSlt {
-        width: 100% !important;
-        max-width: 100% !important;
-        margin-left: 0 !important;
-    }
-
-    .filterBar .sapMBtn {
-        align-self: flex-start !important;
-        margin-left: 0 !important;
-    }
-
-    /*
-       Keep table inside the card.
-       SAPUI5 table handles its own content.
-    */
-    .statementTable {
-        overflow-x: auto !important;
-    }
+}
 }
 
 
@@ -2014,3 +1823,108 @@ body {
 .ledgerPage .sapMPageScroll {
     overflow-x: hidden !important;
 }
+
+.chartHeaderRow {
+    margin-bottom: 0.9rem;
+}
+
+.yearSelectDropdown {
+    min-width: 90px;
+}
+
+.chartLinePath {
+    fill: none;
+    stroke: #3E7CB1;
+    stroke-width: 2.5;
+}
+
+.chartLinePoint {
+    fill: #3E7CB1;
+    stroke: #FFFFFF;
+    stroke-width: 2;
+    cursor: pointer;
+}
+
+.chartLinePoint:hover {
+    fill: #2C567F;
+}
+
+
+
+.chartLinePoint {
+    fill: #3E7CB1;
+    stroke: #FFFFFF;
+    stroke-width: 2;
+    cursor: pointer;
+}
+.welcomeBanner {
+    box-sizing: border-box;
+    min-height: 190px;
+    padding: 1.45rem 1.65rem;
+    border: 1px solid #E5EDF7;
+    border-radius: 14px;
+    position: relative;
+    overflow: hidden;
+
+    background-image:
+        linear-gradient(
+            100deg,
+            rgba(15, 30, 50, 0.72) 0%,
+            rgba(15, 30, 50, 0.45) 35%,
+            rgba(15, 30, 50, 0.15) 65%,
+            rgba(15, 30, 50, 0.05) 100%
+        ),
+        url("../img/welcome-banner.jpg");
+    background-size: cover;
+    background-position: center;
+}
+.navCardClaims {
+    background: #F3F8FE;
+}
+
+.navCardPolicies {
+    background: #F1FBF7;
+}
+
+.navCardCustomers {
+    background: #F8F6FD;
+}
+
+.navCardClaimTypes {
+    background: #FEF9F0;
+}
+
+.kpiWarning {
+    border-left-color: #7F77DD;
+    background: #F8F7FE;
+}
+
+.kpiDanger {
+    border-left-color: #D85A30;
+    background: #FDF5F3;
+}
+
+.kpiNeutral {
+    border-left-color: #3E7CB1;
+    background: #F3F8FD;
+}
+
+.kpiApprovedColor {
+    border-left-color: #1D9E75;
+    background: #F2FAF7;
+}
+
+.kpiSuccess {
+    border-left-color: #1D9E75;
+    background: #F2FAF7;
+}
+
+
+.claimsureSideNav {
+    background-color: #F4F8FB !important;
+}
+
+.claimsureSideNav .sapTntNavLIActive {
+    background-color: #DCEAF6 !important;
+} 
+ 
