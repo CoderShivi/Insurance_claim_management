@@ -356,3 +356,11 @@ Accept: application/json
 POST http://localhost:4004/odata/v4/insurance/generatePendingClaimsExcel
 
 Content-Type: application/json
+
+###
+POST http://localhost:4004/odata/v4/insurance/analyzeClaim
+Content-Type: application/json
+
+{
+    "claimID": "d0000003-0003-0003-0003-000000000003"
+}

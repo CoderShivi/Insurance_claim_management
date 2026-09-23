@@ -4,6 +4,7 @@ const ExcelJS = require('exceljs');
 const path = require('path');
 const fs = require('fs');
 const nodemailer = require("nodemailer");
+const { analyzeClaim } = require('./openrouter');
 
 
 
@@ -353,7 +354,7 @@ module.exports = cds.service.impl(async function () {
                     url: "/workflow/rest/v1/workflow-instances",
 
                     data: {
-                            "definitionId": "us10.f3b9ba19trial.claimsureclaimmanagementv2.claimApprovalProcess",
+                        "definitionId": "us10.f3b9ba19trial.claimsureclaimmanagementv2.claimApprovalProcess",
 
 
                         context: {
@@ -970,6 +971,151 @@ module.exports = cds.service.impl(async function () {
             escalatedCount: 0
 
         };
+
+    });
+
+
+    this.on('analyzeClaim', async (req) => {
+
+        const { claimID } = req.data;
+
+        console.log("========== AI CLAIM ANALYSIS ==========");
+        console.log("Claim ID:", claimID);
+
+        if (!claimID) {
+            return req.error(400, 'Claim ID is required');
+        }
+
+        // ==========================================
+        // 1. GET CLAIM
+        // ==========================================
+
+        const claim = await SELECT.one
+            .from(Claims)
+            .where({
+                ID: claimID
+            });
+
+        if (!claim) {
+            return req.error(404, 'Claim not found');
+        }
+
+        console.log("Claim:", claim.claimNumber);
+
+
+        // ==========================================
+        // 2. GET POLICY
+        // ==========================================
+
+        let policy = null;
+
+        if (claim.policy_ID) {
+
+            policy = await SELECT.one
+                .from(Policies)
+                .where({
+                    ID: claim.policy_ID
+                });
+
+        }
+
+
+        // ==========================================
+        // 3. GET FRAUD RISK
+        // ==========================================
+
+        const fraudRisk = await SELECT.one
+            .from(FraudRiskScores)
+            .where({
+                claim_ID: claimID
+            });
+
+
+        const fraudScore = fraudRisk
+            ? Number(fraudRisk.riskScore)
+            : 0;
+
+        const riskLevel = fraudRisk
+            ? fraudRisk.riskLevel
+            : "Low";
+
+
+        // ==========================================
+        // 4. PREPARE DATA FOR AI
+        // ==========================================
+
+        const claimData = {
+
+            claimNumber:
+                claim.claimNumber || "N/A",
+
+            claimAmount:
+                Number(claim.claimedAmount || 0),
+
+            status:
+                claim.status || "N/A",
+
+            incidentDate:
+                claim.incidentDate || "N/A",
+
+            description:
+                claim.description || "No description provided",
+
+            policyID:
+                claim.policy_ID || "N/A",
+
+            policyStatus:
+                policy?.status || "Unknown",
+
+            fraudScore:
+                fraudScore,
+
+            riskLevel:
+                riskLevel
+
+        };
+
+
+        console.log(
+            "Sending claim data to OpenRouter:",
+            JSON.stringify(claimData, null, 2)
+        );
+
+
+        // ==========================================
+        // 5. CALL OPENROUTER
+        // ==========================================
+
+        try {
+
+            const aiResponse =
+                await analyzeClaim(claimData);
+
+
+            console.log(
+                "AI analysis received successfully"
+            );
+
+
+            // ==========================================
+            // 6. RETURN AI RESPONSE
+            // ==========================================
+
+            return aiResponse;
+
+        }
+        catch (error) {
+
+            console.error(
+                "OPENROUTER ERROR:",
+                error.message
+            );
+
+            return req.error(
+                502,
+                `AI claim analysis failed: ${error.message}`
+            );
+        }
 
     });
 

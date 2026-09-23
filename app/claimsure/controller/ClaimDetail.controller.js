@@ -15,6 +15,7 @@ sap.ui.define([
     MessageBox,
     formatter
 ) {
+
     "use strict";
 
     return Controller.extend("claimsure.app.controller.ClaimDetail", {
@@ -24,6 +25,10 @@ sap.ui.define([
         onInit: function () {
 
             this._sClaimId = null;
+
+            /* ============================================================
+             * CLAIM DETAIL JSON MODEL
+             * ============================================================ */
 
             var oDetailModel = new JSONModel({
                 busy: false,
@@ -48,6 +53,7 @@ sap.ui.define([
 
                 policy: null,
                 documents: [],
+
                 fraudRiskScores: []
             });
 
@@ -56,15 +62,39 @@ sap.ui.define([
                 "claimDetail"
             );
 
-            /*
-             * MainService
-             * Used to read Employees.
-             */
+
+            /* ============================================================
+             * MAIN SERVICE MODEL
+             * Used for Employees
+             * ============================================================ */
+
             this._oMainModel = new ODataModel({
                 serviceUrl: "/odata/v4/main/",
                 synchronizationMode: "None",
                 autoExpandSelect: true
             });
+
+
+            /* ============================================================
+             * INVESTIGATION SERVICE MODEL
+             * Used for FraudRiskScores
+             * ============================================================ */
+
+            this._oInvestigationModel = new ODataModel({
+                serviceUrl: "/odata/v4/investigation/",
+                synchronizationMode: "None",
+                autoExpandSelect: true
+            });
+
+            this.getView().setModel(
+                this._oInvestigationModel,
+                "investigation"
+            );
+
+
+            /* ============================================================
+             * ROUTE
+             * ============================================================ */
 
             this.getOwnerComponent()
                 .getRouter()
@@ -75,11 +105,18 @@ sap.ui.define([
                 );
         },
 
+
+        /* ================================================================
+         * ROUTE MATCHED
+         * ================================================================ */
+
         _onRouteMatched: function (oEvent) {
 
-            var oArguments = oEvent.getParameter("arguments");
+            var oArguments =
+                oEvent.getParameter("arguments");
 
-            this._sClaimId = oArguments.claimId;
+            this._sClaimId =
+                oArguments.claimId;
 
             console.log(
                 "[ClaimDetail] Claim ID:",
@@ -87,70 +124,104 @@ sap.ui.define([
             );
 
             if (!this._sClaimId) {
+
                 MessageBox.error(
                     "Claim ID is missing from the route."
                 );
+
                 return;
             }
 
-            this._loadClaim(this._sClaimId);
+            this._loadClaim(
+                this._sClaimId
+            );
         },
+
+
+        /* ================================================================
+         * LOAD CLAIM
+         * ================================================================ */
 
         _loadClaim: async function (sClaimId) {
 
-            var oInsuranceModel = this.getView().getModel();
-            var oDetailModel = this.getView().getModel("claimDetail");
+            var oInsuranceModel =
+                this.getView().getModel();
+
+            var oDetailModel =
+                this.getView().getModel(
+                    "claimDetail"
+                );
+
 
             if (!oInsuranceModel) {
+
                 MessageBox.error(
                     "InsuranceService OData model is not available."
                 );
+
                 return;
             }
 
-            oDetailModel.setProperty("/busy", true);
+
+            oDetailModel.setProperty(
+                "/busy",
+                true
+            );
+
 
             try {
 
-                /*
-                 * Load Claim.
-                 *
-                 * assignedAgent is NOT expanded because
-                 * Employees belongs to MainService.
-                 */
-                var oClaimBinding = oInsuranceModel.bindContext(
-                    "/Claims(" + sClaimId + ")",
-                    undefined,
-                    {
-                        $expand: "policy,documents"
-                    }
-                );
+                /* ========================================================
+                 * LOAD CLAIM
+                 * ======================================================== */
+
+                var oClaimBinding =
+                    oInsuranceModel.bindContext(
+                        "/Claims(" + sClaimId + ")",
+                        undefined,
+                        {
+                            $expand:
+                                "policy,documents"
+                        }
+                    );
+
 
                 var oClaim =
                     await oClaimBinding.requestObject();
 
+
                 if (!oClaim) {
-                    MessageBox.error("Claim not found.");
+
+                    MessageBox.error(
+                        "Claim not found."
+                    );
+
                     return;
                 }
+
 
                 console.log(
                     "[ClaimDetail] Claim:",
                     oClaim
                 );
 
+
                 console.log(
                     "[ClaimDetail] assignedAgent_ID:",
                     oClaim.assignedAgent_ID
                 );
 
-                /*
-                 * Store claim data.
-                 */
+
+                /* ========================================================
+                 * SET CLAIM DATA
+                 * ======================================================== */
+
                 oDetailModel.setData({
+
                     busy: false,
 
-                    ID: oClaim.ID || "",
+                    ID:
+                        oClaim.ID || "",
 
                     claimNumber:
                         oClaim.claimNumber || "",
@@ -196,9 +267,11 @@ sap.ui.define([
                     fraudRiskScores: []
                 });
 
-                /*
-                 * Load assigned employee.
-                 */
+
+                /* ========================================================
+                 * LOAD ASSIGNED EMPLOYEE
+                 * ======================================================== */
+
                 if (oClaim.assignedAgent_ID) {
 
                     await this._loadAssignedAgent(
@@ -217,12 +290,15 @@ sap.ui.define([
                     );
                 }
 
-                /*
-                 * Load fraud risk scores.
-                 */
+
+                /* ========================================================
+                 * LOAD FRAUD RISK SCORES
+                 * ======================================================== */
+
                 await this._loadFraudRiskScores(
                     sClaimId
                 );
+
 
             } catch (oError) {
 
@@ -234,7 +310,8 @@ sap.ui.define([
                 MessageBox.error(
                     "Could not load claim details.\n\n" +
                     (
-                        oError && oError.message
+                        oError &&
+                            oError.message
                             ? oError.message
                             : "Unknown error"
                     )
@@ -249,15 +326,20 @@ sap.ui.define([
             }
         },
 
-        /*
-         * ============================================================
+
+        /* ================================================================
          * LOAD ASSIGNED EMPLOYEE
-         * ============================================================
-         */
-        _loadAssignedAgent: async function (sEmployeeId) {
+         * ================================================================ */
+
+        _loadAssignedAgent: async function (
+            sEmployeeId
+        ) {
 
             var oDetailModel =
-                this.getView().getModel("claimDetail");
+                this.getView().getModel(
+                    "claimDetail"
+                );
+
 
             if (!sEmployeeId) {
 
@@ -269,21 +351,20 @@ sap.ui.define([
                 return;
             }
 
+
             console.log(
                 "[ClaimDetail] Fetching employee:",
                 sEmployeeId
             );
 
+
             try {
 
-                /*
-                 * MainService:
-                 *
-                 * /odata/v4/main/Employees(<UUID>)
-                 */
                 var oEmployeeBinding =
                     this._oMainModel.bindContext(
-                        "/Employees(" + sEmployeeId + ")",
+                        "/Employees(" +
+                        sEmployeeId +
+                        ")",
                         undefined,
                         {
                             $select:
@@ -291,13 +372,16 @@ sap.ui.define([
                         }
                     );
 
+
                 var oEmployee =
                     await oEmployeeBinding.requestObject();
+
 
                 console.log(
                     "[ClaimDetail] Employee response:",
                     oEmployee
                 );
+
 
                 if (!oEmployee) {
 
@@ -313,9 +397,7 @@ sap.ui.define([
                     return;
                 }
 
-                /*
-                 * Create employee full name.
-                 */
+
                 var sFullName = [
                     oEmployee.firstName,
                     oEmployee.lastName
@@ -324,21 +406,18 @@ sap.ui.define([
                     .join(" ")
                     .trim();
 
+
                 if (!sFullName) {
                     sFullName = "Not Assigned";
                 }
 
-                /*
-                 * Display employee NAME instead of ID.
-                 */
+
                 oDetailModel.setProperty(
                     "/assignedAgentDisplay",
                     sFullName
                 );
 
-                /*
-                 * Store employee details.
-                 */
+
                 oDetailModel.setProperty(
                     "/employeeNumber",
                     oEmployee.employeeNumber || ""
@@ -359,10 +438,12 @@ sap.ui.define([
                     oEmployee.email || ""
                 );
 
+
                 console.log(
                     "[ClaimDetail] Assigned Agent Name:",
                     sFullName
                 );
+
 
             } catch (oError) {
 
@@ -378,20 +459,29 @@ sap.ui.define([
             }
         },
 
-        /*
-         * ============================================================
+
+        /* ================================================================
          * LOAD FRAUD RISK SCORES
-         * ============================================================
-         */
+         * ================================================================ */
+
         _loadFraudRiskScores: async function (sClaimId) {
 
-            var oModel =
-                this.getView().getModel("investigation");
+            var oDetailModel =
+                this.getView().getModel("claimDetail");
 
-            if (!oModel) {
+            if (!this._oInvestigationModel) {
 
-                console.warn(
-                    "[ClaimDetail] Investigation model not available."
+                console.error(
+                    "[ClaimDetail] Investigation model is not available."
+                );
+
+                return;
+            }
+
+            if (!sClaimId) {
+
+                console.error(
+                    "[ClaimDetail] Claim ID is missing."
                 );
 
                 return;
@@ -399,23 +489,42 @@ sap.ui.define([
 
             try {
 
+                console.log(
+                    "=============================================="
+                );
+
+                console.log(
+                    "[ClaimDetail] Loading FraudRiskScores"
+                );
+
+                console.log(
+                    "[ClaimDetail] Current Claim ID:",
+                    sClaimId
+                );
+
+                console.log(
+                    "[ClaimDetail] Investigation URL:",
+                    this._oInvestigationModel.getServiceUrl()
+                );
+
+
+                /* ============================================================
+                 * LOAD ALL FRAUD RISK SCORES
+                 * We intentionally do NOT use claim_ID filter here.
+                 * ============================================================ */
+
                 var oBinding =
-                    oModel.bindList(
+                    this._oInvestigationModel.bindList(
                         "/FraudRiskScores",
                         undefined,
                         undefined,
-                        [
-                            new Filter(
-                                "claim_ID",
-                                FilterOperator.EQ,
-                                sClaimId
-                            )
-                        ],
+                        undefined,
                         {
                             $select:
                                 "ID,claim_ID,riskScore,riskLevel"
                         }
                     );
+
 
                 var aContexts =
                     await oBinding.requestContexts(
@@ -423,67 +532,166 @@ sap.ui.define([
                         100
                     );
 
-                var aScores =
-                    aContexts.map(
-                        function (oContext) {
-                            return oContext.getObject();
-                        }
-                    );
 
                 console.log(
-                    "[ClaimDetail] Fraud scores:",
+                    "[ClaimDetail] Total FraudRiskScores:",
+                    aContexts.length
+                );
+
+
+                var aAllScores =
+                    aContexts.map(function (oContext) {
+
+                        return oContext.getObject();
+
+                    });
+
+
+                console.log(
+                    "[ClaimDetail] All FraudRiskScores:",
+                    aAllScores
+                );
+
+
+                /* ============================================================
+                 * FIND SCORE FOR CURRENT CLAIM
+                 * ============================================================ */
+
+                var aScores =
+                    aAllScores.filter(function (oScore) {
+
+                        return String(oScore.claim_ID) ===
+                            String(sClaimId);
+
+                    });
+
+
+                console.log(
+                    "[ClaimDetail] Matching FraudRiskScores:",
                     aScores
                 );
 
-                this.getView()
-                    .getModel("claimDetail")
-                    .setProperty(
-                        "/fraudRiskScores",
-                        aScores
-                    );
+
+                console.log(
+                    "[ClaimDetail] Matching count:",
+                    aScores.length
+                );
+
+
+                /* ============================================================
+                 * SET DATA FOR UI
+                 * ============================================================ */
+
+                oDetailModel.setProperty(
+                    "/fraudRiskScores",
+                    aScores
+                );
+
+
+                console.log(
+                    "[ClaimDetail] fraudRiskScores model value:",
+                    oDetailModel.getProperty(
+                        "/fraudRiskScores"
+                    )
+                );
+
+
+                console.log(
+                    "=============================================="
+                );
+
 
             } catch (oError) {
 
                 console.error(
-                    "[ClaimDetail] Fraud score error:",
+                    "[ClaimDetail] FraudRiskScores loading failed:",
                     oError
+                );
+
+                console.error(
+                    "[ClaimDetail] Error message:",
+                    oError.message
+                );
+
+                oDetailModel.setProperty(
+                    "/fraudRiskScores",
+                    []
                 );
             }
         },
+
+
+        /* ================================================================
+         * DOCUMENT PRESS
+         * ================================================================ */
+
+        onDocumentPress: function (oEvent) {
+
+            var oDocument =
+                oEvent.getSource()
+                    .getBindingContext(
+                        "claimDetail"
+                    )
+                    .getObject();
+
+
+            if (!oDocument || !oDocument.ID) {
+
+                MessageBox.error(
+                    "Unable to open document."
+                );
+
+                return;
+            }
+
+
+            var oInsuranceModel =
+                this.getView().getModel();
+
+
+            if (!oInsuranceModel) {
+
+                MessageBox.error(
+                    "OData model is not available."
+                );
+
+                return;
+            }
+
+
+            var sBaseUrl =
+                oInsuranceModel
+                    .getServiceUrl()
+                    .replace(/\/$/, "");
+
+
+            var sUrl =
+                sBaseUrl +
+                "/Claims(" +
+                this._sClaimId +
+                ")/documents(" +
+                oDocument.ID +
+                ")/content";
+
+
+            window.open(
+                sUrl,
+                "_blank"
+            );
+        },
+
+
+        /* ================================================================
+         * NAVIGATION BACK
+         * ================================================================ */
 
         onNavBack: function () {
 
             this.getOwnerComponent()
                 .getRouter()
                 .navTo("claims");
-        },
-         
-
-          onDocumentPress: function (oEvent) {
-
-            var oDocument = oEvent.getSource()
-                .getBindingContext("claimDetail")
-                .getObject();
-
-            if (!oDocument || !oDocument.ID) {
-                MessageBox.error("Unable to open document.");
-                return;
-            }
-
-            var oInsuranceModel = this.getView().getModel();
-
-            if (!oInsuranceModel) {
-                MessageBox.error("OData model is not available.");
-                return;
-            }
-
-            var sBaseUrl = oInsuranceModel.getServiceUrl().replace(/\/$/, "");
-
-            var sUrl = sBaseUrl +
-                "/Claims(" + this._sClaimId + ")/documents(" + oDocument.ID + ")/content";
-
-            window.open(sUrl, "_blank");
         }
 
     });
+
 });

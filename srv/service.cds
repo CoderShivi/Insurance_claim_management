@@ -35,6 +35,9 @@ service InsuranceService {
     //job schedalr
     action   processPendingClaims()                returns ProcessPendingClaimsResult;
 
+    // for AI Agent analysis
+    action analyzeClaim(claimID: UUID) returns String;
+
 
     type PendingClaimResult {
         claimID       : UUID;
