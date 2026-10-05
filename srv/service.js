@@ -1091,6 +1091,7 @@ module.exports = cds.service.impl(async function () {
             const aiResponse =
                 await analyzeClaim(claimData);
 
+                //console.log(aiResponse)
 
             console.log(
                 "AI analysis received successfully"

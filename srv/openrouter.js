@@ -117,8 +117,7 @@ Important response rules:
 
             body: JSON.stringify({
 
-                model:
-                    "openrouter/free",
+                model: "openrouter/free",
 
                 messages: [
 
@@ -150,6 +149,9 @@ Important response rules:
 
     const result =
         await response.json();
+
+    //console.log(result);
+
 
 
     return (

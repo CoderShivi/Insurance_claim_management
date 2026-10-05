@@ -30,11 +30,11 @@ sap.ui.define([
             var oBinding = oTable.getBinding("items");
 
             if (oBinding) {
+
                 oBinding.attachDataReceived(function (oEvent) {
 
                     if (oEvent.getParameter("error")) {
                         console.error("Error loading claims");
-                        return;
                     }
 
                 });
@@ -43,7 +43,10 @@ sap.ui.define([
             this.getOwnerComponent()
                 .getRouter()
                 .getRoute("claims")
-                .attachPatternMatched(this._onRouteMatched, this);
+                .attachPatternMatched(
+                    this._onRouteMatched,
+                    this
+                );
         },
 
         onKpiPendingApproval: function () {
@@ -62,22 +65,30 @@ sap.ui.define([
             var oQuery =
                 oEvent.getParameter("arguments")["?query"] || {};
 
-            this._applyStatusFromQuery(oQuery.status);
+            this._applyStatusFromQuery(
+                oQuery.status
+            );
         },
 
         _applyStatusFromQuery: function (sStatus) {
 
-            var oTable = this.byId("claimsTable");
-            var oBinding = oTable.getBinding("items");
-            var oComboBox = this.byId("statusFilter");
+            var oTable =
+                this.byId("claimsTable");
+
+            var oBinding =
+                oTable.getBinding("items");
+
+            var oComboBox =
+                this.byId("statusFilter");
 
             if (!oBinding) {
                 return;
             }
 
-            var sExistingSearch = this.byId("claimsSearch")
-                ? this.byId("claimsSearch").getValue()
-                : "";
+            var sExistingSearch =
+                this.byId("claimsSearch")
+                    ? this.byId("claimsSearch").getValue()
+                    : "";
 
             var aFilters = [];
 
@@ -94,21 +105,22 @@ sap.ui.define([
 
             if (sStatus) {
 
-                var aStatuses = sStatus.split(",");
+                var aStatuses =
+                    sStatus.split(",");
 
                 if (aStatuses.length > 1) {
 
                     aFilters.push(
                         new Filter({
-                            filters: aStatuses.map(function (s) {
-
-                                return new Filter(
-                                    "status",
-                                    FilterOperator.EQ,
-                                    s
-                                );
-
-                            }),
+                            filters: aStatuses.map(
+                                function (s) {
+                                    return new Filter(
+                                        "status",
+                                        FilterOperator.EQ,
+                                        s
+                                    );
+                                }
+                            ),
                             and: false
                         })
                     );
@@ -124,16 +136,27 @@ sap.ui.define([
                     );
                 }
 
-                if (oComboBox && aStatuses.length === 1) {
+                if (
+                    oComboBox &&
+                    aStatuses.length === 1
+                ) {
 
-                    var oMatch = oComboBox.getItems().filter(
-                        function (oItem) {
-                            return oItem.getKey() === aStatuses[0];
-                        }
-                    )[0];
+                    var oMatch =
+                        oComboBox
+                            .getItems()
+                            .filter(
+                                function (oItem) {
+                                    return (
+                                        oItem.getKey() ===
+                                        aStatuses[0]
+                                    );
+                                }
+                            )[0];
 
                     if (oMatch) {
-                        oComboBox.setSelectedItem(oMatch);
+                        oComboBox.setSelectedItem(
+                            oMatch
+                        );
                     }
                 }
 
@@ -147,8 +170,11 @@ sap.ui.define([
 
         onSearch: function (oEvent) {
 
-            var oTable = this.byId("claimsTable");
-            var oBinding = oTable.getBinding("items");
+            var oTable =
+                this.byId("claimsTable");
+
+            var oBinding =
+                oTable.getBinding("items");
 
             var sQuery =
                 oEvent.getParameter("newValue") ||
@@ -157,7 +183,8 @@ sap.ui.define([
 
             var aFilters = [];
 
-            var oStatusFilter = this._getStatusFilter();
+            var oStatusFilter =
+                this._getStatusFilter();
 
             if (oStatusFilter) {
                 aFilters.push(oStatusFilter);
@@ -179,18 +206,23 @@ sap.ui.define([
 
         onStatusFilterChange: function () {
 
-            var oTable = this.byId("claimsTable");
-            var oBinding = oTable.getBinding("items");
+            var oTable =
+                this.byId("claimsTable");
+
+            var oBinding =
+                oTable.getBinding("items");
 
             var aFilters = [];
 
-            var oStatusFilter = this._getStatusFilter();
+            var oStatusFilter =
+                this._getStatusFilter();
 
             if (oStatusFilter) {
                 aFilters.push(oStatusFilter);
             }
 
-            var sQuery = this.byId("claimsSearch").getValue();
+            var sQuery =
+                this.byId("claimsSearch").getValue();
 
             if (sQuery) {
 
@@ -208,9 +240,11 @@ sap.ui.define([
 
         _getStatusFilter: function () {
 
-            var oComboBox = this.byId("statusFilter");
+            var oComboBox =
+                this.byId("statusFilter");
 
-            var oItem = oComboBox.getSelectedItem();
+            var oItem =
+                oComboBox.getSelectedItem();
 
             if (!oItem) {
                 return null;
@@ -226,7 +260,8 @@ sap.ui.define([
         onClaimPress: function (oEvent) {
 
             var oContext =
-                oEvent.getSource().getBindingContext();
+                oEvent.getSource()
+                    .getBindingContext();
 
             if (!oContext) {
                 return;
@@ -242,9 +277,14 @@ sap.ui.define([
                 });
         },
 
+        /* ===================================================== */
+        /* ROW LEVEL APPROVAL                                   */
+        /* ===================================================== */
+
         onGoForApproval: function (oEvent) {
 
-            var oButton = oEvent.getSource();
+            var oButton =
+                oEvent.getSource();
 
             var oContext =
                 oButton.getBindingContext();
@@ -365,6 +405,16 @@ sap.ui.define([
                         oBinding.refresh();
                     }
 
+                    oTable.removeSelections(true);
+
+                    var oAIButton =
+                        this.byId("analyzeAIButton");
+
+                    if (oAIButton) {
+                        oAIButton.setVisible(false);
+                        oAIButton.setEnabled(false);
+                    }
+
                 }.bind(this))
 
                 .catch(function (oError) {
@@ -382,14 +432,629 @@ sap.ui.define([
                 });
         },
 
+        /* ===================================================== */
+        /* CLAIM SELECTION                                      */
+        /* ===================================================== */
+
+        onClaimSelectionChange: function (oEvent) {
+
+            var oSelectedItem =
+                oEvent.getParameter("listItem");
+
+            var oAIButton =
+                this.byId("analyzeAIButton");
+
+            if (!oAIButton) {
+                return;
+            }
+
+            if (!oSelectedItem) {
+
+                oAIButton.setVisible(false);
+                oAIButton.setEnabled(false);
+
+                return;
+            }
+
+            var oContext =
+                oSelectedItem.getBindingContext();
+
+            if (!oContext) {
+
+                oAIButton.setVisible(false);
+                oAIButton.setEnabled(false);
+
+                return;
+            }
+
+            oAIButton.setVisible(true);
+            oAIButton.setEnabled(true);
+        },
+
+        /* ===================================================== */
+        /* AI ANALYSIS                                          */
+        /* ===================================================== */
+
+        onAnalyzeSelectedClaim: function () {
+
+            var oTable =
+                this.byId("claimsTable");
+
+            var oSelectedItem =
+                oTable.getSelectedItem();
+
+            if (!oSelectedItem) {
+
+                MessageBox.warning(
+                    "Please select a claim first."
+                );
+
+                return;
+            }
+
+            var oContext =
+                oSelectedItem.getBindingContext();
+
+            if (!oContext) {
+
+                MessageBox.error(
+                    "Unable to read the selected claim."
+                );
+
+                return;
+            }
+
+            var sClaimId =
+                oContext.getProperty("ID");
+
+            var sClaimNumber =
+                oContext.getProperty("claimNumber");
+
+            if (!sClaimId) {
+
+                MessageBox.error(
+                    "Claim ID is missing."
+                );
+
+                return;
+            }
+
+            if (!this._oAIAnalysisDialog) {
+
+                Fragment.load({
+
+                    id: "aiAnalysis",
+
+                    name:
+                        "claimsure.app.fragment.AIAnalysisDialog",
+
+                    controller: this
+
+                })
+
+                    .then(function (oDialog) {
+
+                        this._oAIAnalysisDialog =
+                            oDialog;
+
+                        this.getView()
+                            .addDependent(oDialog);
+
+                        this._callAIAnalysis(
+                            sClaimId,
+                            sClaimNumber,
+                            oContext
+                        );
+
+                    }.bind(this))
+
+                    .catch(function (oError) {
+
+                        console.error(
+                            "AI fragment loading error:",
+                            oError
+                        );
+
+                        MessageBox.error(
+                            "Unable to open AI analysis."
+                        );
+
+                    });
+
+            } else {
+
+                this._callAIAnalysis(
+                    sClaimId,
+                    sClaimNumber,
+                    oContext
+                );
+            }
+        },
+
+        _callAIAnalysis: function (
+            sClaimId,
+            sClaimNumber,
+            oClaimContext
+        ) {
+
+            var oModel =
+                this.getView().getModel();
+
+            if (!oModel) {
+
+                MessageBox.error(
+                    "OData model is not available."
+                );
+
+                return;
+            }
+
+            var fClaimAmount =
+                Number(
+                    oClaimContext.getProperty(
+                        "claimedAmount"
+                    ) || 0
+                );
+
+            var sStatus =
+                oClaimContext.getProperty(
+                    "status"
+                ) || "";
+
+            var oAIModel =
+                new JSONModel({
+
+                    claimNumber:
+                        sClaimNumber,
+
+                    claimAmount:
+                        fClaimAmount.toLocaleString(
+                            "en-IN"
+                        ),
+
+                    status:
+                        sStatus,
+
+                    statusState:
+                        this._getStatusState(
+                            sStatus
+                        ),
+
+                    riskLevel:
+                        "Loading...",
+
+                    riskState:
+                        "None",
+
+                    fraudScore:
+                        "Loading...",
+
+                    fraudState:
+                        "None",
+
+                    analysisHtml:
+                        "<p>Analyzing claim...</p>"
+                });
+
+            this._oAIAnalysisDialog.setModel(
+                oAIModel,
+                "ai"
+            );
+
+            this._oAIAnalysisDialog.setBusy(true);
+            this._oAIAnalysisDialog.open();
+
+            var oAction =
+                oModel.bindContext(
+                    "/analyzeClaim(...)"
+                );
+
+            oAction.setParameter(
+                "claimID",
+                sClaimId
+            );
+
+            oAction.execute()
+
+                .then(function () {
+
+                    var oResult =
+                        oAction
+                            .getBoundContext()
+                            .getObject();
+
+                    console.log(
+                        "AI Analysis Result:",
+                        oResult
+                    );
+
+                    var sAnalysis =
+                        oResult.value ||
+                        oResult.analysis ||
+                        oResult;
+
+                    var sAnalysisText =
+                        typeof sAnalysis === "string"
+                            ? sAnalysis
+                            : JSON.stringify(
+                                sAnalysis,
+                                null,
+                                2
+                            );
+
+                    oAIModel.setProperty(
+                        "/analysisHtml",
+                        this._markdownToHtml(
+                            sAnalysisText
+                        )
+                    );
+
+                    var sRiskUrl =
+                        "/odata/v4/investigation/FraudRiskScores" +
+                        "?$filter=claim_ID%20eq%20" +
+                        sClaimId +
+                        "&$select=riskScore,riskLevel";
+
+                    return fetch(
+                        sRiskUrl,
+                        {
+                            method: "GET",
+
+                            headers: {
+                                "Accept":
+                                    "application/json"
+                            },
+
+                            credentials:
+                                "include"
+                        }
+                    );
+
+                }.bind(this))
+
+                .then(function (oResponse) {
+
+                    if (!oResponse) {
+                        return null;
+                    }
+
+                    if (!oResponse.ok) {
+
+                        throw new Error(
+                            "Unable to load fraud risk information. HTTP " +
+                            oResponse.status
+                        );
+                    }
+
+                    return oResponse.json();
+
+                })
+
+                .then(function (oFraudData) {
+
+                    if (oFraudData) {
+
+                        var aFraud =
+                            oFraudData.value || [];
+
+                        if (aFraud.length > 0) {
+
+                            var oFraud =
+                                aFraud[0];
+
+                            var iFraudScore =
+                                Number(
+                                    oFraud.riskScore
+                                );
+
+                            var sRiskLevel =
+                                oFraud.riskLevel ||
+                                "";
+
+                            oAIModel.setProperty(
+                                "/fraudScore",
+                                iFraudScore
+                            );
+
+                            oAIModel.setProperty(
+                                "/fraudState",
+                                this._getFraudState(
+                                    iFraudScore
+                                )
+                            );
+
+                            oAIModel.setProperty(
+                                "/riskLevel",
+                                sRiskLevel
+                            );
+
+                            oAIModel.setProperty(
+                                "/riskState",
+                                this._getRiskState(
+                                    sRiskLevel
+                                )
+                            );
+
+                        } else {
+
+                            oAIModel.setProperty(
+                                "/fraudScore",
+                                "N/A"
+                            );
+
+                            oAIModel.setProperty(
+                                "/fraudState",
+                                "None"
+                            );
+
+                            oAIModel.setProperty(
+                                "/riskLevel",
+                                "N/A"
+                            );
+
+                            oAIModel.setProperty(
+                                "/riskState",
+                                "None"
+                            );
+                        }
+                    }
+
+                    this._oAIAnalysisDialog.setBusy(
+                        false
+                    );
+
+                }.bind(this))
+
+                .catch(function (oError) {
+
+                    console.error(
+                        "AI analysis error:",
+                        oError
+                    );
+
+                    if (this._oAIAnalysisDialog) {
+
+                        this._oAIAnalysisDialog.setBusy(
+                            false
+                        );
+                    }
+
+                    MessageBox.error(
+                        oError.message ||
+                        "Failed to analyze the claim."
+                    );
+
+                }.bind(this));
+        },
+
+        /* ===================================================== */
+        /* STATUS COLORS                                        */
+        /* ===================================================== */
+
+        _getStatusState: function (sStatus) {
+
+            switch (sStatus) {
+
+                case "Approved":
+                case "Paid":
+                    return "Success";
+
+                case "Rejected":
+                    return "Error";
+
+                case "UnderReview":
+                case "InvestigationRequired":
+                    return "Warning";
+
+                case "PendingApproval":
+                case "Submitted":
+                    return "Information";
+
+                case "Draft":
+                    return "None";
+
+                default:
+                    return "None";
+            }
+        },
+
+        _getRiskState: function (sRiskLevel) {
+
+            switch (sRiskLevel) {
+
+                case "Critical":
+                    return "Error";
+
+                case "High":
+                    return "Warning";
+
+                case "Medium":
+                    return "Warning";
+
+                case "Low":
+                    return "Success";
+
+                default:
+                    return "None";
+            }
+        },
+
+        _getFraudState: function (iScore) {
+
+            iScore =
+                Number(iScore);
+
+            if (iScore > 75) {
+                return "Error";
+            }
+
+            if (iScore > 50) {
+                return "Warning";
+            }
+
+            if (iScore > 25) {
+                return "Information";
+            }
+
+            return "Success";
+        },
+
+        /* ===================================================== */
+        /* AI MARKDOWN FORMATTING                               */
+        /* ===================================================== */
+
+        _markdownToHtml: function (sText) {
+
+            if (!sText) {
+
+                return (
+                    "<p>No AI analysis available.</p>"
+                );
+            }
+
+            var sHtml =
+                String(sText);
+
+            sHtml =
+                sHtml
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;");
+
+            sHtml =
+                sHtml.replace(
+                    /^### (.*)$/gm,
+                    "<h4>$1</h4>"
+                );
+
+            sHtml =
+                sHtml.replace(
+                    /^## (.*)$/gm,
+                    "<h3>$1</h3>"
+                );
+
+            sHtml =
+                sHtml.replace(
+                    /^# (.*)$/gm,
+                    "<h2>$1</h2>"
+                );
+
+            sHtml =
+                sHtml.replace(
+                    /\*\*(.*?)\*\*/g,
+                    "<strong>$1</strong>"
+                );
+
+            sHtml =
+                sHtml.replace(
+                    /\bCritical\b/gi,
+                    "<strong style='color:#bb0000;'>Critical</strong>"
+                );
+
+            sHtml =
+                sHtml.replace(
+                    /\bHigh\b/gi,
+                    "<strong style='color:#e9730c;'>High</strong>"
+                );
+
+            sHtml =
+                sHtml.replace(
+                    /\bMedium\b/gi,
+                    "<strong style='color:#b26a00;'>Medium</strong>"
+                );
+
+            sHtml =
+                sHtml.replace(
+                    /\bLow\b/gi,
+                    "<strong style='color:#107e3e;'>Low</strong>"
+                );
+
+            sHtml =
+                sHtml.replace(
+                    /(Fraud Score[^0-9]*\d+(?:\s*\/\s*100)?)/gi,
+                    "<strong>$1</strong>"
+                );
+
+            sHtml =
+                sHtml.replace(
+                    /(₹[\d,]+(?:\.\d+)?(?:\s*INR)?)/gi,
+                    "<strong>$1</strong>"
+                );
+
+            sHtml =
+                sHtml.replace(
+                    /\bCLM\d+\b/gi,
+                    "<strong>$&</strong>"
+                );
+
+            sHtml =
+                sHtml.replace(
+                    /\bPolicy\s*\d+\b/gi,
+                    "<strong>$&</strong>"
+                );
+
+            sHtml =
+                sHtml.replace(
+                    /\b\d{4}-\d{2}-\d{2}\b/g,
+                    "<strong>$&</strong>"
+                );
+
+            sHtml =
+                sHtml.replace(
+                    /^- (.*)$/gm,
+                    "<li>$1</li>"
+                );
+
+            sHtml =
+                sHtml.replace(
+                    /((?:<li>.*?<\/li>\s*)+)/gs,
+                    "<ul>$1</ul>"
+                );
+
+            sHtml =
+                sHtml.replace(
+                    /\n\n/g,
+                    "<br><br>"
+                );
+
+            sHtml =
+                sHtml.replace(
+                    /\n/g,
+                    "<br>"
+                );
+
+            return sHtml;
+        },
+
+        /* ===================================================== */
+        /* AI DIALOG CLOSE                                      */
+        /* ===================================================== */
+
+        onCloseAIAnalysis: function () {
+
+            if (this._oAIAnalysisDialog) {
+
+                this._oAIAnalysisDialog.close();
+            }
+        },
+
+        /* ===================================================== */
+        /* CREATE CLAIM                                        */
+        /* ===================================================== */
+
         onCreateClaim: function () {
 
             if (!this._oCreateClaimDialog) {
 
                 Fragment.load({
+
                     id: "createClaim",
-                    name: "claimsure.app.view.CreateClaimDialog",
+
+                    name:
+                        "claimsure.app.view.CreateClaimDialog",
+
                     controller: this
+
                 })
 
                     .then(function (oDialog) {
@@ -638,6 +1303,10 @@ sap.ui.define([
                 });
         },
 
+        /* ===================================================== */
+        /* DOCUMENT                                             */
+        /* ===================================================== */
+
         _createAndUploadDocument: function (
             sClaimId,
             oFile
@@ -708,7 +1377,10 @@ sap.ui.define([
                 oModel.getServiceUrl();
 
             var sUrl =
-                sBaseUrl.replace(/\/$/, "") +
+                sBaseUrl.replace(
+                    /\/$/,
+                    ""
+                ) +
                 "/Claims(" +
                 sClaimId +
                 ")/documents(" +
@@ -739,6 +1411,7 @@ sap.ui.define([
                             method: "PUT",
 
                             headers: {
+
                                 "Content-Type":
                                     oFile.type ||
                                     "application/octet-stream",
@@ -747,9 +1420,11 @@ sap.ui.define([
                                     sToken
                             },
 
-                            body: oFile,
+                            body:
+                                oFile,
 
-                            credentials: "include"
+                            credentials:
+                                "include"
                         }
                     );
                 })
@@ -796,474 +1471,6 @@ sap.ui.define([
             }
 
             this._oSelectedFile = null;
-        },
-
-        /* ========================================================= */
-        /* AI CLAIM ANALYSIS                                        */
-        /* ========================================================= */
-        onAnalyzeClaim: function (oEvent) {
-
-            var oButton = oEvent.getSource();
-            var oContext = oButton.getBindingContext();
-
-            if (!oContext) {
-                MessageBox.error("Unable to read claim details.");
-                return;
-            }
-
-            var sClaimId = oContext.getProperty("ID");
-            var sClaimNumber = oContext.getProperty("claimNumber");
-
-            if (!sClaimId) {
-                MessageBox.error("Claim ID is missing.");
-                return;
-            }
-
-            if (!this._oAIAnalysisDialog) {
-
-                Fragment.load({
-                    id: "aiAnalysis",
-                    name: "claimsure.app.fragment.AIAnalysisDialog",
-                    controller: this
-                })
-                    .then(function (oDialog) {
-
-                        this._oAIAnalysisDialog = oDialog;
-
-                        this.getView().addDependent(oDialog);
-
-                        this._callAIAnalysis(
-                            sClaimId,
-                            sClaimNumber,
-                            oContext
-                        );
-
-                    }.bind(this))
-                    .catch(function (oError) {
-
-                        console.error(
-                            "AI fragment loading error:",
-                            oError
-                        );
-
-                        MessageBox.error(
-                            "Failed to load the AI analysis dialog. Check the browser console."
-                        );
-                    });
-
-            } else {
-
-                this._callAIAnalysis(
-                    sClaimId,
-                    sClaimNumber,
-                    oContext
-                );
-            }
-        },
-        _callAIAnalysis: function (
-            sClaimId,
-            sClaimNumber,
-            oClaimContext
-        ) {
-
-            var oModel = this.getView().getModel();
-
-            if (!oModel) {
-                MessageBox.error("OData model is not available.");
-                return;
-            }
-
-            var fClaimAmount = Number(
-                oClaimContext.getProperty("claimedAmount") || 0
-            );
-
-            var sStatus =
-                oClaimContext.getProperty("status") || "";
-
-            var oAIModel = new JSONModel({
-                claimNumber: sClaimNumber,
-
-                claimAmount:
-                    fClaimAmount.toLocaleString("en-IN"),
-
-                status: sStatus,
-
-                statusState:
-                    this._getStatusState(sStatus),
-
-                riskLevel: "Loading...",
-                riskState: "None",
-
-                fraudScore: "Loading...",
-                fraudState: "None",
-
-                analysisHtml:
-                    "<p>Analyzing claim...</p>"
-            });
-
-            this._oAIAnalysisDialog.setModel(
-                oAIModel,
-                "ai"
-            );
-
-            this._oAIAnalysisDialog.setBusy(true);
-            this._oAIAnalysisDialog.open();
-
-            var oAction =
-                oModel.bindContext(
-                    "/analyzeClaim(...)"
-                );
-
-            oAction.setParameter(
-                "claimID",
-                sClaimId
-            );
-
-            oAction.execute()
-
-                .then(function () {
-
-                    var oResult =
-                        oAction
-                            .getBoundContext()
-                            .getObject();
-
-                    console.log(
-                        "AI Analysis Result:",
-                        oResult
-                    );
-
-                    var sAnalysis =
-                        oResult.value ||
-                        oResult.analysis ||
-                        oResult;
-
-                    var sAnalysisText =
-                        typeof sAnalysis === "string"
-                            ? sAnalysis
-                            : JSON.stringify(
-                                sAnalysis,
-                                null,
-                                2
-                            );
-
-                    /* Remove unnecessary AI introduction */
-
-                    sAnalysisText =
-                        sAnalysisText.replace(
-                            /^(of course[,:\-]?\s*here(?:\s+is)?\s+(?:the\s+)?analysis\s+(?:of|for)\s+.*?\.\s*)/i,
-                            ""
-                        );
-
-                    oAIModel.setProperty(
-                        "/analysisHtml",
-                        this._markdownToHtml(
-                            sAnalysisText
-                        )
-                    );
-
-                    return fetch(
-                        "/odata/v4/investigation/FraudRiskScores" +
-                        "?$filter=claim_ID%20eq%20" +
-                        sClaimId +
-                        "&$select=riskScore,riskLevel",
-                        {
-                            method: "GET",
-                            headers: {
-                                "Accept": "application/json"
-                            },
-                            credentials: "include"
-                        }
-                    );
-
-                }.bind(this))
-
-                .then(function (oResponse) {
-
-                    if (!oResponse) {
-                        return null;
-                    }
-
-                    if (!oResponse.ok) {
-                        throw new Error(
-                            "Unable to load fraud risk information. HTTP " +
-                            oResponse.status
-                        );
-                    }
-
-                    return oResponse.json();
-
-                })
-
-                .then(function (oFraudData) {
-
-                    if (oFraudData) {
-
-                        var aFraud =
-                            oFraudData.value || [];
-
-                        if (aFraud.length > 0) {
-
-                            var oFraud =
-                                aFraud[0];
-
-                            var iFraudScore =
-                                Number(
-                                    oFraud.riskScore
-                                );
-
-                            var sRiskLevel =
-                                oFraud.riskLevel || "";
-
-                            oAIModel.setProperty(
-                                "/fraudScore",
-                                iFraudScore
-                            );
-
-                            oAIModel.setProperty(
-                                "/fraudState",
-                                this._getFraudState(
-                                    iFraudScore
-                                )
-                            );
-
-                            oAIModel.setProperty(
-                                "/riskLevel",
-                                sRiskLevel
-                            );
-
-                            oAIModel.setProperty(
-                                "/riskState",
-                                this._getRiskState(
-                                    sRiskLevel
-                                )
-                            );
-
-                        } else {
-
-                            oAIModel.setProperty(
-                                "/fraudScore",
-                                "N/A"
-                            );
-
-                            oAIModel.setProperty(
-                                "/fraudState",
-                                "None"
-                            );
-
-                            oAIModel.setProperty(
-                                "/riskLevel",
-                                "N/A"
-                            );
-
-                            oAIModel.setProperty(
-                                "/riskState",
-                                "None"
-                            );
-                        }
-                    }
-
-                    this._oAIAnalysisDialog.setBusy(false);
-
-                }.bind(this))
-
-                .catch(function (oError) {
-
-                    console.error(
-                        "AI analysis error:",
-                        oError
-                    );
-
-                    this._oAIAnalysisDialog.setBusy(false);
-
-                    MessageBox.error(
-                        oError.message ||
-                        "Failed to analyze the claim."
-                    );
-
-                }.bind(this));
-        },
-
-        _getStatusState: function (sStatus) {
-
-            switch (sStatus) {
-
-                case "Approved":
-                case "Paid":
-                    return "Success";
-
-                case "Rejected":
-                    return "Error";
-
-                case "UnderReview":
-                case "InvestigationRequired":
-                    return "Warning";
-
-                case "PendingApproval":
-                case "Submitted":
-                    return "Information";
-
-                case "Draft":
-                    return "None";
-
-                default:
-                    return "None";
-            }
-        },
-        _getRiskState: function (sRiskLevel) {
-
-            switch (sRiskLevel) {
-
-                case "Critical":
-                    return "Error";
-
-                case "High":
-                    return "Warning";
-
-                case "Medium":
-                    return "Warning";
-
-                case "Low":
-                    return "Success";
-
-                default:
-                    return "None";
-            }
-        },
-        _getFraudState: function (iScore) {
-
-            iScore = Number(iScore);
-
-            if (iScore > 75) {
-                return "Error";
-            }
-
-            if (iScore > 50) {
-                return "Warning";
-            }
-
-            if (iScore > 25) {
-                return "Information";
-            }
-
-            return "Success";
-        },
-
-        _markdownToHtml: function (sText) {
-
-            if (!sText) {
-                return "<p>No AI analysis available.</p>";
-            }
-
-            var sHtml = String(sText);
-
-            sHtml = sHtml
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;");
-
-            // Existing Markdown formatting
-            sHtml = sHtml.replace(
-                /^### (.*)$/gm,
-                "<h4>$1</h4>"
-            );
-
-            sHtml = sHtml.replace(
-                /^## (.*)$/gm,
-                "<h3>$1</h3>"
-            );
-
-            sHtml = sHtml.replace(
-                /^# (.*)$/gm,
-                "<h2>$1</h2>"
-            );
-
-            sHtml = sHtml.replace(
-                /\*\*(.*?)\*\*/g,
-                "<strong>$1</strong>"
-            );
-
-            // Highlight Risk Levels
-            sHtml = sHtml.replace(
-                /\bCritical\b/gi,
-                "<strong style='color:#bb0000;'>Critical</strong>"
-            );
-
-            sHtml = sHtml.replace(
-                /\bHigh\b/gi,
-                "<strong style='color:#e9730c;'>High</strong>"
-            );
-
-            sHtml = sHtml.replace(
-                /\bMedium\b/gi,
-                "<strong style='color:#b26a00;'>Medium</strong>"
-            );
-
-            sHtml = sHtml.replace(
-                /\bLow\b/gi,
-                "<strong style='color:#107e3e;'>Low</strong>"
-            );
-
-            // Highlight Fraud Score
-            sHtml = sHtml.replace(
-                /(Fraud Score[^0-9]*\d+(?:\s*\/\s*100)?)/gi,
-                "<strong>$1</strong>"
-            );
-
-            // Highlight INR amount
-            sHtml = sHtml.replace(
-                /(₹[\d,]+(?:\.\d+)?(?:\s*INR)?)/gi,
-                "<strong>$1</strong>"
-            );
-
-            // Highlight Claim Number
-            sHtml = sHtml.replace(
-                /\bCLM\d+\b/gi,
-                "<strong>$&</strong>"
-            );
-
-            // Highlight Policy Number
-            sHtml = sHtml.replace(
-                /\bPolicy\s*\d+\b/gi,
-                "<strong>$&</strong>"
-            );
-
-            // Highlight dates
-            sHtml = sHtml.replace(
-                /\b\d{4}-\d{2}-\d{2}\b/g,
-                "<strong>$&</strong>"
-            );
-
-            // Keep bullet points
-            sHtml = sHtml.replace(
-                /^- (.*)$/gm,
-                "<li>$1</li>"
-            );
-
-            sHtml = sHtml.replace(
-                /((?:<li>.*?<\/li>\s*)+)/gs,
-                "<ul>$1</ul>"
-            );
-
-            sHtml = sHtml.replace(
-                /\n\n/g,
-                "<br><br>"
-            );
-
-            sHtml = sHtml.replace(
-                /\n/g,
-                "<br>"
-            );
-
-            return sHtml;
-        },
-
-        onCloseAIAnalysis: function () {
-
-            if (this._oAIAnalysisDialog) {
-
-                this._oAIAnalysisDialog.close();
-            }
         }
 
     });

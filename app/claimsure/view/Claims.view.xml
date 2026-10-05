@@ -12,9 +12,18 @@
         <content>
             <Table
                 id="claimsTable"
+                mode="SingleSelectLeft"
+                includeItemInSelection="true"
                 growing="true"
                 growingThreshold="20"
-                class="sapUiResponsiveMargin"
+                autoPopinMode="true"
+                popinLayout="GridSmall"
+                sticky="ColumnHeaders,HeaderToolbar"
+                fixedLayout="true"
+                inset="false"
+                width="100%"
+                selectionChange="onClaimSelectionChange"
+                class="claimsTable"
                 items="{
                     path: '/Claims',
                     parameters: {
@@ -25,12 +34,17 @@
                 }"
                 noDataText="{i18n>noClaims}"
             >
+                <!-- ================================================= -->
+                <!-- HEADER TOOLBAR                                    -->
+                <!-- ================================================= -->
+
                 <headerToolbar>
-                    <OverflowToolbar>
+                    <OverflowToolbar class="claimsToolbar">
                         <Title
                             text="{i18n>navClaims}"
                             level="H2"
                         />
+
                         <ToolbarSpacer />
 
                         <SearchField
@@ -51,82 +65,143 @@
                                 text="Submitted"
                                 key="Submitted"
                             />
+
                             <core:Item
-                                text="UnderReview"
+                                text="Under Review"
                                 key="UnderReview"
                             />
+
                             <core:Item
-                                text="InvestigationRequired"
+                                text="Investigation Required"
                                 key="InvestigationRequired"
                             />
+
                             <core:Item
-                                text="PendingApproval"
+                                text="Pending Approval"
                                 key="PendingApproval"
                             />
+
                             <core:Item
                                 text="Approved"
                                 key="Approved"
                             />
+
                             <core:Item
                                 text="Rejected"
                                 key="Rejected"
                             />
+
                             <core:Item
                                 text="Paid"
                                 key="Paid"
                             />
                         </ComboBox>
 
+                        <ToolbarSeparator />
+
+                        <!-- ========================================= -->
+                        <!-- AI ANALYSIS                                -->
+                        <!-- ========================================= -->
+
+                        <Button
+                            id="analyzeAIButton"
+                            text="Analyze with AI"
+                            icon="sap-icon://ai"
+                            type="Emphasized"
+                            visible="false"
+                            enabled="false"
+                            press="onAnalyzeSelectedClaim"
+                            tooltip="Analyze selected claim with AI"
+                        />
+
+                        <!-- ========================================= -->
+                        <!-- NEW CLAIM                                  -->
+                        <!-- ========================================= -->
+
                         <Button
                             id="newClaimButton"
                             icon="sap-icon://add"
                             text="{i18n>newClaim}"
                             type="Emphasized"
-                            class="sapUiLargeMarginEnd"
                             press="onCreateClaim"
                         />
                     </OverflowToolbar>
                 </headerToolbar>
 
+                <!-- ================================================= -->
+                <!-- TABLE COLUMNS                                     -->
+                <!-- ================================================= -->
+
                 <columns>
-                    <Column>
+                    <!-- CLAIM NUMBER -->
+
+                    <Column
+                        width="9rem"
+                        importance="High"
+                    >
                         <Text text="{i18n>colClaimNumber}" />
                     </Column>
 
-                    <Column>
+                    <!-- CUSTOMER -->
+
+                    <Column
+                        width="11rem"
+                        importance="High"
+                    >
                         <Text text="{i18n>colCustomer}" />
                     </Column>
 
+                    <!-- CLAIM TYPE -->
+
                     <Column
-                        demandPopin="true"
-                        minScreenWidth="Tablet"
+                        width="12rem"
+                        importance="Medium"
                     >
                         <Text text="{i18n>colClaimType}" />
                     </Column>
 
-                    <Column hAlign="End">
+                    <!-- CLAIM AMOUNT -->
+
+                    <Column
+                        width="10rem"
+                        hAlign="End"
+                        importance="High"
+                    >
                         <Text text="{i18n>colAmount}" />
                     </Column>
 
+                    <!-- INCIDENT DATE -->
+
                     <Column
-                        demandPopin="true"
-                        minScreenWidth="Desktop"
+                        width="9rem"
+                        importance="Medium"
                     >
                         <Text text="{i18n>colIncidentDate}" />
                     </Column>
 
-                    <Column>
+                    <!-- STATUS -->
+
+                    <Column
+                        width="12rem"
+                        importance="High"
+                    >
                         <Text text="{i18n>colStatus}" />
                     </Column>
 
+                    <!-- ACTION -->
+
                     <Column
+                        width="9rem"
                         hAlign="Center"
-                        demandPopin="true"
-                        minScreenWidth="Tablet"
+                        importance="High"
                     >
                         <Text text="Action" />
                     </Column>
                 </columns>
+
+                <!-- ================================================= -->
+                <!-- TABLE ROWS                                        -->
+                <!-- ================================================= -->
 
                 <items>
                     <ColumnListItem
@@ -134,7 +209,11 @@
                         press="onClaimPress"
                     >
                         <cells>
+                            <!-- CLAIM NUMBER -->
+
                             <ObjectIdentifier title="{claimNumber}" />
+
+                            <!-- CUSTOMER -->
 
                             <Text
                                 text="{
@@ -144,7 +223,10 @@
                                     ],
                                     formatter: '.formatter.idToName'
                                 }"
+                                wrapping="false"
                             />
+
+                            <!-- CLAIM TYPE -->
 
                             <Text
                                 text="{
@@ -154,7 +236,10 @@
                                     ],
                                     formatter: '.formatter.idToName'
                                 }"
+                                wrapping="false"
                             />
+
+                            <!-- CLAIM AMOUNT -->
 
                             <ObjectNumber
                                 number="{
@@ -163,12 +248,17 @@
                                 }"
                             />
 
+                            <!-- INCIDENT DATE -->
+
                             <Text
                                 text="{
                                     path: 'incidentDate',
                                     formatter: '.formatter.shortDate'
                                 }"
+                                wrapping="false"
                             />
+
+                            <!-- STATUS -->
 
                             <ObjectStatus
                                 text="{status}"
@@ -182,31 +272,20 @@
                                 }"
                             />
 
-                            <HBox
-                                justifyContent="Center"
-                                alignItems="Center"
-                            >
-                                <Button
-                                    text="Go for Approval"
-                                    icon="sap-icon://approvals"
-                                    type="Emphasized"
-                                    visible="{
-            path: 'status',
-            targetType: 'any',
-            formatter: '.formatter.approvalButtonVisible'
-        }"
-                                    press="onGoForApproval"
-                                    class="sapUiTinyMarginEnd"
-                                />
+                            <!-- APPROVAL ACTION -->
 
-                                <Button
-                                    text="Analyze with AI"
-                                    icon="sap-icon://ai"
-                                    type="Transparent"
-                                    press="onAnalyzeClaim"
-                                    tooltip="Analyze claim using AI"
-                                />
-                            </HBox>
+                            <Button
+                                text="Approval"
+                                icon="sap-icon://approvals"
+                                type="Emphasized"
+                                visible="{
+                                    path: 'status',
+                                    targetType: 'any',
+                                    formatter: '.formatter.approvalButtonVisible'
+                                }"
+                                press="onGoForApproval"
+                                tooltip="Go for Approval"
+                            />
                         </cells>
                     </ColumnListItem>
                 </items>
