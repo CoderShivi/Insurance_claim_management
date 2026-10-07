@@ -36,7 +36,6 @@ module.exports = cds.service.impl(async function () {
             );
         }
 
-        // Check Claim
         const claim = await SELECT.one
             .from(Claims)
             .where({
@@ -50,60 +49,70 @@ module.exports = cds.service.impl(async function () {
             );
         }
 
-        // Check whether payout already exists
         let payout = await SELECT.one
             .from(Payouts)
             .where({
                 claim_ID: claimID
             });
 
-        /*
-         * EXISTING PAYOUT
-         */
         if (payout) {
 
             console.log(
                 `Existing payout found: ${payout.ID}, status: ${payout.status}`
             );
 
-            // Already successfully processed
             if (payout.status === 'Processed') {
-
-                console.log(
-                    `Payout ${payout.ID} is already Processed`
-                );
-
                 return payout;
             }
 
-            // Already created and waiting for payout approval
             if (payout.status === 'Pending') {
-
-                console.log(
-                    `Payout ${payout.ID} is Pending and waiting for approval`
-                );
-
                 return payout;
             }
 
-            // Another process is currently processing it
             if (payout.status === 'Processing') {
 
-                return req.error(
-                    400,
-                    `Payout ${payout.ID} is currently being processed`
-                );
+                await UPDATE(Payouts)
+                    .set({
+                        status: 'Processed'
+                    })
+                    .where({
+                        ID: payout.ID
+                    });
+
+                await UPDATE(Claims)
+                    .set({
+                        status: 'Paid'
+                    })
+                    .where({
+                        ID: claimID
+                    });
+
+                await INSERT.into(AlertLog).entries({
+
+                    ID: cds.utils.uuid(),
+
+                    claim_ID: claimID,
+
+                    alertType: 'PayoutSuccess',
+
+                    message:
+                        `Payout ${payout.payoutNumber} processed successfully`,
+
+                    status: 'Created'
+                });
+
+                return await SELECT.one
+                    .from(Payouts)
+                    .where({
+                        ID: payout.ID
+                    });
             }
+
             if (payout.status === 'Failed') {
-
-                console.log(
-                    `Payout ${payout.ID} previously failed`
-                );
-
                 return payout;
             }
         }
-        // A new payout can only be created for an Approved claim
+
         if (claim.status !== 'Approved') {
 
             return req.error(
@@ -111,7 +120,6 @@ module.exports = cds.service.impl(async function () {
                 `Payout can be created only for an approved claim. Current status: ${claim.status}`
             );
         }
-
 
         const payoutID = cds.utils.uuid();
 
@@ -149,13 +157,131 @@ module.exports = cds.service.impl(async function () {
         const { payoutID } = req.data;
 
         if (!payoutID) {
+            return req.error(400, 'payoutID is required');
+        }
+
+        const payout = await SELECT.one
+            .from(Payouts)
+            .where({ ID: payoutID });
+
+        if (!payout) {
+            return req.error(404, `Payout ${payoutID} not found`);
+        }
+
+        if (payout.status === 'Processed') {
+            return payout;
+        }
+
+        if (
+            payout.status !== 'Pending' &&
+            payout.status !== 'Failed' &&
+            payout.status !== 'Processing'
+        ) {
             return req.error(
                 400,
-                'payoutID is required'
+                `Payout cannot be processed. Current status: ${payout.status}`
             );
         }
 
-        // Find payout
+        const claim = await SELECT.one
+            .from(Claims)
+            .where({ ID: payout.claim_ID });
+
+        if (!claim) {
+            return req.error(404, 'Claim associated with payout not found');
+        }
+
+        if (claim.status !== 'Approved') {
+            return req.error(
+                400,
+                `Payout can be processed only for an approved claim. Current claim status: ${claim.status}`
+            );
+        }
+
+        try {
+
+            if (
+                payout.status === 'Pending' ||
+                payout.status === 'Failed'
+            ) {
+                await UPDATE(Payouts)
+                    .set({ status: 'Processing' })
+                    .where({ ID: payoutID });
+            }
+
+            const paymentSuccessful = true;
+
+            if (paymentSuccessful) {
+
+                await UPDATE(Payouts)
+                    .set({ status: 'Processed' })
+                    .where({ ID: payoutID });
+
+                await UPDATE(Claims)
+                    .set({ status: 'Paid' })
+                    .where({ ID: payout.claim_ID });
+
+                await INSERT.into(AlertLog).entries({
+                    ID: cds.utils.uuid(),
+                    claim_ID: payout.claim_ID,
+                    alertType: 'PayoutSuccess',
+                    message: `Payout ${payout.payoutNumber} processed successfully`,
+                    status: 'Created'
+                });
+
+                return await SELECT.one
+                    .from(Payouts)
+                    .where({ ID: payoutID });
+            }
+
+            await UPDATE(Payouts)
+                .set({ status: 'Failed' })
+                .where({ ID: payoutID });
+
+            await INSERT.into(AlertLog).entries({
+                ID: cds.utils.uuid(),
+                claim_ID: payout.claim_ID,
+                alertType: 'PayoutFailed',
+                message: `Payout ${payout.payoutNumber} failed`,
+                status: 'Created'
+            });
+
+            return await SELECT.one
+                .from(Payouts)
+                .where({ ID: payoutID });
+
+        } catch (error) {
+
+            console.error('Payout processing error:', error);
+
+            await UPDATE(Payouts)
+                .set({ status: 'Failed' })
+                .where({ ID: payoutID });
+
+            await INSERT.into(AlertLog).entries({
+                ID: cds.utils.uuid(),
+                claim_ID: payout.claim_ID,
+                alertType: 'PayoutFailed',
+                message: `Payout ${payout.payoutNumber} failed: ${error.message}`,
+                status: 'Created'
+            });
+
+            return req.error(
+                500,
+                `Payout processing failed: ${error.message}`
+            );
+        }
+    });
+
+
+    this.on('rejectPayout', async (req) => {
+
+        const { payoutID } = req.data;
+
+        if (!payoutID) {
+            return req.error(400, 'payoutID is required');
+        }
+
         const payout = await SELECT.one
             .from(Payouts)
             .where({
@@ -169,266 +295,45 @@ module.exports = cds.service.impl(async function () {
             );
         }
 
-        console.log(
-            `Processing payout ${payout.ID}, current status: ${payout.status}`
-        );
-
-
-        //Do not process the same payout twice.
-
         if (payout.status === 'Processed') {
-
-            console.log(
-                `Payout ${payout.ID} is already Processed`
+            return req.error(
+                400,
+                'Processed payout cannot be rejected'
             );
-
-            return payout;
         }
 
-        /*
-         * ONLY Pending OR Failed CAN BE PROCESSED
-         */
+        if (payout.status === 'Processing') {
+            return req.error(
+                400,
+                'Payout currently being processed cannot be rejected'
+            );
+        }
+
         if (
             payout.status !== 'Pending' &&
             payout.status !== 'Failed'
         ) {
-
-            return req.error(
-                400,
-                `Payout cannot be processed. Current status: ${payout.status}`
-            );
-        }
-
-        // Get associated claim
-        const claim = await SELECT.one
-            .from(Claims)
-            .where({
-                ID: payout.claim_ID
-            });
-
-        if (!claim) {
-            return req.error(
-                404,
-                'Claim associated with payout not found'
-            );
-        }
-
-
-        /*
-        * If the claim is already Paid, something is inconsistent
-        * because the payout should already be Processed.
-        */
-        if (claim.status !== 'Approved') {
-
-            return req.error(
-                400,
-                `Payout can be processed only for an approved claim. Current claim status: ${claim.status}`
-            );
-        }
-
-        try {
-
-            /*
-             * Pending / Failed
-             *        ↓
-             *    Processing
-             */
-
-            await UPDATE(Payouts)
-                .set({
-                    status: 'Processing'
-                })
-                .where({
-                    ID: payoutID
-                });
-
-            console.log(
-                `Payout ${payoutID} status changed to Processing`
-            );
-
-            /*
-             * PAYMENT PROCESSING
-             *
-             * Replace this later with actual payment integration.
-             */
-            const paymentSuccessful = true;
-
-            if (paymentSuccessful) {
-
-                /*
-                 * Processing
-                 *      ↓
-                 *  Processed
-                 */
-
-                await UPDATE(Payouts)
-                    .set({
-                        status: 'Processed'
-                    })
-                    .where({
-                        ID: payoutID
-                    });
-
-                /*
-                 * Claim
-                 * Approved
-                 *    ↓
-                 * Paid
-                 */
-
-                await UPDATE(Claims)
-                    .set({
-                        status: 'Paid'
-                    })
-                    .where({
-                        ID: payout.claim_ID
-                    });
-
-                console.log(
-                    `Payout ${payoutID} processed successfully`
-                );
-
-                /*
-                 * Success Alert
-                 */
-
-                await INSERT.into(AlertLog).entries({
-
-                    ID: cds.utils.uuid(),
-
-                    claim_ID: payout.claim_ID,
-
-                    alertType: 'PayoutSuccess',
-
-                    message:
-                        `Payout ${payout.payoutNumber} processed successfully`,
-
-                    status: 'Created'
-                });
-
-                /*
-                 * Return final payout
-                 */
-
-                return await SELECT.one
-                    .from(Payouts)
-                    .where({
-                        ID: payoutID
-                    });
-            }
-
-            /*
-             * PAYMENT FAILED
-             */
-
-            await UPDATE(Payouts)
-                .set({
-                    status: 'Failed'
-                })
-                .where({
-                    ID: payoutID
-                });
-
-            await INSERT.into(AlertLog).entries({
-
-                ID: cds.utils.uuid(),
-
-                claim_ID: payout.claim_ID,
-
-                alertType: 'PayoutFailed',
-
-                message:
-                    `Payout ${payout.payoutNumber} failed`,
-
-                status: 'Created'
-            });
-
-            return await SELECT.one
-                .from(Payouts)
-                .where({
-                    ID: payoutID
-                });
-
-        } catch (error) {
-
-            console.error(
-                'Payout processing error:',
-                error
-            );
-
-            /*
-             * Processing
-             *      ↓
-             *   Failed
-             */
-
-            await UPDATE(Payouts)
-                .set({
-                    status: 'Failed'
-                })
-                .where({
-                    ID: payoutID
-                });
-
-            /*
-             * Failure Alert
-             */
-
-            await INSERT.into(AlertLog).entries({
-
-                ID: cds.utils.uuid(),
-
-                claim_ID: payout.claim_ID,
-
-                alertType: 'PayoutFailed',
-
-                message:
-                    `Payout ${payout.payoutNumber} failed: ${error.message}`,
-
-                status: 'Created'
-            });
-
-            return req.error(
-                500,
-                `Payout processing failed: ${error.message}`
-            );
-        }
-
-    });
-
-
-    this.on('rejectPayout', async (req) => {
-        const { payoutID } = req.data;
-
-        if (!payoutID) {
-            return req.error(400, 'payoutID is required');
-        }
-
-        const payout = await SELECT.one
-            .from(Payouts)
-            .where({ ID: payoutID });
-
-        if (!payout) {
-            return req.error(404, `Payout ${payoutID} not found`);
-        }
-
-        if (payout.status === 'Processed') {
-            return req.error(400, 'Processed payout cannot be rejected');
-        }
-
-        if (payout.status === 'Processing') {
-            return req.error(400, 'Payout currently being processed cannot be rejected');
-        }
-
-        if (payout.status !== 'Pending' && payout.status !== 'Failed') {
             return req.error(
                 400,
                 `Payout cannot be rejected. Current status: ${payout.status}`
             );
         }
 
-        await DELETE.from(Payouts)
-            .where({ ID: payoutID });
+        await UPDATE(Payouts)
+            .set({
+                status: 'Failed'
+            })
+            .where({
+                ID: payoutID
+            });
+
+        await UPDATE(Claims)
+            .set({
+                status: 'Rejected'
+            })
+            .where({
+                ID: payout.claim_ID
+            });
 
         await INSERT.into(AlertLog).entries({
             ID: cds.utils.uuid(),
@@ -438,7 +343,11 @@ module.exports = cds.service.impl(async function () {
             status: 'Created'
         });
 
-        return true;
+        return await SELECT.one
+            .from(Payouts)
+            .where({
+                ID: payoutID
+            });
     });
 
     // CALCULATE SLA STATUS

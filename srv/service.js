@@ -501,13 +501,10 @@ module.exports = cds.service.impl(async function () {
     this.on('processPendingClaims', async (req) => {
 
         console.log(
-            "========== PROCESS PENDING CLAIMS =========="
+            " PROCESS PENDING CLAIMS "
         );
 
 
-        // ==========================================
-        // 1. GET PENDING APPROVAL CLAIMS
-        // ==========================================
 
         const pendingClaims = await SELECT
             .from(Claims)
@@ -521,10 +518,6 @@ module.exports = cds.service.impl(async function () {
             pendingClaims.length
         );
 
-
-        // ==========================================
-        // IF NO PENDING CLAIMS
-        // ==========================================
 
         if (pendingClaims.length === 0) {
 
@@ -546,9 +539,6 @@ module.exports = cds.service.impl(async function () {
         }
 
 
-        // ==========================================
-        // 2. CREATE EXCEL WORKBOOK
-        // ==========================================
 
         const workbook =
             new ExcelJS.Workbook();
@@ -560,9 +550,6 @@ module.exports = cds.service.impl(async function () {
             );
 
 
-        // ==========================================
-        // EXCEL HEADERS
-        // ==========================================
 
         worksheet.addRow([
 
@@ -579,9 +566,6 @@ module.exports = cds.service.impl(async function () {
         ]);
 
 
-        // ==========================================
-        // ADD CLAIM DATA TO EXCEL
-        // ==========================================
 
         for (const claim of pendingClaims) {
 
@@ -603,21 +587,12 @@ module.exports = cds.service.impl(async function () {
 
         }
 
-
-        // ==========================================
-        // EXCEL HEADER FORMATTING
-        // ==========================================
-
         worksheet.getRow(1).font = {
 
             bold: true
 
         };
 
-
-        // ==========================================
-        // EXCEL COLUMN WIDTH
-        // ==========================================
 
         worksheet.getColumn(1).width = 20;
 
@@ -629,10 +604,6 @@ module.exports = cds.service.impl(async function () {
 
         worksheet.getColumn(5).width = 20;
 
-
-        // ==========================================
-        // 3. CREATE EXPORT DIRECTORY
-        // ==========================================
 
         const exportDirectory = path.join(
 
@@ -658,10 +629,6 @@ module.exports = cds.service.impl(async function () {
         }
 
 
-        // ==========================================
-        // 4. CREATE EXCEL FILE
-        // ==========================================
-
         const filePath = path.join(
 
             exportDirectory,
@@ -685,11 +652,6 @@ module.exports = cds.service.impl(async function () {
             filePath
 
         );
-
-
-        // ==========================================
-        // 5. CREATE HTML EMAIL CONTENT
-        // ==========================================
 
         let claimsRows = "";
 
@@ -848,9 +810,6 @@ module.exports = cds.service.impl(async function () {
     `;
 
 
-        // ==========================================
-        // 6. CREATE EMAIL TRANSPORTER
-        // ==========================================
 
         const transporter =
             nodemailer.createTransport({
@@ -873,10 +832,6 @@ module.exports = cds.service.impl(async function () {
 
             });
 
-
-        // ==========================================
-        // 7. SEND EMAIL
-        // ==========================================
 
         try {
 
@@ -931,10 +886,6 @@ module.exports = cds.service.impl(async function () {
         }
 
 
-        // ==========================================
-        // 8. RETURN JOB RESPONSE
-        // ==========================================
-
         return {
 
             message:
@@ -986,9 +937,6 @@ module.exports = cds.service.impl(async function () {
             return req.error(400, 'Claim ID is required');
         }
 
-        // ==========================================
-        // 1. GET CLAIM
-        // ==========================================
 
         const claim = await SELECT.one
             .from(Claims)
@@ -1003,10 +951,6 @@ module.exports = cds.service.impl(async function () {
         console.log("Claim:", claim.claimNumber);
 
 
-        // ==========================================
-        // 2. GET POLICY
-        // ==========================================
-
         let policy = null;
 
         if (claim.policy_ID) {
@@ -1019,10 +963,6 @@ module.exports = cds.service.impl(async function () {
 
         }
 
-
-        // ==========================================
-        // 3. GET FRAUD RISK
-        // ==========================================
 
         const fraudRisk = await SELECT.one
             .from(FraudRiskScores)
@@ -1091,7 +1031,7 @@ module.exports = cds.service.impl(async function () {
             const aiResponse =
                 await analyzeClaim(claimData);
 
-                //console.log(aiResponse)
+            //console.log(aiResponse)
 
             console.log(
                 "AI analysis received successfully"
@@ -1288,4 +1228,4 @@ module.exports = cds.service.impl(async function () {
 
 
 
-})
+}) 

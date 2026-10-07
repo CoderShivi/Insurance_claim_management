@@ -174,8 +174,8 @@
 
                                 <SearchField width="320px" placeholder="Search by payout no., claim no., customer..." liveChange="onSearch" class="regSearch"/>
 
-                                <Button text="Filters" icon="sap-icon://filter" type="Transparent" class="sapUiSmallMarginBegin"/>
-
+<!--                                 <Button text="Filters" icon="sap-icon://filter" type="Transparent" class="sapUiSmallMarginBegin"/>
+ -->
                                 <Button text="Export" icon="sap-icon://export" type="Transparent" press="onExportPayouts" class="sapUiSmallMarginBegin"/>
 
                             </HBox>

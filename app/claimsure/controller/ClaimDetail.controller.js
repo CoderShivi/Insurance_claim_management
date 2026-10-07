@@ -627,59 +627,43 @@ sap.ui.define([
 
         onDocumentPress: function (oEvent) {
 
-            var oDocument =
-                oEvent.getSource()
-                    .getBindingContext(
-                        "claimDetail"
-                    )
-                    .getObject();
-
+            var oDocument = oEvent.getSource()
+                .getBindingContext("claimDetail")
+                .getObject();
 
             if (!oDocument || !oDocument.ID) {
-
-                MessageBox.error(
-                    "Unable to open document."
-                );
-
+                MessageBox.error("Unable to open document.");
                 return;
             }
 
-
-            var oInsuranceModel =
-                this.getView().getModel();
-
+            var oInsuranceModel = this.getView().getModel();
 
             if (!oInsuranceModel) {
-
-                MessageBox.error(
-                    "OData model is not available."
-                );
-
+                MessageBox.error("OData model is not available.");
                 return;
             }
 
-
-            var sBaseUrl =
-                oInsuranceModel
-                    .getServiceUrl()
-                    .replace(/\/$/, "");
-
+            var sBaseUrl = oInsuranceModel
+                .getServiceUrl()
+                .replace(/\/$/, "");
 
             var sUrl =
                 sBaseUrl +
-                "/Claims(" +
-                this._sClaimId +
-                ")/documents(" +
+                "/ClaimDocuments(" +
                 oDocument.ID +
                 ")/content";
 
+            console.log("========== DOCUMENT DEBUG ==========");
+            console.log("Document object:", oDocument);
+            console.log("Document ID:", oDocument.ID);
+            console.log("File name:", oDocument.fileName);
+            console.log("Media type:", oDocument.mediaType);
+            console.log("Base URL:", sBaseUrl);
+            console.log("Final document URL:", sUrl);
+            console.log("====================================");
 
-            window.open(
-                sUrl,
-                "_blank"
-            );
+            window.open(sUrl, "_blank");
         },
-
 
         /* ================================================================
          * NAVIGATION BACK
